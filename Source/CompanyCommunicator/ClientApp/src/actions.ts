@@ -6,6 +6,8 @@ import {
   getGroups,
   getSentNotifications,
   getTeams,
+  getUnits,
+  getUnit,
   searchGroups,
   verifyGroupAccess,
 } from "./apis/messageListApi";
@@ -19,6 +21,9 @@ import {
   selectedMessage,
   sentMessages,
   teamsData,
+  units,
+  unitGroups,
+  unitMembers,
   verifyGroup,
 } from "./messagesSlice";
 import { store } from "./store";
@@ -125,4 +130,22 @@ export const DraftMessageFetchStatusAction = (dispatch: typeof store.dispatch, p
 
 export const SentMessageFetchStatusAction = (dispatch: typeof store.dispatch, payload: boolean) => {
   dispatch(isSentMessagesFetchOn({ type: "SENT_MESSAGES_FETCH_STATUS", payload }));
+};
+
+export const GetUnitsAction = (dispatch: typeof store.dispatch) => {
+  getUnits().then((response) => {
+    dispatch(units({ type: "GET_UNITS", payload: response?.data || [] }));
+  });
+};
+
+export const GetUnitMembersAction = (dispatch: typeof store.dispatch, payload: { id: number }) => {
+  getUnit(payload.id).then((response) => {
+    dispatch(unitMembers({ type: "GET_UNIT_MEMBERS", payload: response?.members.data || [] }));
+  });
+};
+
+export const GetUnitGroupsAction = (dispatch: typeof store.dispatch, payload: { id: number }) => {
+  getUnit(payload.id).then((response) => {
+    dispatch(unitGroups({ type: "GET_UNIT_GROUPS", payload: response?.groups.data || [] }));
+  });
 };

@@ -101,5 +101,7 @@
   "ExportSuccessView": "Export success view loaded",
   "ExportFailureView": "Export failure view loaded",
   "NewMessageStep1": "Message form basic information step",
-  "NewMessageStep2": "Message form audience selection step"
+  "NewMessageStep2": "Message form audience selection step",
+  "RequestAccess": "Request access here",
+  "SelectUnitText":  "Please select your unit"
 }

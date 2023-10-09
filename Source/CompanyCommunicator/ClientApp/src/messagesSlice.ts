@@ -13,6 +13,9 @@ export interface MessagesState {
   verifyGroup: { action: string; payload: boolean };
   isDraftMessagesFetchOn: { action: string; payload: boolean };
   isSentMessagesFetchOn: { action: string; payload: boolean };
+  units: { action: string, payload: any[] };
+  unitMembers: { action: string; payload: any[] };
+  unitGroups: { action: string; payload: any[] };
 }
 
 const initialState: MessagesState = {
@@ -25,6 +28,9 @@ const initialState: MessagesState = {
   verifyGroup: { action: "VERIFY_GROUP_ACCESS", payload: false },
   isDraftMessagesFetchOn: { action: "DRAFT_MESSAGES_FETCH_STATUS", payload: false },
   isSentMessagesFetchOn: { action: "SENT_MESSAGES_FETCH_STATUS", payload: false },
+  units: {action: "GET_UNITS", payload: []},
+  unitMembers: { action: "GET_UNIT_MEMBERS", payload: [] },
+  unitGroups: { action: "GET_UNIT_GROUPS", payload: [] }
 };
 
 export const messagesSlice = createSlice({
@@ -58,6 +64,15 @@ export const messagesSlice = createSlice({
     isSentMessagesFetchOn: (state, action) => {
       state.isSentMessagesFetchOn = action.payload;
     },
+    units: (state, action) => {
+      state.units = action.payload;
+    },
+    unitMembers: (state, action) => {
+      state.unitMembers = action.payload;
+    },
+    unitGroups: (state, action) => {
+      state.unitGroups = action.payload;
+    },
   },
 });
 
@@ -71,6 +86,9 @@ export const {
   verifyGroup,
   isDraftMessagesFetchOn,
   isSentMessagesFetchOn,
+  units,
+  unitMembers,
+  unitGroups,
 } = messagesSlice.actions;
 
 export default messagesSlice.reducer;

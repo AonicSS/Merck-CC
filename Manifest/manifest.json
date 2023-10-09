@@ -1,0 +1,53 @@
+{
+  "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.5/MicrosoftTeams.schema.json",
+  "manifestVersion": "1.5",
+  "version": "5.4.1",
+  "id": "1c07cd26-a088-4db8-8928-ace382fa219f",
+  "packageName": "com.microsoft.teams.companycommunicator.authors",
+  "developer": {
+    "name": "Aonic",
+    "websiteUrl": "https://aonic.de/",
+    "privacyUrl": "https://aonic.de/",
+    "termsOfUseUrl": "https://aonic.de/"
+  },
+  "icons": {
+    "color": "color.png",
+    "outline": "outline.png"
+  },
+  "name": {
+    "short": "CC Local (Authors)",
+    "full": "CC Local (Authors)"
+  },
+  "description": {
+    "short": "Broadcast messages to multiple teams and people in one go",
+    "full": "Broadcasts messages to multiple teams and individuals through channel posts and chat messages"
+  },
+  "accentColor": "#64A2CC",
+  "configurableTabs": [{
+    "configurationUrl": "https://primate-strong-ideally.ngrok-free.app/configtab",
+    "canUpdateConfiguration": true,
+    "scopes": [
+      "team"
+    ]
+  }],
+  "bots": [{
+    "botId": "06e8da20-140f-49f6-a1e2-0afced426520",
+    "scopes": [
+      "team"
+    ],
+    "supportsFiles": true,
+    "isNotificationOnly": true
+  }],
+  "permissions": [
+    "identity",
+    "messageTeamMembers"
+  ],
+  "validDomains": [
+    "jcrcommunicator.azurefd.net",
+    "primate-strong-ideally.ngrok-free.app"
+  ],
+  "webApplicationInfo": {
+    "id": "06e8da20-140f-49f6-a1e2-0afced426520",
+    "resource": "api://primate-strong-ideally.ngrok-free.app"
+  }
+}
