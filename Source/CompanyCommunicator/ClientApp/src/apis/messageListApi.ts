@@ -130,23 +130,28 @@ const mockedUnitData = {
 };
 
 
+// get all units
 export const getUnits = async (): Promise<any> => {
   let url = baseAxiosUrl + "/units";
 
   return mockedUnitData;
 };
 
+// get a single unit
 export const getUnit = async (id: number): Promise<any> => {
   let url = baseAxiosUrl + "/units" + id;
 
   return mockedUnitData.data[0];
 };
 
+
+// update a single unit, return updated unit
 export const updateUnit = async (id: number): Promise<any> => {
   let url = baseAxiosUrl + "/units" + id;
 
   return mockedUnitData;
 };
+
 
 
 export const addUnitMember = async (id: number, newMember: { id: number, name: string, email: string }): Promise<any> => {
@@ -193,4 +198,25 @@ export const deleteUnitGroup = async (id: number, groupId: number): Promise<any>
   return mockedGroupData;
 
 
+};
+
+
+// delete a single unit, return 200 ok
+export const deleteUnit = async (id: number): Promise<any> => {
+  let url = baseAxiosUrl + "/units" + id;
+
+};
+
+// get all AD Groups,
+export const getADGroups = async (): Promise<any> => {
+  let url = baseAxiosUrl + "/adGroups";
+
+  
+};
+
+// get all users
+export const getUsers = async (): Promise<any> => {
+  let url = baseAxiosUrl + "/users";
+
+  
 };
