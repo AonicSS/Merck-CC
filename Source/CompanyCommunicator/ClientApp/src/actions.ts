@@ -8,8 +8,11 @@ import {
   getTeams,
   getUnits,
   getUnit,
+  getUsers,
+  getADGroups,
   searchGroups,
   verifyGroupAccess,
+  updateUnit,
 } from "./apis/messageListApi";
 import { formatDate } from "./i18n";
 import {
@@ -22,8 +25,11 @@ import {
   sentMessages,
   teamsData,
   units,
+  unit,
   unitGroups,
   unitMembers,
+  users,
+  adGroups,
   verifyGroup,
 } from "./messagesSlice";
 import { store } from "./store";
@@ -138,14 +144,32 @@ export const GetUnitsAction = (dispatch: typeof store.dispatch) => {
   });
 };
 
+export const GetUnitAction = (dispatch: typeof store.dispatch, payload: { id: number }) => {
+  getUnit(payload.id).then((response) => {
+    dispatch(unit({ type: "GET_UNIT", payload: response || [] }));
+  });
+};
+
 export const GetUnitMembersAction = (dispatch: typeof store.dispatch, payload: { id: number }) => {
   getUnit(payload.id).then((response) => {
-    dispatch(unitMembers({ type: "GET_UNIT_MEMBERS", payload: response?.members.data || [] }));
+    dispatch(unitMembers({ type: "GET_UNIT_MEMBERS", payload: response?.members || [] }));
   });
 };
 
 export const GetUnitGroupsAction = (dispatch: typeof store.dispatch, payload: { id: number }) => {
   getUnit(payload.id).then((response) => {
-    dispatch(unitGroups({ type: "GET_UNIT_GROUPS", payload: response?.groups.data || [] }));
+    dispatch(unitGroups({ type: "GET_UNIT_GROUPS", payload: response?.groups || [] }));
+  });
+};
+
+export const GetUsersAction = (dispatch: typeof store.dispatch) => {
+  getUsers().then((response) => {
+    dispatch(users({ type: "GET_USERS", payload: response?.data || [] }));
+  });
+};
+
+export const GetADGroupssAction = (dispatch: typeof store.dispatch) => {
+  getADGroups().then((response) => {
+    dispatch(adGroups({ type: "GET_AD_GROUPS", payload: response?.data || [] }));
   });
 };

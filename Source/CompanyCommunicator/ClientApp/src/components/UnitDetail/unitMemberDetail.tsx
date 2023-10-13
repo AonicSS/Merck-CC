@@ -23,11 +23,17 @@ import {
   DeleteRegular,
   People24Regular,
   MoreHorizontal24Filled,
-  Add24Filled
 } from "@fluentui/react-icons";
-import { GetUnitMembersAction } from "../../actions";
+import { GetUnitMembersAction, GetUsersAction } from "../../actions";
 import { deleteUnitMember, addUnitMember } from "../../apis/messageListApi";
-import { useAppDispatch } from "../../store";
+import { RootState, useAppDispatch, useAppSelector } from "../../store";
+import { ComboBox } from "../ComboBox/comboBox";
+
+interface MemberItem {
+  id: number;
+  name: string;
+  email: string;
+}
 
 export const UnitMemberDetail = (unitMembers: any) => {
   const { t } = useTranslation();
@@ -35,19 +41,37 @@ export const UnitMemberDetail = (unitMembers: any) => {
 
   const dispatch = useAppDispatch();
 
-  const addMember = async (id: number) => {
-    try {
-      await addUnitMember(id, { id: 4, name: "Jack Doe", email:"user4@email.com" });
-      GetUnitMembersAction(dispatch, { id: 1 });
-    } catch (error) {
-      return error;
+  // Get current units of the user from api endpoint
+  const unit = useAppSelector((state: RootState) => state.messages).unit.payload;
+  const users = useAppSelector((state: RootState) => state.messages).users.payload;
+  const options = users?.filter((item: any) => !unitMembers?.unitMembers?.some((elm: any) => elm.id === item.id));
+
+  const currentUnit: any = unit;
+
+
+  React.useEffect(() => {
+    if (users && users.length === 0) {
+      GetUsersAction(dispatch);
+    }
+  }, [dispatch, users]);
+
+
+
+  const addMember = async (item: MemberItem) => {
+    if (item) {
+      try {
+        await addUnitMember(currentUnit?.id, item);
+        GetUnitMembersAction(dispatch, { id: currentUnit?.id });
+      } catch (error) {
+        return error;
+      }
     }
   }
 
-  const deleteMember = async (id: number) => {
+  const deleteMember = async (memberId: number) => {
     try {
-      await deleteUnitMember(id, 1);
-      GetUnitMembersAction(dispatch, { id: 1 });
+      await deleteUnitMember(currentUnit?.id, memberId);
+      GetUnitMembersAction(dispatch, { id: currentUnit?.id });
     } catch (error) {
       return error;
     }
@@ -97,9 +121,7 @@ export const UnitMemberDetail = (unitMembers: any) => {
           ))}
         </TableBody>
       </Table>
-      <Button appearance="transparent" icon={<Add24Filled />} onClick={() => addMember(1)}>
-        Add User
-      </Button>
+      <ComboBox options={options} onSelect={addMember} placeholder="Add User" />
     </>
   );
 };

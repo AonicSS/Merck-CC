@@ -15,10 +15,10 @@ import {
 } from "@fluentui/react-components";
 import { PeopleAudience24Regular, Settings24Filled, Status24Regular } from "@fluentui/react-icons";
 import * as microsoftTeams from "@microsoft/teams-js";
-import { GetDraftMessagesSilentAction } from "../../actions";
+import { GetDraftMessagesSilentAction, GetUnitAction } from "../../actions";
 import { getBaseUrl } from "../../configVariables";
 import { ROUTE_PARTS, ROUTE_QUERY_PARAMS } from "../../routes";
-import { useAppDispatch } from "../../store";
+import { useAppDispatch, useAppSelector, RootState } from "../../store";
 import { DraftMessages } from "../DraftMessages/draftMessages";
 import { SentMessages } from "../SentMessages/sentMessages";
 import { HeaderContainer } from "../HeaderContainer/headerContainer";
@@ -33,13 +33,25 @@ export const UnitContainer = (props: IUnitContainer) => {
     const search = window.location.search;
     const params = new URLSearchParams(search);
     const unit = params.get("unit");
-    return unit;
+    return unit ? parseInt(unit, 10) : 0;
   }
 
-  const messageUrl = getBaseUrl() + `/${ROUTE_PARTS.NEW_MESSAGE}?${ROUTE_QUERY_PARAMS.LOCALE}={locale}`;
-  const unitUrl = getBaseUrl() + `/${ROUTE_PARTS.MANAGE_UNIT}?${ROUTE_QUERY_PARAMS.LOCALE}={locale}&unit=${getUnit()}`;
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
+
+  const unit = useAppSelector((state: RootState) => state.messages).unit.payload;
+
+  React.useEffect(() => {
+    if (unit && Object.keys(unit).length === 0) {
+      GetUnitAction(dispatch, { id: getUnit() });
+    }
+  }, []);
+
+  // select the current unit
+  const currentUnit:any = unit;
+
+  const messageUrl = getBaseUrl() + `/${ROUTE_PARTS.NEW_MESSAGE}?${ROUTE_QUERY_PARAMS.LOCALE}={locale}`;
+  const unitUrl = getBaseUrl() + `/${ROUTE_PARTS.MANAGE_UNIT}?${ROUTE_QUERY_PARAMS.LOCALE}={locale}&unit=${currentUnit?.id}`;
  
   const onManageUnit = () => {
     let taskInfo: microsoftTeams.TaskInfo = {
@@ -89,7 +101,7 @@ export const UnitContainer = (props: IUnitContainer) => {
       <div className="cc-unit-container-header">
         <div className="cc-unit-name">
           <PeopleAudience24Regular />
-          <h2>{ getUnit() }</h2>
+          <h2>{currentUnit?.name}</h2>
         </div>
         <div>
           <div className="cc-new-message">
