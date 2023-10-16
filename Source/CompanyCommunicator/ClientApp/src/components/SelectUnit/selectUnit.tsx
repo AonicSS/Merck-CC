@@ -22,7 +22,7 @@ import {
   Theme,
 } from "@fluentui/react-components";
 import { HeaderContainer } from "../HeaderContainer/headerContainer";
-import { GetUnitsAction } from "../../actions";
+import { GetUnitAction, GetUnitsAction } from "../../actions";
 
 interface ISelectUnit {
   theme: Theme;
@@ -31,8 +31,8 @@ interface ISelectUnit {
 const SelectUnit = (props: ISelectUnit) => {
   const keyboardNavAttr = useArrowNavigationGroup({ axis: "grid" });
   const { t } = useTranslation();
-  
-  function onSelectUnit(props: String) {
+
+  function onSelectUnit(props: number) {
     window.location.href = `/unitmessages?unit=${props}`;
   }
 
@@ -47,7 +47,6 @@ const SelectUnit = (props: ISelectUnit) => {
   }, []);
 
   const currentUserUnits = units;
-  console.log(currentUserUnits);
 
   return (
     <>
@@ -69,7 +68,7 @@ const SelectUnit = (props: ISelectUnit) => {
                   truncate
                   media={<PeopleAudience24Regular />}
                   style={{ cursor: 'pointer' }}
-                  onClick={() => onSelectUnit(item.name)}
+                  onClick={() => onSelectUnit(item.id)}
                 >
                   {item.name}
                 </TableCellLayout>

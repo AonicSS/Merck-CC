@@ -19,15 +19,21 @@ import {
   TableRow,
   useArrowNavigationGroup,
 } from "@fluentui/react-components";
+
 import {
   DeleteRegular,
   PeopleAudience24Regular,
   MoreHorizontal24Filled,
-  Add24Filled
 } from "@fluentui/react-icons";
-import { GetUnitGroupsAction } from "../../actions";
+import { GetADGroupssAction, GetUnitGroupsAction } from "../../actions";
 import { addUnitGroup, deleteUnitGroup } from "../../apis/messageListApi";
-import { useAppDispatch } from "../../store";
+import { useAppDispatch, useAppSelector, RootState } from "../../store";
+import { ComboBox } from "../ComboBox/comboBox";
+
+interface GroupItem {
+  id: number;
+  name: string;
+}
 
 export const UnitGroupDetail = (unitGroups: any) => {
   const { t } = useTranslation();
@@ -35,26 +41,39 @@ export const UnitGroupDetail = (unitGroups: any) => {
 
   const dispatch = useAppDispatch();
 
+  // Get current units of the user from api endpoint
+  const unit = useAppSelector((state: RootState) => state.messages).unit.payload;
+  const groups = useAppSelector((state: RootState) => state.messages).adGroups.payload;
+  const options = groups?.filter((item: any) => !unitGroups?.unitGroups?.some((elm: any) => elm.id === item.id));
 
-  const addGroup = async (id: number) => {
-    try {
-      await addUnitGroup(id, { id: 1, name: "Test_Grp_4" });
-      GetUnitGroupsAction(dispatch, { id: 1 });
-    } catch (error) {
-      return error;
+  const currentUnit:any = unit;
+
+  React.useEffect(() => {
+    if (groups && groups.length === 0) {
+      GetADGroupssAction(dispatch);
+    }
+  }, [dispatch, groups]);
+
+
+  const addGroup = async (item: GroupItem) => {
+    if (item) {
+      try {
+        await addUnitGroup(currentUnit?.id, item);
+        GetUnitGroupsAction(dispatch, { id: currentUnit?.id });
+      } catch (error) {
+        return error;
+      }
     }
   }
 
-  const deleteGroup = async (id: number) => {
+  const deleteGroup = async (groupId: number) => {
     try {
-      await deleteUnitGroup(id, 1);
-      GetUnitGroupsAction(dispatch, { id: 1 });
+      await deleteUnitGroup(currentUnit?.id, groupId);
+      GetUnitGroupsAction(dispatch, { id: currentUnit?.id });
     } catch (error) {
       return error;
     }
   };
-
-  console.log(unitGroups);
 
   return (
     <>
@@ -100,9 +119,7 @@ export const UnitGroupDetail = (unitGroups: any) => {
           ))}
         </TableBody>
       </Table>
-      <Button appearance="transparent" icon={<Add24Filled />} onClick={() => addGroup(1)}>
-        Add AD Group
-      </Button>
+      <ComboBox options={options} onSelect={addGroup} placeholder="Add AD Group" />
     </>
   );
 };

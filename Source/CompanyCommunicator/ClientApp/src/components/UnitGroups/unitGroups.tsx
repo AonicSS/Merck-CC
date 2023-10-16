@@ -10,17 +10,19 @@ import { UnitGroupDetail } from "../UnitDetail/unitGroupDetail";
 
 export const UnitGroups = () => {
   const { t } = useTranslation();
+  const unit = useAppSelector((state: RootState) => state.messages).unit.payload;
   const unitGroups = useAppSelector((state: RootState) => state.messages).unitGroups.payload;
   const loader = useAppSelector((state: RootState) => state.messages).isSentMessagesFetchOn.payload;
   const dispatch = useAppDispatch();
 
+  const currentUnit: any = unit;
+
   React.useEffect(() => {
     if (unitGroups && unitGroups.length === 0) {
-      GetUnitGroupsAction(dispatch, {id: 1});
+      GetUnitGroupsAction(dispatch, { id: currentUnit?.id });
     }
-  }, []);
+  }, [currentUnit]);
 
-  console.log(unitGroups);
 
   return (
     <>

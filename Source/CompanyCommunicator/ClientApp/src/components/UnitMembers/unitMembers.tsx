@@ -10,15 +10,18 @@ import { UnitMemberDetail } from "../UnitDetail/unitMemberDetail";
 
 export const UnitMembers = () => {
   const { t } = useTranslation();
+  const unit = useAppSelector((state: RootState) => state.messages).unit.payload;
   const unitMembers = useAppSelector((state: RootState) => state.messages).unitMembers.payload;
   const loader = useAppSelector((state: RootState) => state.messages).isSentMessagesFetchOn.payload;
   const dispatch = useAppDispatch();
 
+  const currentUnit: any = unit;
+
   React.useEffect(() => {
     if (unitMembers && unitMembers.length === 0) {
-      GetUnitMembersAction(dispatch, {"id": 1});
+      GetUnitMembersAction(dispatch, { id: currentUnit?.id });
     }
-  }, []);
+  }, [currentUnit]);
 
   return (
     <>
