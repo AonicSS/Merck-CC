@@ -3,6 +3,8 @@
 // Licensed under the MIT License.
 // </copyright>
 
+using Microsoft.Azure.Cosmos.Table;
+
 namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.NotificationData
 {
     using System;
@@ -54,6 +56,28 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.Notificat
         }
 
         /// <inheritdoc/>
+        public async Task<IEnumerable<NotificationDataEntity>> GetAllDraftNotificationsOfUnitAsync(string unitId)
+        {
+            var filter = TableQuery.GenerateFilterCondition(
+                nameof(NotificationDataEntity.UnitId),
+                QueryComparisons.Equal,
+                unitId);
+            var result = await this.GetWithFilterAsync(filter, NotificationDataTableNames.DraftNotificationsPartition);
+            return result;
+        }
+
+        /// <inheritdoc/>
+        public async Task<IEnumerable<NotificationDataEntity>> GetAllSentNotificationsOfUnitAsync(string unitId)
+        {
+            var filter = TableQuery.GenerateFilterCondition(
+                nameof(NotificationDataEntity.UnitId),
+                QueryComparisons.Equal,
+                unitId);
+            var result = await this.GetWithFilterAsync(filter, NotificationDataTableNames.SentNotificationsPartition);
+            return result;
+        }
+
+        /// <inheritdoc/>
         public async Task<IEnumerable<NotificationDataEntity>> GetMostRecentSentNotificationsAsync()
         {
             var result = await this.GetAllAsync(NotificationDataTableNames.SentNotificationsPartition, 25);
@@ -101,6 +125,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.Notificat
                     TotalMessageCount = draftNotificationEntity.TotalMessageCount,
                     SendingStartedDate = DateTime.UtcNow,
                     Status = NotificationStatus.Queued.ToString(),
+                    UnitId = draftNotificationEntity.UnitId,
                 };
                 await this.CreateOrUpdateAsync(sentNotificationEntity);
 
@@ -144,6 +169,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.Notificat
                     Groups = notificationEntity.Groups,
                     Rosters = notificationEntity.Rosters,
                     AllUsers = notificationEntity.AllUsers,
+                    UnitId = notificationEntity.UnitId,
                 };
 
                 if (!string.IsNullOrEmpty(notificationEntity.ImageBase64BlobName))

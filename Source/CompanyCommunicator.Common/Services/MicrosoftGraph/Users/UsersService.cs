@@ -144,6 +144,29 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.MicrosoftGrap
             return graphResult;
         }
 
+        /// <summary>
+        /// Get user by mail.
+        /// </summary>
+        /// <param name="mail">The user's email.</param>
+        /// <returns>The user data.</returns>
+        public async Task<User> GetUserByMailAsync(string mail)
+        {
+            var graphResult = await this.graphServiceClient
+                    .Users
+                    .Request()
+                    .Filter($"mail eq '{mail}'")
+                    .Select(user => new
+                    {
+                        user.Id,
+                        user.DisplayName,
+                        user.UserPrincipalName,
+                        user.UserType,
+                    })
+                    .WithMaxRetry(GraphConstants.MaxRetry)
+                    .GetAsync();
+            return graphResult.FirstOrDefault();
+        }
+
         /// <inheritdoc/>
         public async Task<(IEnumerable<User>, string)> GetAllUsersAsync(string deltaLink = null)
         {

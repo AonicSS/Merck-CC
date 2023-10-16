@@ -3,6 +3,8 @@
 // Licensed under the MIT License.
 // </copyright>
 
+using Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.Unit;
+
 namespace Microsoft.Teams.Apps.CompanyCommunicator
 {
     using System;
@@ -172,6 +174,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator
             services.AddSingleton<IExportDataRepository, ExportDataRepository>();
             services.AddSingleton<IAppConfigRepository, AppConfigRepository>();
             services.AddSingleton<ISendingNotificationDataRepository, SendingNotificationDataRepository>();
+            services.AddSingleton<IUnitDataRepository, UnitDataRepository>();
 
             // Add service bus message queues.
             services.AddSingleton<IPrepareToSendQueue, PrepareToSendQueue>();

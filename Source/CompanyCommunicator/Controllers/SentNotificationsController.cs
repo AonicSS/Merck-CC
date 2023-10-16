@@ -244,6 +244,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
                 CanDownload = userNotificationDownload == null,
                 SendingCompleted = notificationEntity.IsCompleted(),
                 CreatedBy = notificationEntity.CreatedBy,
+                UnitId = notificationEntity.UnitId,
             };
 
             // In case we have blob name instead of URL to public image.
