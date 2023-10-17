@@ -50,5 +50,12 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.MicrosoftGrap
         /// <param name="userId">User's AAD id.</param>
         /// <returns>true if the user has teams license, false otherwise.</returns>
         Task<bool> HasTeamsLicenseAsync(string userId);
+
+        /// <summary>
+        /// Get user by mail.
+        /// </summary>
+        /// <param name="mail">The user's email.</param>
+        /// <returns>The user data.</returns>
+        Task<User> GetUserByMailAsync(string mail);
     }
 }

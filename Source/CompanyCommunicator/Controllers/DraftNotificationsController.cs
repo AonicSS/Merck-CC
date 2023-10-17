@@ -270,6 +270,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
                 Rosters = notificationEntity.Rosters,
                 Groups = notificationEntity.Groups,
                 AllUsers = notificationEntity.AllUsers,
+                UnitId = notificationEntity.UnitId,
             };
 
             // In case we have blob name instead of URL to public image.

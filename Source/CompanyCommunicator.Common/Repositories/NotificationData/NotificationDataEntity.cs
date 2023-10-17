@@ -228,5 +228,10 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.Notificat
         /// Gets or sets the payload of the durable function instance.
         /// </summary>
         public string FunctionInstancePayload { get; set; }
+
+        /// <summary>
+        /// Gets or sets the unit id.
+        /// </summary>
+        public string UnitId { get; set; }
     }
 }
