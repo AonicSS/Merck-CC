@@ -28,7 +28,7 @@ export const UnitGroups = () => {
     <>
       {loader && <Spinner labelPosition="below" label="Fetching..." />}
       {unitGroups && unitGroups.length === 0 && !loader && <div>No Groups</div>}
-      {unitGroups && unitGroups.length > 0 && !loader && <UnitGroupDetail unitGroups={unitGroups} />}
+      {unitGroups && unitGroups.length > 0 && !loader && <UnitGroupDetail />}
     </>
   );
 };

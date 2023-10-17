@@ -33,24 +33,22 @@ export const UnitContainer = (props: IUnitContainer) => {
     const search = window.location.search;
     const params = new URLSearchParams(search);
     const unit = params.get("unit");
-    return unit ? parseInt(unit, 10) : 0;
+    return unit ? unit : "0";
   }
 
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
 
-  const unit = useAppSelector((state: RootState) => state.messages).unit.payload;
+  const currentUnit:any = useAppSelector((state: RootState) => state.messages).unit.payload;
 
   React.useEffect(() => {
-    if (unit && Object.keys(unit).length === 0) {
+    if (currentUnit && Object.keys(currentUnit).length === 0) {
       GetUnitAction(dispatch, { id: getUnit() });
     }
   }, []);
 
-  // select the current unit
-  const currentUnit:any = unit;
 
-  const messageUrl = getBaseUrl() + `/${ROUTE_PARTS.NEW_MESSAGE}?${ROUTE_QUERY_PARAMS.LOCALE}={locale}`;
+  const messageUrl = getBaseUrl() + `/${ROUTE_PARTS.NEW_MESSAGE}?${ROUTE_QUERY_PARAMS.LOCALE}={locale}&unit=${currentUnit?.id}`;
   const unitUrl = getBaseUrl() + `/${ROUTE_PARTS.MANAGE_UNIT}?${ROUTE_QUERY_PARAMS.LOCALE}={locale}&unit=${currentUnit?.id}`;
  
   const onManageUnit = () => {

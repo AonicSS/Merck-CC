@@ -22,7 +22,8 @@ import {
   Theme,
 } from "@fluentui/react-components";
 import { HeaderContainer } from "../HeaderContainer/headerContainer";
-import { GetUnitAction, GetUnitsAction } from "../../actions";
+import { GetUnitsAction } from "../../actions";
+import * as microsoftTeams from '@microsoft/teams-js';
 
 interface ISelectUnit {
   theme: Theme;
@@ -32,11 +33,9 @@ const SelectUnit = (props: ISelectUnit) => {
   const keyboardNavAttr = useArrowNavigationGroup({ axis: "grid" });
   const { t } = useTranslation();
 
-  function onSelectUnit(props: number) {
+  function onSelectUnit(props: string) {
     window.location.href = `/unitmessages?unit=${props}`;
   }
-
-  // TODO: Get current units of the user from api endpoint
   const units = useAppSelector((state: RootState) => state.messages).units.payload;
   const dispatch = useAppDispatch();
 
@@ -47,6 +46,12 @@ const SelectUnit = (props: ISelectUnit) => {
   }, []);
 
   const currentUserUnits = units;
+
+  const isAdmin = currentUserUnits.some(unit => unit.name === "Admin_Unit");
+
+  //if (isAdmin) {
+  //  window.location.href = `/messages`;
+  //}
 
   return (
     <>

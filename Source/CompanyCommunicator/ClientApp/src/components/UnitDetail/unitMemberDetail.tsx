@@ -24,7 +24,7 @@ import {
   People24Regular,
   MoreHorizontal24Filled,
 } from "@fluentui/react-icons";
-import { GetUnitMembersAction, GetUsersAction } from "../../actions";
+import { GetUsersAction, UpdateUnitAction } from "../../actions";
 import { deleteUnitMember, addUnitMember } from "../../apis/messageListApi";
 import { RootState, useAppDispatch, useAppSelector } from "../../store";
 import { ComboBox } from "../ComboBox/comboBox";
@@ -35,33 +35,30 @@ interface MemberItem {
   email: string;
 }
 
-export const UnitMemberDetail = (unitMembers: any) => {
+export const UnitMemberDetail = () => {
   const { t } = useTranslation();
   const keyboardNavAttr = useArrowNavigationGroup({ axis: "grid" });
 
   const dispatch = useAppDispatch();
 
   // Get current units of the user from api endpoint
-  const unit = useAppSelector((state: RootState) => state.messages).unit.payload;
+  const currentUnit:any = useAppSelector((state: RootState) => state.messages).unit.payload;
   const users = useAppSelector((state: RootState) => state.messages).users.payload;
-  const options = users?.filter((item: any) => !unitMembers?.unitMembers?.some((elm: any) => elm.id === item.id));
-
-  const currentUnit: any = unit;
-
+  const options = users?.filter((item: any) => !currentUnit.members?.some((elm: any) => elm.id === item.id));
 
   React.useEffect(() => {
     if (users && users.length === 0) {
       GetUsersAction(dispatch);
     }
-  }, [dispatch, users]);
+  }, [dispatch, users, currentUnit]);
 
 
 
   const addMember = async (item: MemberItem) => {
     if (item) {
       try {
-        await addUnitMember(currentUnit?.id, item);
-        GetUnitMembersAction(dispatch, { id: currentUnit?.id });
+        const updatedUnit = await addUnitMember(currentUnit?.id, item);
+        UpdateUnitAction(dispatch, updatedUnit);
       } catch (error) {
         return error;
       }
@@ -70,8 +67,8 @@ export const UnitMemberDetail = (unitMembers: any) => {
 
   const deleteMember = async (memberId: number) => {
     try {
-      await deleteUnitMember(currentUnit?.id, memberId);
-      GetUnitMembersAction(dispatch, { id: currentUnit?.id });
+      const updatedUnit = await deleteUnitMember(currentUnit?.id, memberId);
+      UpdateUnitAction(dispatch, updatedUnit);
     } catch (error) {
       return error;
     }
@@ -91,7 +88,7 @@ export const UnitMemberDetail = (unitMembers: any) => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {unitMembers!.unitMembers!.map((item: any) => (
+          {currentUnit?.members?.map((item: any) => (
             <TableRow key={item.id + 'key'}>
               <TableCell tabIndex={0} role='gridcell'>
                 <TableCellLayout

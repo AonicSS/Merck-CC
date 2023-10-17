@@ -13,20 +13,30 @@ import {
   MenuList,
   MenuPopover,
   MenuTrigger,
+  useId,
+  Input,
+  Dialog,
+  DialogTrigger,
+  DialogSurface,
+  DialogTitle,
+  DialogBody,
+  DialogActions,
+  DialogContent,
 } from "@fluentui/react-components";
+import * as microsoftTeams from '@microsoft/teams-js';
 import { PeopleAudience24Regular, MoreHorizontal24Filled, DeleteRegular, Pen24Regular } from "@fluentui/react-icons";
-import { UnitMembers } from "../UnitMembers/unitMembers";
-import { UnitGroups } from "../UnitGroups/unitGroups";
 import { useAppDispatch, useAppSelector, RootState } from "../../store";
-import { GetUnitAction } from "../../actions";
+import { GetUnitAction, UpdateUnitAction } from "../../actions";
 import { deleteUnit, updateUnit } from '../../apis/messageListApi';
+import { UnitMemberDetail } from '../UnitDetail/unitMemberDetail';
+import { UnitGroupDetail } from '../UnitDetail/unitGroupDetail';
 
 export const ManageUnit = () => {
   const getUnit = () => {
     const search = window.location.search;
     const params = new URLSearchParams(search);
     const unit = params.get("unit");
-    return unit ? parseInt(unit, 10) : 0;
+    return unit ? unit : "0";
   }
 
   const { t } = useTranslation();
@@ -34,40 +44,71 @@ export const ManageUnit = () => {
 
   const unit = useAppSelector((state: RootState) => state.messages).unit.payload;
 
+  const [currentUnit, setCurrentUnit]: any = React.useState(unit || []);
+  const [isEditing, setIsEditing] = React.useState(false);
+
   React.useEffect(() => {
     if (unit && Object.keys(unit).length === 0) {
       GetUnitAction(dispatch, { id: getUnit() });
     }
   }, []);
 
-  // select the current unit
-  const currentUnit: any = unit;
 
-  const renameUnit = async (id: number, name: string) => {
+  React.useEffect(() => {
+    if (Object.keys(unit).length === 0) {
+      UpdateUnitAction(dispatch, {
+        id: 0,
+        name: "New_Unit",
+        members: [],
+        groups: [],
+      });
+    } else {
+      setCurrentUnit(unit);
+    }
+  }, [unit]);
+
+  const removeUnit = async () => {
     try {
-      await updateUnit(id, name);
-      GetUnitAction(dispatch, { id: getUnit() });
+      await deleteUnit(currentUnit.id);
+      microsoftTeams.tasks.submitTask();
     } catch (error) {
       return error;
     }
   }
 
-  const removeUnit = async (id: number) => {
+  const handleRenameClick = () => {
+    setIsEditing(true);
+  }
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCurrentUnit({
+      ...currentUnit,
+      name: e.target.value
+    });
+  }
+
+  const onNext = async (event: any) => {
     try {
-      await deleteUnit(id);
-      window.location.href = `/selectUnit`;
+      await updateUnit(currentUnit);
+      GetUnitAction(dispatch, { id: currentUnit.id });
+      microsoftTeams.tasks.submitTask();
     } catch (error) {
       return error;
     }
-  }
+  };
 
+  const inputId = useId("input");
 
   return (
     <>
       <div className="cc-unit">
         <div className="cc-unit-name">
           <PeopleAudience24Regular />
-          <h2>{currentUnit?.name}</h2>
+          {isEditing ? (
+            <Input id={inputId} onChange={(event) => handleInputChange(event)} />
+          ) : (
+            <h2>{currentUnit?.name}</h2>
+          )}
         </div>
         <Menu>
           <MenuTrigger disableButtonEnhancement>
@@ -75,12 +116,30 @@ export const ManageUnit = () => {
           </MenuTrigger>
           <MenuPopover>
             <MenuList>
-              <MenuItem key={'renameKey'} icon={<Pen24Regular />} onClick={() => renameUnit(currentUnit?.id, "new_name")}>
+              {!isEditing && <MenuItem key={'renameKey'} icon={<Pen24Regular />} onClick={handleRenameClick}>
                 Rename
-              </MenuItem>
-              <MenuItem key={'deleteKey'} icon={<DeleteRegular />} onClick={() => removeUnit(currentUnit?.id)}>
-                {t('Delete')}
-              </MenuItem>
+              </MenuItem>}
+              <Dialog>
+                <DialogTrigger>
+                  <Button className="delete-dialog" icon={<DeleteRegular />}>{t('Delete')}</Button>
+                </DialogTrigger>
+                <DialogSurface>
+                  <DialogBody>
+                    <DialogTitle>Delete Unit?</DialogTitle>
+                    <DialogContent>
+                      Are you sure you want to delete this unit. This action cannot be undone.
+                    </DialogContent>
+                    <DialogActions>
+                      <DialogTrigger disableButtonEnhancement>
+                        <Button appearance="secondary">Close</Button>
+                      </DialogTrigger>
+                      <DialogTrigger>
+                        <Button onClick={() => removeUnit()} appearance="primary">Delete</Button>
+                      </DialogTrigger>
+                    </DialogActions>
+                  </DialogBody>
+                </DialogSurface>
+              </Dialog>
             </MenuList>
           </MenuPopover>
         </Menu>
@@ -90,19 +149,26 @@ export const ManageUnit = () => {
         If you would like to add a member to your unit or request access to a new AD Group,
         use the request button belwo</div>
       <Accordion defaultOpenItems={["1", "2"]} multiple collapsible>
-        <AccordionItem value="1" key="draftMessagesKey">
+        <AccordionItem value="1" key="unitMemberKey">
           <AccordionHeader>Unit</AccordionHeader>
           <AccordionPanel className="cc-accordion-panel">
-            <UnitMembers />
+            <UnitMemberDetail />
           </AccordionPanel>
         </AccordionItem>
-        <AccordionItem value="2" key="sentMessagesKey">
+        <AccordionItem value="2" key="unitGroupKey">
           <AccordionHeader>AD Groups</AccordionHeader>
           <AccordionPanel className="cc-accordion-panel">
-            <UnitGroups />
+            <UnitGroupDetail />
           </AccordionPanel>
         </AccordionItem>
       </Accordion>
+      <div className='fixed-footer'>
+        <div className='footer-action-right'>
+          <Button id='saveBtn' onClick={onNext} appearance='primary'>
+            Save
+          </Button>
+        </div>
+      </div>
     </>
   )
 }

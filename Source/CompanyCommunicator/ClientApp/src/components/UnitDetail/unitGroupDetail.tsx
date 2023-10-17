@@ -18,62 +18,87 @@ import {
   TableHeaderCell,
   TableRow,
   useArrowNavigationGroup,
+  Combobox,
+  Option,
+  useId,
+  ComboboxProps,
 } from "@fluentui/react-components";
 
 import {
   DeleteRegular,
   PeopleAudience24Regular,
   MoreHorizontal24Filled,
+  Add24Filled
 } from "@fluentui/react-icons";
-import { GetADGroupssAction, GetUnitGroupsAction } from "../../actions";
+import { SearchGroupsAction, UpdateUnitAction } from "../../actions";
 import { addUnitGroup, deleteUnitGroup } from "../../apis/messageListApi";
 import { useAppDispatch, useAppSelector, RootState } from "../../store";
-import { ComboBox } from "../ComboBox/comboBox";
 
 interface GroupItem {
-  id: number;
+  id: string;
   name: string;
 }
 
-export const UnitGroupDetail = (unitGroups: any) => {
+interface ITeamTemplate {
+  id: string;
+  name: string;
+}
+
+
+export const UnitGroupDetail = () => {
   const { t } = useTranslation();
   const keyboardNavAttr = useArrowNavigationGroup({ axis: "grid" });
 
   const dispatch = useAppDispatch();
 
   // Get current units of the user from api endpoint
-  const unit = useAppSelector((state: RootState) => state.messages).unit.payload;
-  const groups = useAppSelector((state: RootState) => state.messages).adGroups.payload;
-  const options = groups?.filter((item: any) => !unitGroups?.unitGroups?.some((elm: any) => elm.id === item.id));
+  const currentUnit:any = useAppSelector((state: RootState) => state.messages).unit.payload;
+  const queryGroups = useAppSelector((state: RootState) => state.messages).queryGroups.payload;
+  const unitGroups = currentUnit.groups;
+  const [filteredQueryGroups, setFilteredQueryGroups] = React.useState<ITeamTemplate[]>([]);
 
-  const currentUnit:any = unit;
 
   React.useEffect(() => {
-    if (groups && groups.length === 0) {
-      GetADGroupssAction(dispatch);
-    }
-  }, [dispatch, groups]);
-
+    const filteredItems = queryGroups.filter(item => !unitGroups.some((group: any) => group.name === item.name));
+    setFilteredQueryGroups(filteredItems);
+  }, [queryGroups, currentUnit]);
 
   const addGroup = async (item: GroupItem) => {
     if (item) {
       try {
-        await addUnitGroup(currentUnit?.id, item);
-        GetUnitGroupsAction(dispatch, { id: currentUnit?.id });
+        const updatedUnit = await addUnitGroup(currentUnit?.id, item);
+        UpdateUnitAction(dispatch, updatedUnit);
       } catch (error) {
         return error;
       }
     }
   }
 
-  const deleteGroup = async (groupId: number) => {
+  const deleteGroup = async (groupId: string) => {
     try {
-      await deleteUnitGroup(currentUnit?.id, groupId);
-      GetUnitGroupsAction(dispatch, { id: currentUnit?.id });
+      const updatedUnit = await deleteUnitGroup(currentUnit?.id, groupId);
+      UpdateUnitAction(dispatch, updatedUnit);
     } catch (error) {
       return error;
     }
   };
+
+  const onSearchChange = (event: any) => {
+    if (event?.target?.value) {
+      const q = encodeURIComponent(event.target.value);
+      SearchGroupsAction(dispatch, { query: q });
+    }
+  };
+
+  const onSearchSelect: ComboboxProps['onOptionSelect'] = (event, data: any) => {
+    const itemToAdd = {
+      id: data.optionValue,
+      name: data.optionText
+    }
+    addGroup(itemToAdd);
+  };
+
+  const comboId = useId("combo-default");
 
   return (
     <>
@@ -89,8 +114,8 @@ export const UnitGroupDetail = (unitGroups: any) => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {unitGroups!.unitGroups!.map((item: any) => (
-            <TableRow key={item.id + 'key'}>
+          {currentUnit?.groups?.map((item: any) => (
+            <TableRow key={'group' + item.id + 'key'}>
               <TableCell tabIndex={0} role='gridcell'>
                 <TableCellLayout
                   truncate
@@ -119,7 +144,28 @@ export const UnitGroupDetail = (unitGroups: any) => {
           ))}
         </TableBody>
       </Table>
-      <ComboBox options={options} onSelect={addGroup} placeholder="Add AD Group" />
+      <div style={{ display: "flex", alignItems: "center", gap: "15px", marginTop: "15px" }}>
+        <Add24Filled />
+        <Combobox
+          appearance='filled-darker'
+          size='large'
+          onOptionSelect={onSearchSelect}
+          onChange={onSearchChange}
+          aria-labelledby={comboId}
+          placeholder={t('searchForGroups') ?? ''}
+        >
+          {filteredQueryGroups.map((opt) => (
+            <Option text={opt.name} value={opt.id} key={opt.id}>
+              {opt.name}
+            </Option>
+          ))}
+          {unitGroups?.length === 0 ? (
+            <Option key="no-results" text="">
+              No results found
+            </Option>
+          ) : null}
+        </Combobox>
+      </div>
     </>
   );
 };

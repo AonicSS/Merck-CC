@@ -27,7 +27,7 @@ export const UnitMembers = () => {
     <>
       {loader && <Spinner labelPosition="below" label="Fetching..." />}
       {unitMembers && unitMembers.length === 0 && !loader && <div>No Members</div>}
-      {unitMembers && unitMembers.length > 0 && !loader && <UnitMemberDetail unitMembers={unitMembers} />}
+      {unitMembers && unitMembers.length > 0 && !loader && <UnitMemberDetail />}
     </>
   );
 };

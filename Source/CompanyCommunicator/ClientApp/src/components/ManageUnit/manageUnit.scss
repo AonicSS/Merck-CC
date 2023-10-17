@@ -2,4 +2,11 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 15px;
+}
+
+.delete-dialog {
+    border: none !important;
+    justify-content: start !important;
+    font-weight: normal !important;
 }
