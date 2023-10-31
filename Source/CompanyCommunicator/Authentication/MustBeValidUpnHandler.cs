@@ -24,7 +24,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Authentication
     {
         private readonly bool disableCreatorUpnCheck;
 
-        // private readonly HashSet<string> authorizedCreatorUpnsSet;
+        private readonly HashSet<string> authorizedCreatorUpnsSet;
         private readonly IUnitDataService unitDataService;
 
         /// <summary>
@@ -36,14 +36,13 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Authentication
         {
             this.unitDataService = unitDataService;
             this.disableCreatorUpnCheck = authenticationOptions.Value.DisableCreatorUpnCheck;
-            /*
+
             var authorizedCreatorUpns = authenticationOptions.Value.AuthorizedCreatorUpns;
             this.authorizedCreatorUpnsSet = authorizedCreatorUpns
                 ?.Split(new char[] { ';', ',' }, StringSplitOptions.RemoveEmptyEntries)
                 ?.Select(p => p.Trim())
                 ?.ToHashSet()
                 ?? new HashSet<string>();
-            */
         }
 
         /// <summary>
@@ -81,19 +80,13 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Authentication
                 return false;
             }
 
-            /*
-            bool upncheck = this.authorizedCreatorUpnsSet.Contains(upn, StringComparer.OrdinalIgnoreCase);
-            bool emailcheck = this.authorizedCreatorUpnsSet.Contains(email, StringComparer.OrdinalIgnoreCase);
+            var upncheck = this.authorizedCreatorUpnsSet.Contains(upn, StringComparer.OrdinalIgnoreCase);
+            var emailcheck = this.authorizedCreatorUpnsSet.Contains(email, StringComparer.OrdinalIgnoreCase);
 
             if (upncheck || emailcheck)
             {
                 return true;
             }
-            else
-            {
-                return false;
-            }
-            */
 
             var used = upn ?? email;
             var result = await this.unitDataService.IsUserInAnyUnitAsync(used);
