@@ -57,5 +57,15 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.MicrosoftGrap
         /// <param name="mail">The user's email.</param>
         /// <returns>The user data.</returns>
         Task<User> GetUserByMailAsync(string mail);
+
+        /// <summary>
+        /// Get user by userPrincipalName.
+        /// </summary>
+        /// <param name="upn">userPrincipalName.</param>
+        /// <returns>The user data.</returns>
+        Task<User> GetUserByUpnAsync(string upn);
+
+        /// <inheritdoc/>
+        Task<List<string>> GetUsersGroupIdsAsync(string userId);
     }
 }
