@@ -18,22 +18,33 @@ import {
   TableHeaderCell,
   TableRow,
   useArrowNavigationGroup,
+  Combobox,
+  Option,
+  useId,
+  ComboboxProps,
 } from "@fluentui/react-components";
+
 import {
   DeleteRegular,
-  People24Regular,
+  PeopleAudience24Regular,
   MoreHorizontal24Filled,
+  Add24Filled
 } from "@fluentui/react-icons";
 import { GetUsersAction, UpdateUnitAction } from "../../actions";
-import { deleteUnitMember, addUnitMember } from "../../apis/messageListApi";
-import { RootState, useAppDispatch, useAppSelector } from "../../store";
-import { ComboBox } from "../ComboBox/comboBox";
+import { useAppDispatch, useAppSelector, RootState } from "../../store";
 
-interface MemberItem {
-  id: number;
+interface UserItem {
+  id: string;
   name: string;
-  email: string;
+  mail: string;
 }
+
+interface ITeamTemplate {
+  id: string;
+  name: string;
+  mail: string;
+}
+
 
 export const UnitMemberDetail = () => {
   const { t } = useTranslation();
@@ -42,22 +53,22 @@ export const UnitMemberDetail = () => {
   const dispatch = useAppDispatch();
 
   // Get current units of the user from api endpoint
-  const currentUnit:any = useAppSelector((state: RootState) => state.messages).unit.payload;
-  const users = useAppSelector((state: RootState) => state.messages).users.payload;
-  const options = users?.filter((item: any) => !currentUnit.members?.some((elm: any) => elm.id === item.id));
+  const currentUnit: any = useAppSelector((state: RootState) => state.messages).unit.payload;
+  const queryUsers = useAppSelector((state: RootState) => state.messages).users.payload;
+  const unitUsers = currentUnit.users;
+  const [filteredQueryUsers, setFilteredQueryUsers] = React.useState<ITeamTemplate[]>([]);
+
 
   React.useEffect(() => {
-    if (users && users.length === 0) {
-      GetUsersAction(dispatch);
-    }
-  }, [dispatch, users, currentUnit]);
+    const filteredItems = queryUsers.filter(item => !unitUsers.some((user: any) => user.name === item.name));
+    setFilteredQueryUsers(filteredItems);
+  }, [queryUsers, currentUnit]);
 
-
-
-  const addMember = async (item: MemberItem) => {
+  const addUser = async (item: UserItem) => {
     if (item) {
       try {
-        const updatedUnit = await addUnitMember(currentUnit?.id, item);
+        const updatedUnit = { ...currentUnit };
+        updatedUnit.users = [...updatedUnit.users, item];
         UpdateUnitAction(dispatch, updatedUnit);
       } catch (error) {
         return error;
@@ -65,14 +76,35 @@ export const UnitMemberDetail = () => {
     }
   }
 
-  const deleteMember = async (memberId: number) => {
+  const deleteUser = async (userId: string) => {
     try {
-      const updatedUnit = await deleteUnitMember(currentUnit?.id, memberId);
+      const updatedUnit = { ...currentUnit };
+      updatedUnit.users = updatedUnit.users.filter((user: any) => user.id !== userId);
       UpdateUnitAction(dispatch, updatedUnit);
     } catch (error) {
       return error;
     }
   };
+
+  const onSearchChange = (event: any) => {
+    if (event?.target?.value) {
+      const q = encodeURIComponent(event.target.value);
+      GetUsersAction(dispatch, { query: q });
+    }
+  };
+
+
+  const onSearchSelect: ComboboxProps['onOptionSelect'] = (event, data: any) => {
+    const itemToAdd = {
+      id: data.optionValue,
+      name: data.optionText,
+      mail: data.optionValue,
+    }
+    addUser(itemToAdd);
+  };
+
+  const comboId = useId("combo-default");
+
 
   return (
     <>
@@ -88,12 +120,12 @@ export const UnitMemberDetail = () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {currentUnit?.members?.map((item: any) => (
-            <TableRow key={item.id + 'key'}>
+          {currentUnit?.users?.map((item: any) => (
+            <TableRow key={'user' + item.id + 'key'}>
               <TableCell tabIndex={0} role='gridcell'>
                 <TableCellLayout
                   truncate
-                  media={<People24Regular />}
+                  media={<PeopleAudience24Regular />}
                 >
                   {item.name}
                 </TableCellLayout>
@@ -106,7 +138,7 @@ export const UnitMemberDetail = () => {
                     </MenuTrigger>
                     <MenuPopover>
                       <MenuList>
-                        <MenuItem key={'deleteKey'} icon={<DeleteRegular />} onClick={() => deleteMember(item.id)}>
+                        <MenuItem key={'deleteKey'} icon={<DeleteRegular />} onClick={() => deleteUser(item.id)}>
                           {t('Delete')}
                         </MenuItem>
                       </MenuList>
@@ -118,7 +150,28 @@ export const UnitMemberDetail = () => {
           ))}
         </TableBody>
       </Table>
-      <ComboBox options={options} onSelect={addMember} placeholder="Add User" />
+      <div style={{ display: "flex", alignItems: "center", gap: "15px", marginTop: "15px" }}>
+        <Add24Filled />
+        <Combobox
+          appearance='filled-darker'
+          size='large'
+          onOptionSelect={onSearchSelect}
+          onChange={onSearchChange}
+          aria-labelledby={comboId}
+          placeholder="searchForUsers"
+        >
+          {filteredQueryUsers.map((opt) => (
+            <Option text={opt.name} value={opt.id} key={opt.id}>
+              {opt.name}
+            </Option>
+          ))}
+          {filteredQueryUsers?.length === 0 ? (
+            <Option key="no-results" text="">
+              No results found
+            </Option>
+          ) : null}
+        </Combobox>
+      </div>
     </>
   );
 };

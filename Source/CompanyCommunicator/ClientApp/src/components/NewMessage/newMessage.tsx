@@ -51,7 +51,7 @@ interface IMessageState {
   rosters: any[];
   groups: any[];
   allUsers: boolean;
-  unit: any;
+  unitId: any;
 }
 
 interface ITeamTemplate {
@@ -129,7 +129,7 @@ export const NewMessage = () => {
     rosters: [],
     groups: [],
     allUsers: false,
-    unit: {},
+    unitId: {},
   });
   const [filteredQueryGroups, setFilteredQueryGroups] = React.useState<ITeamTemplate[]>([]);
 
@@ -160,7 +160,7 @@ export const NewMessage = () => {
         SearchGroupsAction(dispatch, { query: q });
       });
     }
-    setMessageState({ ...messageState, unit: unit.name })
+    setMessageState({ ...messageState, unitId: unit.id })
   }, [dispatch, unit]);
 
   React.useEffect(() => {
@@ -225,8 +225,6 @@ export const NewMessage = () => {
     try {
       await getDraftNotification(id).then((response) => {
         const draftMessageDetail = response.data;
-
-        console.log(messageState);
         if (draftMessageDetail.teams.length > 0) {
           setSelectedRadioButton(AudienceSelection.Teams);
         } else if (draftMessageDetail.rosters.length > 0) {
@@ -249,7 +247,7 @@ export const NewMessage = () => {
           rosters: draftMessageDetail.rosters,
           groups: draftMessageDetail.groups,
           allUsers: draftMessageDetail.allUsers,
-          unit: draftMessageDetail.unit,
+          unitId: draftMessageDetail.unit,
         });
 
         setCardTitle(card, draftMessageDetail.title);
@@ -417,7 +415,17 @@ export const NewMessage = () => {
     if (id) {
       editDraftMessage(finalMessage);
     } else {
-      postDraftMessage(finalMessage);
+      finalMessage.groups.forEach(group => {
+        const message = {
+          title: finalMessage.title,
+          teams: finalMessage.teams,
+          rosters: finalMessage.rosters,
+          groups: [group],
+          allUsers: finalMessage.allUsers,
+          unitId: finalMessage.unitId
+        };
+        postDraftMessage(message);
+      });
     }
   };
 

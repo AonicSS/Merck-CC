@@ -48,7 +48,7 @@ export const MainContainer = (props: IMainContainer) => {
         document.getElementById("manageUnitId")?.focus();
       } else {
         //TODO: handle manage unit and groups
-        console.log("Handle manage unit and groups");
+        microsoftTeams.tasks.submitTask();
       }
     };
 
@@ -79,16 +79,18 @@ export const MainContainer = (props: IMainContainer) => {
     <>
       <HeaderContainer theme={props.theme} />
       <Divider />
-      <div className="cc-new-message">
-        <Button
-          id="newMessageButtonId"
-          icon={<Status24Regular />}
-          appearance="primary"
-          onClick={onNewMessage}
-        >
-          {t("NewMessage")}
-        </Button>
-      </div>
+      {
+        //<div className="cc-new-message">
+        //  <Button
+        //    id="newMessageButtonId"
+        //    icon={<Status24Regular />}
+        //    appearance="primary"
+        //    onClick={onNewMessage}
+        //  >
+        //    {t("NewMessage")}
+        //  </Button>
+        //</div>
+      }
       <div className="cc-new-message">
         <Button
           id="manageUnitId"

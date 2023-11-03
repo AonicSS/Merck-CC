@@ -18,7 +18,8 @@ export interface MessagesState {
   unitMembers: { action: string; payload: any[] };
   unitGroups: { action: string; payload: any[] };
   users: { action: string; payload: any[] };
-  adGroups: { action: string; payload: any[] };
+  user: { action: string; payload: any[] }
+  isAdmin: { action: string; payload: boolean };
 }
 
 const initialState: MessagesState = {
@@ -36,7 +37,8 @@ const initialState: MessagesState = {
   unitMembers: { action: "GET_UNIT_MEMBERS", payload: [] },
   unitGroups: { action: "GET_UNIT_GROUPS", payload: [] },
   users: { action: "GET_UNIT_GROUPS", payload: [] },
-  adGroups: { action: "GET_UNIT_GROUPS", payload: [] }
+  user: { action: "GET_USER", payload: [] },
+  isAdmin: { action: "IS_ADMIN", payload: false }
 };
 
 export const messagesSlice = createSlice({
@@ -85,9 +87,12 @@ export const messagesSlice = createSlice({
     users: (state, action) => {
       state.users = action.payload;
     },
-    adGroups: (state, action) => {
-      state.adGroups = action.payload;
+    user: (state, action) => {
+      state.user = action.payload;
     },
+    isAdmin: (state, action) => {
+      state.isAdmin = action.payload;
+    }
   },
 });
 
@@ -106,7 +111,8 @@ export const {
   unitMembers,
   unitGroups,
   users,
-  adGroups
+  user,
+  isAdmin,
 } = messagesSlice.actions;
 
 export default messagesSlice.reducer;

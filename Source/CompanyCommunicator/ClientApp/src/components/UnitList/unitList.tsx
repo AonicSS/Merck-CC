@@ -46,15 +46,14 @@ export const UnitList = () => {
   const keyboardNavAttr = useArrowNavigationGroup({ axis: "grid" });
   const dispatch = useAppDispatch();
 
-  const units = useAppSelector((state: RootState) => state.messages).units.payload;
+  const currentUserUnits = useAppSelector((state: RootState) => state.messages).units.payload;
 
   React.useEffect(() => {
-    if (units && units.length === 0) {
+    if (currentUserUnits && currentUserUnits.length === 0) {
       GetUnitsAction(dispatch);
     }
   }, []);
 
-  const currentUserUnits = units;
 
   const onManageUnit = (id: string) => {
     const unitUrl = getBaseUrl() + `/${ROUTE_PARTS.MANAGE_UNIT}?${ROUTE_QUERY_PARAMS.LOCALE}={locale}&unit=${id}`;
@@ -116,7 +115,7 @@ export const UnitList = () => {
                 </TableCellLayout>
               </TableCell>
               <TableCell tabIndex={0} role='gridcell'>
-                <TableCellLayout>{ unit.members.length}</TableCellLayout>
+                <TableCellLayout>{ unit.size}</TableCellLayout>
               </TableCell>
               <TableCell role='gridcell' style={{ width: '50px' }}>
                 <TableCellLayout>

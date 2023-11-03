@@ -9,8 +9,12 @@ import {
   getUnits,
   getUnit,
   getUsers,
+  getUnitDraftNotification,
+  getUnitSentNotification,
   searchGroups,
   verifyGroupAccess,
+  getUser,
+  getUserUnits,
 } from "./apis/messageListApi";
 import { formatDate } from "./i18n";
 import {
@@ -27,6 +31,7 @@ import {
   unitGroups,
   unitMembers,
   users,
+  user,
   verifyGroup,
 } from "./messagesSlice";
 import { store } from "./store";
@@ -88,6 +93,28 @@ export const GetDraftMessagesAction = (dispatch: typeof store.dispatch) => {
     });
 };
 
+export const GetUnitDraftMessagesAction = (dispatch: typeof store.dispatch, payload: { id: string }) => {
+  DraftMessageFetchStatusAction(dispatch, true);
+  getUnitDraftNotification(payload.id)
+    .then((response) => {
+      dispatch(draftMessages({ type: "FETCH_DRAFT_MESSAGES", payload: response?.data || [] }));
+    })
+    .finally(() => {
+      DraftMessageFetchStatusAction(dispatch, false);
+    });
+};
+
+export const GetUnitSentMessagesAction = (dispatch: typeof store.dispatch, payload: { id: string }) => {
+  SentMessageFetchStatusAction(dispatch, true);
+  getUnitSentNotification(payload.id)
+    .then((response) => {
+      dispatch(sentMessages({ type: "FETCH_MESSAGES", payload: response?.data || [] }));
+    })
+    .finally(() => {
+      SentMessageFetchStatusAction(dispatch, false);
+    });
+};
+
 export const GetDraftMessagesSilentAction = (dispatch: typeof store.dispatch) => {
   getDraftNotifications().then((response) => {
     dispatch(draftMessages({ type: "FETCH_DRAFT_MESSAGES", payload: response?.data || [] }));
@@ -137,13 +164,20 @@ export const SentMessageFetchStatusAction = (dispatch: typeof store.dispatch, pa
 
 export const GetUnitsAction = (dispatch: typeof store.dispatch) => {
   getUnits().then((response) => {
+    console.log(response);
+    dispatch(units({ type: "GET_UNITS", payload: response?.data || [] }));
+  });
+};
+
+export const GetUserUnitsAction = (dispatch: typeof store.dispatch, payload: { id: string }) => {
+  getUserUnits(payload.id).then((response) => {
     dispatch(units({ type: "GET_UNITS", payload: response?.data || [] }));
   });
 };
 
 export const GetUnitAction = (dispatch: typeof store.dispatch, payload: { id: string }) => {
   getUnit(payload.id).then((response) => {
-    dispatch(unit({ type: "GET_UNIT", payload: response || [] }));
+    dispatch(unit({ type: "GET_UNIT", payload: response?.data || [] }));
   });
 };
 
@@ -163,8 +197,14 @@ export const GetUnitGroupsAction = (dispatch: typeof store.dispatch, payload: { 
   });
 };
 
-export const GetUsersAction = (dispatch: typeof store.dispatch) => {
-  getUsers().then((response) => {
+export const GetUsersAction = (dispatch: typeof store.dispatch, payload: { query: string }) => {
+  getUsers(payload.query).then((response) => {
     dispatch(users({ type: "GET_USERS", payload: response?.data || [] }));
+  });
+};
+
+export const GetUserAction = (dispatch: typeof store.dispatch, payload: { mail: string }) => {
+  getUser(payload.mail).then((response) => {
+    dispatch(user({ type: "GET_USER", payload: response?.data || [] }));
   });
 };

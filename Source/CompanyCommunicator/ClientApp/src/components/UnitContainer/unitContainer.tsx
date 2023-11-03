@@ -39,7 +39,7 @@ export const UnitContainer = (props: IUnitContainer) => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
 
-  const currentUnit:any = useAppSelector((state: RootState) => state.messages).unit.payload;
+  const currentUnit: any = useAppSelector((state: RootState) => state.messages).unit.payload;
 
   React.useEffect(() => {
     if (currentUnit && Object.keys(currentUnit).length === 0) {
@@ -50,7 +50,7 @@ export const UnitContainer = (props: IUnitContainer) => {
 
   const messageUrl = getBaseUrl() + `/${ROUTE_PARTS.NEW_MESSAGE}?${ROUTE_QUERY_PARAMS.LOCALE}={locale}&unit=${currentUnit?.id}`;
   const unitUrl = getBaseUrl() + `/${ROUTE_PARTS.MANAGE_UNIT}?${ROUTE_QUERY_PARAMS.LOCALE}={locale}&unit=${currentUnit?.id}`;
- 
+
   const onManageUnit = () => {
     let taskInfo: microsoftTeams.TaskInfo = {
       url: unitUrl,
@@ -64,8 +64,7 @@ export const UnitContainer = (props: IUnitContainer) => {
       if (result === null) {
         document.getElementById("manageUnitId")?.focus();
       } else {
-        //TODO: handle manage unit and groups
-        console.log("Handle manage unit and groups");
+        microsoftTeams.tasks.submitTask();
       }
     };
 
@@ -128,13 +127,13 @@ export const UnitContainer = (props: IUnitContainer) => {
         <AccordionItem value="1" key="draftMessagesKey">
           <AccordionHeader>{t("DraftMessagesSectionTitle")}</AccordionHeader>
           <AccordionPanel className="cc-accordion-panel">
-            <DraftMessages />
+            {currentUnit.id && < DraftMessages />}
           </AccordionPanel>
         </AccordionItem>
         <AccordionItem value="2" key="sentMessagesKey">
           <AccordionHeader>{t("SentMessagesSectionTitle")}</AccordionHeader>
           <AccordionPanel className="cc-accordion-panel">
-            <SentMessages />
+            {currentUnit.id && < SentMessages />}
           </AccordionPanel>
         </AccordionItem>
       </Accordion>

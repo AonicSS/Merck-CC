@@ -4,19 +4,25 @@
 import * as React from "react";
 import { useTranslation } from "react-i18next";
 import { Spinner } from "@fluentui/react-components";
-import { GetDraftMessagesAction } from "../../actions";
+import { GetDraftMessagesAction, GetUnitDraftMessagesAction } from "../../actions";
 import { RootState, useAppDispatch, useAppSelector } from "../../store";
 import { DraftMessageDetail } from "../MessageDetail/draftMessageDetail";
 
 export const DraftMessages = () => {
   const { t } = useTranslation();
+  const currentUnit: any = useAppSelector((state: RootState) => state.messages).unit.payload;
+  const isAdmin: boolean = useAppSelector((state: RootState) => state.messages).isAdmin.payload;
   const draftMessages = useAppSelector((state: RootState) => state.messages).draftMessages.payload;
   const loader = useAppSelector((state: RootState) => state.messages).isDraftMessagesFetchOn.payload;
   const dispatch = useAppDispatch();
 
   React.useEffect(() => {
     if (draftMessages && draftMessages.length === 0) {
-      GetDraftMessagesAction(dispatch);
+      if (!isAdmin) {
+        GetUnitDraftMessagesAction(dispatch, {id: currentUnit.id});
+      } else {
+        GetDraftMessagesAction(dispatch)
+      }
     }
   }, []);
 

@@ -31,7 +31,6 @@ import {
   Add24Filled
 } from "@fluentui/react-icons";
 import { SearchGroupsAction, UpdateUnitAction } from "../../actions";
-import { addUnitGroup, deleteUnitGroup } from "../../apis/messageListApi";
 import { useAppDispatch, useAppSelector, RootState } from "../../store";
 
 interface GroupItem {
@@ -66,7 +65,8 @@ export const UnitGroupDetail = () => {
   const addGroup = async (item: GroupItem) => {
     if (item) {
       try {
-        const updatedUnit = await addUnitGroup(currentUnit?.id, item);
+        const updatedUnit = { ...currentUnit }
+        updatedUnit.groups = [...updatedUnit.groups, item];
         UpdateUnitAction(dispatch, updatedUnit);
       } catch (error) {
         return error;
@@ -76,7 +76,8 @@ export const UnitGroupDetail = () => {
 
   const deleteGroup = async (groupId: string) => {
     try {
-      const updatedUnit = await deleteUnitGroup(currentUnit?.id, groupId);
+      const updatedUnit = { ...currentUnit };
+      updatedUnit.groups = updatedUnit.groups.filter((group:any) => group.id !== groupId);
       UpdateUnitAction(dispatch, updatedUnit);
     } catch (error) {
       return error;
@@ -159,7 +160,7 @@ export const UnitGroupDetail = () => {
               {opt.name}
             </Option>
           ))}
-          {unitGroups?.length === 0 ? (
+          {filteredQueryGroups?.length === 0 ? (
             <Option key="no-results" text="">
               No results found
             </Option>

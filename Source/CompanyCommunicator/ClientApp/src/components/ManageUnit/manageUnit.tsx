@@ -57,9 +57,8 @@ export const ManageUnit = () => {
   React.useEffect(() => {
     if (Object.keys(unit).length === 0) {
       UpdateUnitAction(dispatch, {
-        id: 0,
         name: "New_Unit",
-        members: [],
+        users: [],
         groups: [],
       });
     } else {
@@ -70,6 +69,7 @@ export const ManageUnit = () => {
   const removeUnit = async () => {
     try {
       await deleteUnit(currentUnit.id);
+      window.location.href = "/selectunit"
       microsoftTeams.tasks.submitTask();
     } catch (error) {
       return error;
@@ -81,11 +81,12 @@ export const ManageUnit = () => {
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCurrentUnit({
-      ...currentUnit,
-      name: e.target.value
+    setCurrentUnit((currentUnit: any) => {
+      const updatedUnit = { ...currentUnit, name: e.target.value };
+      UpdateUnitAction(dispatch, updatedUnit);
+      return updatedUnit; // Return the updated value to ensure it's reflected in the state
     });
-  }
+  };
 
   const onNext = async (event: any) => {
     try {

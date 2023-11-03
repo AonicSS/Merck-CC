@@ -21,8 +21,9 @@ import {
 import {
   Theme,
 } from "@fluentui/react-components";
+import { useHistory } from 'react-router-dom';
 import { HeaderContainer } from "../HeaderContainer/headerContainer";
-import { GetUnitsAction } from "../../actions";
+import { GetUnitsAction, GetUserAction, GetUserUnitsAction } from "../../actions";
 import * as microsoftTeams from '@microsoft/teams-js';
 
 interface ISelectUnit {
@@ -30,29 +31,49 @@ interface ISelectUnit {
 }
 
 const SelectUnit = (props: ISelectUnit) => {
+  const [userPrincipalName, setUserPrincipalName] = React.useState<string | undefined>(undefined);
+  const isAdmin: boolean = useAppSelector((state: RootState) => state.messages).isAdmin.payload;
+  const history = useHistory();
+
+
+  React.useEffect(() => {
+    microsoftTeams.getContext(function (context) {
+      setUserPrincipalName(context.userPrincipalName);
+    });
+  }, []);
+
+
   const keyboardNavAttr = useArrowNavigationGroup({ axis: "grid" });
   const { t } = useTranslation();
 
   function onSelectUnit(props: string) {
-    window.location.href = `/unitmessages?unit=${props}`;
+    history.push(`/unitmessages?unit=${props}`);
   }
-  const units = useAppSelector((state: RootState) => state.messages).units.payload;
+
+  //TODO: Select user units only
+  const currentUser:any = useAppSelector((state: RootState) => state.messages).user.payload;
+  const currentUserUnits = useAppSelector((state: RootState) => state.messages).units.payload;
   const dispatch = useAppDispatch();
 
   React.useEffect(() => {
-    if (units && units.length === 0) {
-      GetUnitsAction(dispatch);
+    if (userPrincipalName) {
+      GetUserAction(dispatch, { mail: userPrincipalName });
     }
-  }, []);
+  }, [userPrincipalName]);
 
-  const currentUserUnits = units;
+  React.useEffect(() => {
+    if (currentUserUnits && currentUserUnits.length === 0 && Object.keys(currentUser).length !== 0) {
+      GetUserUnitsAction(dispatch, { id: currentUser.id });
+      //GetUnitsAction(dispatch);
+    }
+  }, [dispatch, currentUser]);
 
-  const isAdmin = currentUserUnits.some(unit => unit.name === "Admin_Unit");
+  if (isAdmin) {
+    window.location.href = `/messages`;
+  }
 
-  //if (isAdmin) {
-  //  window.location.href = `/messages`;
-  //}
-
+  console.log(currentUserUnits);
+  console.log(currentUser);
   return (
     <>
       <HeaderContainer theme={props.theme} />
