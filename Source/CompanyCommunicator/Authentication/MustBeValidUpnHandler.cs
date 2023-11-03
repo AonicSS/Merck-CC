@@ -3,6 +3,10 @@
 // Licensed under the MIT License.
 // </copyright>
 
+using Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.User;
+using Microsoft.Teams.Apps.CompanyCommunicator.Services;
+using Microsoft.Teams.Apps.CompanyCommunicator.Services.UnitData;
+
 namespace Microsoft.Teams.Apps.CompanyCommunicator.Authentication
 {
     using System;
@@ -19,15 +23,20 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Authentication
     public class MustBeValidUpnHandler : AuthorizationHandler<MustBeValidUpnRequirement>
     {
         private readonly bool disableCreatorUpnCheck;
+
         private readonly HashSet<string> authorizedCreatorUpnsSet;
+        private readonly IUnitDataService unitDataService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MustBeValidUpnHandler"/> class.
         /// </summary>
         /// <param name="authenticationOptions">The authentication options.</param>
-        public MustBeValidUpnHandler(IOptions<AuthenticationOptions> authenticationOptions)
+        /// <param name="unitDataService">The unit data service.</param>
+        public MustBeValidUpnHandler(IOptions<AuthenticationOptions> authenticationOptions, IUnitDataService unitDataService)
         {
+            this.unitDataService = unitDataService;
             this.disableCreatorUpnCheck = authenticationOptions.Value.DisableCreatorUpnCheck;
+
             var authorizedCreatorUpns = authenticationOptions.Value.AuthorizedCreatorUpns;
             this.authorizedCreatorUpnsSet = authorizedCreatorUpns
                 ?.Split(new char[] { ';', ',' }, StringSplitOptions.RemoveEmptyEntries)
@@ -42,16 +51,14 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Authentication
         /// <param name="context">AuthorizationHandlerContext instance.</param>
         /// <param name="requirement">IAuthorizationRequirement instance.</param>
         /// <returns>A task that represents the work queued to execute.</returns>
-        protected override Task HandleRequirementAsync(
+        protected override async Task HandleRequirementAsync(
             AuthorizationHandlerContext context,
             MustBeValidUpnRequirement requirement)
         {
-            if (this.disableCreatorUpnCheck || this.IsValidUpn(context))
+            if (this.disableCreatorUpnCheck || await this.IsValidUpn(context))
             {
                 context.Succeed(requirement);
             }
-
-            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -60,7 +67,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Authentication
         /// </summary>
         /// <param name="context">Authorization handler context instance.</param>
         /// <returns>Indicate if a upn is valid or not.</returns>
-        private bool IsValidUpn(AuthorizationHandlerContext context)
+        private async Task<bool> IsValidUpn(AuthorizationHandlerContext context)
         {
             var claimupn = context.User?.Claims?.FirstOrDefault(p => p.Type == ClaimTypes.Upn);
             var upn = claimupn?.Value;
@@ -73,17 +80,17 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Authentication
                 return false;
             }
 
-            bool upncheck = this.authorizedCreatorUpnsSet.Contains(upn, StringComparer.OrdinalIgnoreCase);
-            bool emailcheck = this.authorizedCreatorUpnsSet.Contains(email, StringComparer.OrdinalIgnoreCase);
+            var upncheck = this.authorizedCreatorUpnsSet.Contains(upn, StringComparer.OrdinalIgnoreCase);
+            var emailcheck = this.authorizedCreatorUpnsSet.Contains(email, StringComparer.OrdinalIgnoreCase);
 
             if (upncheck || emailcheck)
             {
                 return true;
             }
-            else
-            {
-                return false;
-            }
+
+            var used = upn ?? email;
+            var result = await this.unitDataService.IsUserInAnyUnitAsync(used);
+            return result;
         }
     }
 }

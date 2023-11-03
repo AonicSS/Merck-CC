@@ -4,6 +4,8 @@
 // </copyright>
 
 using Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.Unit;
+using Microsoft.Teams.Apps.CompanyCommunicator.Services;
+using Microsoft.Teams.Apps.CompanyCommunicator.Services.UnitData;
 
 namespace Microsoft.Teams.Apps.CompanyCommunicator
 {
@@ -211,6 +213,8 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator
             services.AddTransient<CCBotAdapterBase, CCBotAdapter>();
             services.AddTransient<IStorageClientFactory, StorageClientFactory>();
             services.AddTransient<IBlobStorageProvider, BlobStorageProvider>();
+
+            services.AddScoped<IUnitDataService, UnitDataService>();
         }
 
         /// <summary>

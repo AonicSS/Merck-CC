@@ -168,6 +168,49 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.MicrosoftGrap
         }
 
         /// <inheritdoc/>
+        public async Task<User> GetUserByUpnAsync(string upn)
+        {
+            var graphResult = await this.graphServiceClient
+                .Users
+                .Request()
+                .Filter($"userPrincipalName eq '{upn}'")
+                .Select(user => new
+                {
+                    user.Id,
+                    user.DisplayName,
+                    user.UserPrincipalName,
+                    user.UserType,
+                })
+                .WithMaxRetry(GraphConstants.MaxRetry)
+                .GetAsync();
+            return graphResult.FirstOrDefault();
+        }
+
+        /// <inheritdoc/>
+        public async Task<List<string>> GetUsersGroupIdsAsync(string userId)
+        {
+            var groups = await this.graphServiceClient
+                .Users[userId]
+                .MemberOf
+                .Request()
+                .WithMaxRetry(GraphConstants.MaxRetry)
+                .GetAsync();
+
+            var groupIds = new List<string>();
+            if (groups.Count > 0)
+            {
+                do
+                {
+                    groupIds.AddRange(groups.OfType<Group>().Select(g => g.Id));
+                    groups = await groups.NextPageRequest.GetAsync();
+                }
+                while (groups.NextPageRequest != null);
+            }
+
+            return groupIds;
+        }
+
+        /// <inheritdoc/>
         public async Task<(IEnumerable<User>, string)> GetAllUsersAsync(string deltaLink = null)
         {
             var users = new List<User>();
