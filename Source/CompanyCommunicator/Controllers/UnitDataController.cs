@@ -59,6 +59,7 @@
         /// </summary>
         /// <param name="unitData">The unit data to be created.</param>
         /// <returns>The unit data id.</returns>
+        [HttpPut]
         public async Task<string> UpdateUnitDataAsync([FromBody] UnitDataWithIds unitData)
         {
             var unitDataEntity = new UnitDataEntity
@@ -144,7 +145,7 @@
                 var groupIds = unitDataEntity.GroupIds.Split(",").Select(e => e.Trim());
                 var groups = await this.groupsService.GetByIdsAsync(groupIds).Select(g => new
                 {
-                    Size = g.Members.Count,
+                    Size = g.Members?.Count ?? 0,
                     Group = new GroupData
                     {
                         Id = g.Id,
@@ -171,7 +172,7 @@
         {
             var unitDataEntities = await this.unitDataRepository.GetByUserIdAsync(userId);
 
-            var results = this.GetUnitsAsync(unitDataEntities);
+            var results = await this.GetUnitsAsync(unitDataEntities);
             return this.Ok(results);
         }
 
@@ -190,7 +191,7 @@
                 if (entity.GroupIds != null && entity.GroupIds.Any())
                 {
                     var groupIds = entity.GroupIds.Split(",").Select(id => id.Trim());
-                    var groupCounts = await this.groupsService.GetByIdsAsync(groupIds).Select(g => g.Members.Count)
+                    var groupCounts = await this.groupsService.GetByIdsAsync(groupIds).Select(g => g.Members?.Count ?? 0)
                         .ToListAsync();
                     groupCounts.ForEach(gc => unitData.Size += gc);
                 }

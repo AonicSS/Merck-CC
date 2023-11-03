@@ -74,6 +74,7 @@
                     Groups = entity.Groups,
                     AllUsers = entity.AllUsers,
                     UnitId = entity.UnitId,
+                    CreatedBy = entity.CreatedBy,
                 };
 
                 // In case we have blob name instead of URL to public image.

@@ -224,6 +224,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
                 {
                     Id = notificationEntity.Id,
                     Title = notificationEntity.Title,
+                    UnitId = notificationEntity.UnitId,
                 };
 
                 result.Add(summary);
