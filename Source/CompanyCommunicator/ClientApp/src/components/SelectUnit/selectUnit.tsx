@@ -72,8 +72,6 @@ const SelectUnit = (props: ISelectUnit) => {
     window.location.href = `/messages`;
   }
 
-  console.log(currentUserUnits);
-  console.log(currentUser);
   return (
     <>
       <HeaderContainer theme={props.theme} />

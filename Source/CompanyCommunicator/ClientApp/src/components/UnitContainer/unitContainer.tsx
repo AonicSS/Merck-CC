@@ -13,9 +13,9 @@ import {
   Divider,
   Theme,
 } from "@fluentui/react-components";
-import { PeopleAudience24Regular, Settings24Filled, Status24Regular } from "@fluentui/react-icons";
+import { PeopleAudience24Regular, Settings24Filled, Status24Regular, ChevronDown24Filled } from "@fluentui/react-icons";
 import * as microsoftTeams from "@microsoft/teams-js";
-import { GetDraftMessagesSilentAction, GetUnitAction } from "../../actions";
+import { GetDraftMessagesSilentAction, GetUnitAction, GetUnitDraftMessagesAction } from "../../actions";
 import { getBaseUrl } from "../../configVariables";
 import { ROUTE_PARTS, ROUTE_QUERY_PARAMS } from "../../routes";
 import { useAppDispatch, useAppSelector, RootState } from "../../store";
@@ -40,12 +40,13 @@ export const UnitContainer = (props: IUnitContainer) => {
   const dispatch = useAppDispatch();
 
   const currentUnit: any = useAppSelector((state: RootState) => state.messages).unit.payload;
+  const currentUserUnits = useAppSelector((state: RootState) => state.messages).units.payload;
 
   React.useEffect(() => {
     if (currentUnit && Object.keys(currentUnit).length === 0) {
       GetUnitAction(dispatch, { id: getUnit() });
     }
-  }, []);
+  }, [dispatch, currentUnit]);
 
 
   const messageUrl = getBaseUrl() + `/${ROUTE_PARTS.NEW_MESSAGE}?${ROUTE_QUERY_PARAMS.LOCALE}={locale}&unit=${currentUnit?.id}`;
@@ -84,11 +85,22 @@ export const UnitContainer = (props: IUnitContainer) => {
       if (result === null) {
         document.getElementById("newMessageButtonId")?.focus();
       } else {
-        GetDraftMessagesSilentAction(dispatch);
+        GetUnitDraftMessagesAction(dispatch, { id: currentUnit.id });
       }
     };
 
     microsoftTeams.tasks.startTask(taskInfo, submitHandler);
+  };
+
+  const [isOpen, setIsOpen] = React.useState(false);
+
+  const handleToggleDropdown = () => {
+    setIsOpen(!isOpen);
+  };
+
+  const handleSelectUnit = (unit:any) => {
+    GetUnitAction(dispatch, { id: unit.id });
+    setIsOpen(false);
   };
 
   return (
@@ -97,8 +109,21 @@ export const UnitContainer = (props: IUnitContainer) => {
       <Divider />
       <div className="cc-unit-container-header">
         <div className="cc-unit-name">
-          <PeopleAudience24Regular />
-          <h2>{currentUnit?.name}</h2>
+          <div onClick={handleToggleDropdown} className="cc-unit-item">
+            <PeopleAudience24Regular />
+            <h2>{currentUnit.name}</h2>
+            <ChevronDown24Filled />
+          </div>
+          {isOpen && (
+            <ul style={{ listStyleType: 'none', margin: 0, padding: 0 }}>
+              {currentUserUnits.filter(unit => unit.id !== currentUnit.id).map((unit) => (
+                <li key={unit.id} onClick={() => handleSelectUnit(unit)} className="cc-unit-item">
+                  <PeopleAudience24Regular />
+                  <div>{unit.name}</div>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
         <div>
           <div className="cc-new-message">

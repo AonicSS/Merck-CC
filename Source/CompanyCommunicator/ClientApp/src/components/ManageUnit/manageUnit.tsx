@@ -43,6 +43,7 @@ export const ManageUnit = () => {
   const dispatch = useAppDispatch();
 
   const unit = useAppSelector((state: RootState) => state.messages).unit.payload;
+  const isAdmin: boolean = useAppSelector((state: RootState) => state.messages).isAdmin.payload;
 
   const [currentUnit, setCurrentUnit]: any = React.useState(unit || []);
   const [isEditing, setIsEditing] = React.useState(false);
@@ -100,6 +101,8 @@ export const ManageUnit = () => {
 
   const inputId = useId("input");
 
+  console.log(isAdmin);
+
   return (
     <>
       <div className="cc-unit">
@@ -111,7 +114,7 @@ export const ManageUnit = () => {
             <h2>{currentUnit?.name}</h2>
           )}
         </div>
-        <Menu>
+        {isAdmin && <Menu>
           <MenuTrigger disableButtonEnhancement>
             <Button aria-label='Actions menu' icon={<MoreHorizontal24Filled />} />
           </MenuTrigger>
@@ -143,7 +146,7 @@ export const ManageUnit = () => {
               </Dialog>
             </MenuList>
           </MenuPopover>
-        </Menu>
+        </Menu>}
       </div>
       <Divider />
       <div>Organize, edit and view your unit and all the AD groups you can send a message to.
@@ -163,13 +166,14 @@ export const ManageUnit = () => {
           </AccordionPanel>
         </AccordionItem>
       </Accordion>
-      <div className='fixed-footer'>
+      {isAdmin && <div className='fixed-footer'>
         <div className='footer-action-right'>
           <Button id='saveBtn' onClick={onNext} appearance='primary'>
             Save
           </Button>
         </div>
       </div>
+      }
     </>
   )
 }

@@ -22,6 +22,7 @@ import {
   Option,
   useId,
   ComboboxProps,
+  Link,
 } from "@fluentui/react-components";
 
 import {
@@ -53,6 +54,7 @@ export const UnitGroupDetail = () => {
   // Get current units of the user from api endpoint
   const currentUnit:any = useAppSelector((state: RootState) => state.messages).unit.payload;
   const queryGroups = useAppSelector((state: RootState) => state.messages).queryGroups.payload;
+  const isAdmin: boolean = useAppSelector((state: RootState) => state.messages).isAdmin.payload;
   const unitGroups = currentUnit.groups;
   const [filteredQueryGroups, setFilteredQueryGroups] = React.useState<ITeamTemplate[]>([]);
 
@@ -127,7 +129,7 @@ export const UnitGroupDetail = () => {
               </TableCell>
               <TableCell role='gridcell' style={{ width: '50px' }}>
                 <TableCellLayout>
-                  <Menu>
+                  {isAdmin && <Menu>
                     <MenuTrigger disableButtonEnhancement>
                       <Button aria-label='Actions menu' icon={<MoreHorizontal24Filled />} />
                     </MenuTrigger>
@@ -139,6 +141,7 @@ export const UnitGroupDetail = () => {
                       </MenuList>
                     </MenuPopover>
                   </Menu>
+                  }
                 </TableCellLayout>
               </TableCell>
             </TableRow>
@@ -147,7 +150,7 @@ export const UnitGroupDetail = () => {
       </Table>
       <div style={{ display: "flex", alignItems: "center", gap: "15px", marginTop: "15px" }}>
         <Add24Filled />
-        <Combobox
+        {isAdmin && <Combobox
           appearance='filled-darker'
           size='large'
           onOptionSelect={onSearchSelect}
@@ -166,6 +169,10 @@ export const UnitGroupDetail = () => {
             </Option>
           ) : null}
         </Combobox>
+        }
+        {!isAdmin && <Link href="https://www.google.com" target="_blank">
+          Add AD Groups
+        </Link>}
       </div>
     </>
   );

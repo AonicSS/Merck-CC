@@ -19,14 +19,12 @@ export const SentMessages = () => {
   const delay = 60000;
 
   React.useEffect(() => {
-    if (sentMessages && sentMessages.length === 0) {
-      if (!isAdmin) {
+    if (!isAdmin) {
         GetUnitSentMessagesAction(dispatch, { id: currentUnit.id });
       } else {
         GetSentMessagesAction(dispatch)
       }
-    }
-  }, []);
+  }, [dispatch, currentUnit, isAdmin]);
 
   CustomHooks.useInterval(() => {
     GetSentMessagesSilentAction(dispatch);

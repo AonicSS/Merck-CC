@@ -16,15 +16,14 @@ export const DraftMessages = () => {
   const loader = useAppSelector((state: RootState) => state.messages).isDraftMessagesFetchOn.payload;
   const dispatch = useAppDispatch();
 
+
   React.useEffect(() => {
-    if (draftMessages && draftMessages.length === 0) {
-      if (!isAdmin) {
-        GetUnitDraftMessagesAction(dispatch, {id: currentUnit.id});
-      } else {
-        GetDraftMessagesAction(dispatch)
-      }
+    if (!isAdmin) {
+      GetUnitDraftMessagesAction(dispatch, { id: currentUnit.id });
+    } else {
+      GetDraftMessagesAction(dispatch)
     }
-  }, []);
+  }, [dispatch, currentUnit, isAdmin]);
 
   return (
     <>
