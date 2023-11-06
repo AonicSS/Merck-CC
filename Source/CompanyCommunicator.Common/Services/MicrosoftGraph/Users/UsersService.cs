@@ -197,14 +197,18 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.MicrosoftGrap
                 .GetAsync();
 
             var groupIds = new List<string>();
-            if (groups.Count > 0)
+            while (groups.Count > 0)
             {
-                do
+                groupIds.AddRange(groups.OfType<Group>().Select(g => g.Id));
+
+                if (groups.NextPageRequest != null)
                 {
-                    groupIds.AddRange(groups.OfType<Group>().Select(g => g.Id));
                     groups = await groups.NextPageRequest.GetAsync();
                 }
-                while (groups.NextPageRequest != null);
+                else
+                {
+                    break; // No more pages, exit the loop
+                }
             }
 
             return groupIds;
