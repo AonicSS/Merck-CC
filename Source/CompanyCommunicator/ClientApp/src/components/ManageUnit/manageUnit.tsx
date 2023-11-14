@@ -101,15 +101,13 @@ export const ManageUnit = () => {
 
   const inputId = useId("input");
 
-  console.log(isAdmin);
-
   return (
     <>
       <div className="cc-unit">
         <div className="cc-unit-name">
           <PeopleAudience24Regular />
           {isEditing ? (
-            <Input id={inputId} onChange={(event) => handleInputChange(event)} />
+            <Input placeholder={currentUnit?.name} id={inputId} onChange={(event) => handleInputChange(event)} />
           ) : (
             <h2>{currentUnit?.name}</h2>
           )}

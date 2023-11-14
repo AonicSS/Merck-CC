@@ -33,6 +33,7 @@ import {
   users,
   user,
   verifyGroup,
+  isAdmin,
 } from "./messagesSlice";
 import { store } from "./store";
 
@@ -207,4 +208,8 @@ export const GetUserAction = (dispatch: typeof store.dispatch, payload: { mail: 
   getUser(payload.mail).then((response) => {
     dispatch(user({ type: "GET_USER", payload: response?.data || [] }));
   });
+};
+
+export const UpdateUserPermission = (dispatch: typeof store.dispatch, payload: boolean) => {
+  dispatch(isAdmin({ type: "IS_ADMIN", payload: payload }));
 };

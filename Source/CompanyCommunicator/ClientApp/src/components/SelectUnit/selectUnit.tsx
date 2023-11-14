@@ -23,7 +23,7 @@ import {
 } from "@fluentui/react-components";
 import { useHistory } from 'react-router-dom';
 import { HeaderContainer } from "../HeaderContainer/headerContainer";
-import { GetUnitsAction, GetUserAction, GetUserUnitsAction } from "../../actions";
+import { GetUnitsAction, GetUserAction, GetUserUnitsAction, UpdateUserPermission } from "../../actions";
 import * as microsoftTeams from '@microsoft/teams-js';
 
 interface ISelectUnit {
@@ -31,9 +31,13 @@ interface ISelectUnit {
 }
 
 const SelectUnit = (props: ISelectUnit) => {
-  const [userPrincipalName, setUserPrincipalName] = React.useState<string | undefined>(undefined);
   const isAdmin: boolean = useAppSelector((state: RootState) => state.messages).isAdmin.payload;
+  const keyboardNavAttr = useArrowNavigationGroup({ axis: "grid" });
+  const { t } = useTranslation();
   const history = useHistory();
+  const dispatch = useAppDispatch();
+
+  const [userPrincipalName, setUserPrincipalName] = React.useState<string | undefined>(undefined);
 
 
   React.useEffect(() => {
@@ -43,34 +47,45 @@ const SelectUnit = (props: ISelectUnit) => {
   }, []);
 
 
-  const keyboardNavAttr = useArrowNavigationGroup({ axis: "grid" });
-  const { t } = useTranslation();
-
   function onSelectUnit(props: string) {
     history.push(`/unitmessages?unit=${props}`);
   }
 
-  //TODO: Select user units only
   const currentUser:any = useAppSelector((state: RootState) => state.messages).user.payload;
   const currentUserUnits = useAppSelector((state: RootState) => state.messages).units.payload;
-  const dispatch = useAppDispatch();
+  const [unitFetched, setUnitFetched] = React.useState(false);
 
+  // get the current user
   React.useEffect(() => {
     if (userPrincipalName) {
       GetUserAction(dispatch, { mail: userPrincipalName });
     }
-  }, [userPrincipalName]);
+  }, [dispatch, userPrincipalName]);
 
+
+  // get the current users unit
   React.useEffect(() => {
-    if (currentUserUnits && currentUserUnits.length === 0 && Object.keys(currentUser).length !== 0) {
+    if (Object.keys(currentUser).length !== 0) {
       GetUserUnitsAction(dispatch, { id: currentUser.id });
-      //GetUnitsAction(dispatch);
+      setUnitFetched(true);
     }
   }, [dispatch, currentUser]);
 
-  if (isAdmin) {
-    window.location.href = `/messages`;
-  }
+  // check if current user unit is empty after fetching
+  React.useEffect(() => {
+    if (currentUserUnits && currentUserUnits.length === 0 && unitFetched) {
+      window.location.href = `/requestaccess`;
+    } else if (currentUserUnits && currentUserUnits.length !== 0) {
+      const isInAdmin = currentUserUnits.some(unit => unit.name === "Admin Unit");
+      UpdateUserPermission(dispatch, isInAdmin);
+    }
+  }, [dispatch, currentUserUnits]);
+
+  React.useEffect(() => {
+    if (isAdmin) {
+      history.push(`/messages`);
+    }
+  }, [history, isAdmin]);
 
   return (
     <>

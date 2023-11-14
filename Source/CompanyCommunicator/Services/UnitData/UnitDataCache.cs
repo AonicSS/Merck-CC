@@ -47,13 +47,13 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Services
         public void Put(string upn, bool isIncluded)
         {
             this.CleanUpEveryFiveMinutes();
-            var item = new UnitDataCacheItem(DateTime.Now.AddMinutes(5), isIncluded);
+            var item = new UnitDataCacheItem(DateTime.Now.AddMinutes(360), isIncluded);
             this.cache[upn] = item;
         }
 
         private void CleanUpEveryFiveMinutes()
         {
-            if (DateTime.Now - this.lastCleanUp <= TimeSpan.FromMinutes(5))
+            if (DateTime.Now - this.lastCleanUp <= TimeSpan.FromMinutes(360))
             {
                 return;
             }

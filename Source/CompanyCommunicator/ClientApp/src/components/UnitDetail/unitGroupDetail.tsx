@@ -109,7 +109,7 @@ export const UnitGroupDetail = () => {
         <TableHeader>
           <TableRow>
             <TableHeaderCell key='title'>
-              <b>User</b>
+              <b>Group</b>
             </TableHeaderCell>
             <TableHeaderCell key='actions' style={{ width: '50px' }}>
               <b>Actions</b>

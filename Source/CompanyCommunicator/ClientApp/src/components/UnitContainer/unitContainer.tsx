@@ -108,7 +108,7 @@ export const UnitContainer = (props: IUnitContainer) => {
       <HeaderContainer theme={props.theme} />
       <Divider />
       <div className="cc-unit-container-header">
-        <div className="cc-unit-name">
+        <div className="cc-unit-dropdown">
           <div onClick={handleToggleDropdown} className="cc-unit-item">
             <PeopleAudience24Regular />
             <h2>{currentUnit.name}</h2>

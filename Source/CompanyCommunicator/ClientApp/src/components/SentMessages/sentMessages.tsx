@@ -27,7 +27,11 @@ export const SentMessages = () => {
   }, [dispatch, currentUnit, isAdmin]);
 
   CustomHooks.useInterval(() => {
-    GetSentMessagesSilentAction(dispatch);
+    if (!isAdmin) {
+      GetUnitSentMessagesAction(dispatch, { id: currentUnit.id });
+    } else {
+      GetSentMessagesSilentAction(dispatch)
+    }
   }, delay);
 
   return (
