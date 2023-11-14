@@ -27,6 +27,7 @@ const ErrorPage: React.FunctionComponent<RouteComponentProps> = (props) => {
   return (
     <Text className="error-message" size={500}>
       {parseErrorMessage()}
+      UAT
     </Text>
   );
 };
