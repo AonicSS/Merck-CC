@@ -26,7 +26,7 @@ import {
 import * as microsoftTeams from '@microsoft/teams-js';
 import { PeopleAudience24Regular, MoreHorizontal24Filled, DeleteRegular, Pen24Regular } from "@fluentui/react-icons";
 import { useAppDispatch, useAppSelector, RootState } from "../../store";
-import { GetUnitAction, UpdateUnitAction } from "../../actions";
+import { GetUnitAction, GetUserAction, GetUserUnitsAction, UpdateUnitAction, UpdateUserPermission } from "../../actions";
 import { deleteUnit, updateUnit } from '../../apis/messageListApi';
 import { UnitMemberDetail } from '../UnitDetail/unitMemberDetail';
 import { UnitGroupDetail } from '../UnitDetail/unitGroupDetail';
@@ -42,18 +42,52 @@ export const ManageUnit = () => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
 
-  const unit = useAppSelector((state: RootState) => state.messages).unit.payload;
+  const unit: any = useAppSelector((state: RootState) => state.messages).unit.payload;
   const isAdmin: boolean = useAppSelector((state: RootState) => state.messages).isAdmin.payload;
+  const [userPrincipalName, setUserPrincipalName] = React.useState<string | undefined>(undefined);
+  const currentUser: any = useAppSelector((state: RootState) => state.messages).user.payload;
+  const currentUserUnits = useAppSelector((state: RootState) => state.messages).units.payload;
+  const [unitFetched, setUnitFetched] = React.useState(false);
 
   const [currentUnit, setCurrentUnit]: any = React.useState(unit || []);
   const [isEditing, setIsEditing] = React.useState(false);
 
   React.useEffect(() => {
+    microsoftTeams.getContext(function (context) {
+      setUserPrincipalName(context.userPrincipalName);
+    });
+  }, []);
+
+  // get the current user
+  React.useEffect(() => {
+    if (userPrincipalName) {
+      GetUserAction(dispatch, { mail: userPrincipalName });
+    }
+  }, [dispatch, userPrincipalName]);
+
+  // get the current users unit
+  React.useEffect(() => {
+    if (Object.keys(currentUser).length !== 0) {
+      GetUserUnitsAction(dispatch, { id: currentUser.id });
+      setUnitFetched(true);
+    }
+  }, [dispatch, currentUser]);
+
+  // check if current user unit is empty after fetching
+  React.useEffect(() => {
+    if (currentUserUnits && currentUserUnits.length === 0 && unitFetched) {
+      window.location.href = `/requestaccess`;
+    } else if (currentUserUnits && currentUserUnits.length !== 0) {
+      const isInAdmin = currentUserUnits.some(unit => unit.name === "Admin_Unit");
+      UpdateUserPermission(dispatch, isInAdmin);
+    }
+  }, [dispatch, currentUserUnits]);
+
+  React.useEffect(() => {
     if (unit && Object.keys(unit).length === 0) {
       GetUnitAction(dispatch, { id: getUnit() });
     }
-  }, []);
-
+  }, [dispatch]);
 
   React.useEffect(() => {
     if (Object.keys(unit).length === 0) {
@@ -65,7 +99,8 @@ export const ManageUnit = () => {
     } else {
       setCurrentUnit(unit);
     }
-  }, [unit]);
+  }, [dispatch, unit]);
+
 
   const removeUnit = async () => {
     try {
@@ -100,6 +135,7 @@ export const ManageUnit = () => {
   };
 
   const inputId = useId("input");
+
 
   return (
     <>

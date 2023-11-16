@@ -83,9 +83,11 @@ const SelectUnit = (props: ISelectUnit) => {
 
   React.useEffect(() => {
     if (isAdmin) {
+      // if is admin, get all units
+      GetUnitsAction(dispatch);
       history.push(`/messages`);
     }
-  }, [history, isAdmin]);
+  }, [dispatch, history, isAdmin]);
 
   return (
     <>

@@ -165,7 +165,6 @@ export const SentMessageFetchStatusAction = (dispatch: typeof store.dispatch, pa
 
 export const GetUnitsAction = (dispatch: typeof store.dispatch) => {
   getUnits().then((response) => {
-    console.log(response);
     dispatch(units({ type: "GET_UNITS", payload: response?.data || [] }));
   });
 };
