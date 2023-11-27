@@ -66,11 +66,19 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
             }
 
             var groups = await this.groupsService.SearchAsync(query);
+            var memberCounts = new Dictionary<string, int>();
+            foreach (var group in groups)
+            {
+                var memberCount = await this.groupsService.GetMemberCountAsync(group.Id);
+                memberCounts[group.Id] = memberCount;
+            }
+
             return groups.Select(group => new GroupData()
             {
                 Id = group.Id,
                 Name = group.DisplayName,
                 Mail = group.Mail,
+                MemberCount = memberCounts.ContainsKey(group.Id) ? memberCounts[group.Id] : 0,
             });
         }
 

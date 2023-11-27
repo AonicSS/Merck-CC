@@ -86,6 +86,23 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.MicrosoftGrap
         }
 
         /// <summary>
+        /// Returns membership count for a group.
+        /// </summary>
+        /// <param name="groupId">query param.</param>
+        /// <returns>count of members.</returns>
+        public async Task<int> GetMemberCountAsync(string groupId)
+        {
+            var groupMembers = await this.graphServiceClient
+                .Groups[groupId]
+                .Members
+                .Request()
+                .WithMaxRetry(this.MaxRetry)
+                .GetAsync();
+
+            return groupMembers.Count;
+        }
+
+        /// <summary>
         /// Search M365 groups, distribution groups, security groups based on query and visibilty.
         /// </summary>
         /// <param name="query">query param.</param>

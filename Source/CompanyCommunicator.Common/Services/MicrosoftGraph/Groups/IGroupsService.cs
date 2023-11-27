@@ -34,5 +34,12 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.MicrosoftGrap
         /// <param name="query">query param.</param>
         /// <returns>list of group.</returns>
         Task<IList<Group>> SearchAsync(string query);
+
+        /// <summary>
+        /// get group membership count by id.
+        /// </summary>
+        /// <param name="groupId">query param.</param>
+        /// <returns>count of members.</returns>
+        Task<int> GetMemberCountAsync(string groupId);
     }
 }
