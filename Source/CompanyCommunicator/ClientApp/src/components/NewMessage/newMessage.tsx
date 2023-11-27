@@ -32,7 +32,7 @@ import { ArrowUpload24Regular, Dismiss12Regular } from '@fluentui/react-icons';
 import * as microsoftTeams from '@microsoft/teams-js';
 
 import { GetDraftMessagesSilentAction, GetGroupsAction, GetTeamsDataAction, GetUnitAction, SearchGroupsAction, VerifyGroupAccessAction } from '../../actions';
-import { createDraftNotification, getDraftNotification, updateDraftNotification } from '../../apis/messageListApi';
+import { createDraftNotification, getDraftNotification, sendDraftNotification, updateDraftNotification } from '../../apis/messageListApi';
 import { getBaseUrl } from '../../configVariables';
 import { RootState, useAppDispatch, useAppSelector } from '../../store';
 import { getInitAdaptiveCard, setCardAuthor, setCardBtn, setCardImageLink, setCardSummary, setCardTitle } from '../AdaptiveCard/adaptiveCard';
@@ -57,6 +57,7 @@ interface IMessageState {
 interface ITeamTemplate {
   id: string;
   name: string;
+  memberCount: number;
 }
 
 const useComboboxStyles = makeStyles({
@@ -111,7 +112,7 @@ export const NewMessage = () => {
   const groups = useAppSelector((state: RootState) => state.messages).groups.payload;
   const queryGroups = useAppSelector((state: RootState) => state.messages).queryGroups.payload;
   const canAccessGroups = useAppSelector((state: RootState) => state.messages).verifyGroup.payload;
-  const unit:any = useAppSelector((state: RootState) => state.messages).unit.payload;
+  const unit: any = useAppSelector((state: RootState) => state.messages).unit.payload;
   const [selectedRadioButton, setSelectedRadioButton] = React.useState(AudienceSelection.Groups);
   const [pageSelection, setPageSelection] = React.useState(CurrentPageSelection.CardCreation);
   const [allUsersState, setAllUsersState] = React.useState(false);
@@ -424,7 +425,21 @@ export const NewMessage = () => {
           allUsers: finalMessage.allUsers,
           unitId: finalMessage.unitId
         };
-        postDraftMessage(message);
+        const memberCount = filteredQueryGroups.filter(item => item.id === group);
+        if (memberCount[0].memberCount < 10) {
+          createDraftNotification(message)
+            .then((draftNotification) => {
+              getDraftNotification(draftNotification.data)
+                .then((response) => {
+                  sendDraftNotification(response.data)
+                    .then(() => {
+                      microsoftTeams.tasks.submitTask();
+                    });
+                });
+            });
+        } else {
+          postDraftMessage(message);
+        }
       });
     }
   };
@@ -571,7 +586,8 @@ export const NewMessage = () => {
 
   const onSearchSelect: ComboboxProps['onOptionSelect'] = (event, data: any) => {
     if (data.optionText && !searchSelectedOptions.find((x) => x.id === data.optionValue)) {
-      setSearchSelectedOptions([...searchSelectedOptions, { id: data.optionValue, name: data.optionText }]);
+      const selectedGroup = filteredQueryGroups.filter(group => group.id === data.optionValue);
+      setSearchSelectedOptions([...searchSelectedOptions, { id: data.optionValue, name: data.optionText, memberCount: selectedGroup[0].memberCount }]);
     }
   };
 
@@ -819,7 +835,7 @@ export const NewMessage = () => {
                           onOptionSelect={onSearchSelect}
                           aria-labelledby={searchLabelledBy}
                           placeholder={'Search for groups'}
-                          
+
                         >
                           {filteredQueryGroups?.map((opt) => (
                             <Option text={opt.name} value={opt.id} key={opt.id}>

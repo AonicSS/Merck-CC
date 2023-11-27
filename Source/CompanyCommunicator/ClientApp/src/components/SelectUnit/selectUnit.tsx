@@ -92,7 +92,7 @@ const SelectUnit = (props: ISelectUnit) => {
   return (
     <>
       <HeaderContainer theme={props.theme} />
-      <h3>{t('SelectUnitText')}</h3>
+      <h3>Select a unit.</h3>
       <Table {...keyboardNavAttr} role='grid' aria-label='Select unit table with grid keyboard navigation'>
         <TableHeader>
           <TableRow>

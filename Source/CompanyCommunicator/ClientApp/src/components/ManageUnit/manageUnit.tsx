@@ -75,10 +75,9 @@ export const ManageUnit = () => {
 
   // check if current user unit is empty after fetching
   React.useEffect(() => {
-    if (currentUserUnits && currentUserUnits.length === 0 && unitFetched) {
-      window.location.href = `/requestaccess`;
-    } else if (currentUserUnits && currentUserUnits.length !== 0) {
-      const isInAdmin = currentUserUnits.some(unit => unit.name === "Admin_Unit");
+    console.log(currentUserUnits);
+    if (currentUserUnits && currentUserUnits.length !== 0) {
+      const isInAdmin = currentUserUnits.some(unit => unit.name === "Admin Unit");
       UpdateUserPermission(dispatch, isInAdmin);
     }
   }, [dispatch, currentUserUnits]);
@@ -135,7 +134,6 @@ export const ManageUnit = () => {
   };
 
   const inputId = useId("input");
-
 
   return (
     <>

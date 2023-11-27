@@ -136,7 +136,7 @@ export const GetGroupsAction = (dispatch: typeof store.dispatch, payload: { id: 
 
 export const SearchGroupsAction = (dispatch: typeof store.dispatch, payload: { query: string }) => {
   searchGroups(payload.query).then((response) => {
-    dispatch(queryGroups({ type: "SEARCH_GROUPS", payload: response?.data || [] }));
+        dispatch(queryGroups({ type: "SEARCH_GROUPS", payload: response?.data || [] }));
   });
 };
 
