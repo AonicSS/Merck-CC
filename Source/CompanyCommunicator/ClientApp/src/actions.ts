@@ -6,8 +6,15 @@ import {
   getGroups,
   getSentNotifications,
   getTeams,
+  getUnits,
+  getUnit,
+  getUsers,
+  getUnitDraftNotification,
+  getUnitSentNotification,
   searchGroups,
   verifyGroupAccess,
+  getUser,
+  getUserUnits,
 } from "./apis/messageListApi";
 import { formatDate } from "./i18n";
 import {
@@ -19,7 +26,14 @@ import {
   selectedMessage,
   sentMessages,
   teamsData,
+  units,
+  unit,
+  unitGroups,
+  unitMembers,
+  users,
+  user,
   verifyGroup,
+  isAdmin,
 } from "./messagesSlice";
 import { store } from "./store";
 
@@ -80,6 +94,28 @@ export const GetDraftMessagesAction = (dispatch: typeof store.dispatch) => {
     });
 };
 
+export const GetUnitDraftMessagesAction = (dispatch: typeof store.dispatch, payload: { id: string }) => {
+  DraftMessageFetchStatusAction(dispatch, true);
+  getUnitDraftNotification(payload.id)
+    .then((response) => {
+      dispatch(draftMessages({ type: "FETCH_DRAFT_MESSAGES", payload: response?.data || [] }));
+    })
+    .finally(() => {
+      DraftMessageFetchStatusAction(dispatch, false);
+    });
+};
+
+export const GetUnitSentMessagesAction = (dispatch: typeof store.dispatch, payload: { id: string }) => {
+  SentMessageFetchStatusAction(dispatch, true);
+  getUnitSentNotification(payload.id)
+    .then((response) => {
+      dispatch(sentMessages({ type: "FETCH_MESSAGES", payload: response?.data || [] }));
+    })
+    .finally(() => {
+      SentMessageFetchStatusAction(dispatch, false);
+    });
+};
+
 export const GetDraftMessagesSilentAction = (dispatch: typeof store.dispatch) => {
   getDraftNotifications().then((response) => {
     dispatch(draftMessages({ type: "FETCH_DRAFT_MESSAGES", payload: response?.data || [] }));
@@ -100,7 +136,7 @@ export const GetGroupsAction = (dispatch: typeof store.dispatch, payload: { id: 
 
 export const SearchGroupsAction = (dispatch: typeof store.dispatch, payload: { query: string }) => {
   searchGroups(payload.query).then((response) => {
-    dispatch(queryGroups({ type: "SEARCH_GROUPS", payload: response?.data || [] }));
+        dispatch(queryGroups({ type: "SEARCH_GROUPS", payload: response?.data || [] }));
   });
 };
 
@@ -125,4 +161,54 @@ export const DraftMessageFetchStatusAction = (dispatch: typeof store.dispatch, p
 
 export const SentMessageFetchStatusAction = (dispatch: typeof store.dispatch, payload: boolean) => {
   dispatch(isSentMessagesFetchOn({ type: "SENT_MESSAGES_FETCH_STATUS", payload }));
+};
+
+export const GetUnitsAction = (dispatch: typeof store.dispatch) => {
+  getUnits().then((response) => {
+    dispatch(units({ type: "GET_UNITS", payload: response?.data || [] }));
+  });
+};
+
+export const GetUserUnitsAction = (dispatch: typeof store.dispatch, payload: { id: string }) => {
+  getUserUnits(payload.id).then((response) => {
+    dispatch(units({ type: "GET_UNITS", payload: response?.data || [] }));
+  });
+};
+
+export const GetUnitAction = (dispatch: typeof store.dispatch, payload: { id: string }) => {
+  getUnit(payload.id).then((response) => {
+    dispatch(unit({ type: "GET_UNIT", payload: response?.data || [] }));
+  });
+};
+
+export const UpdateUnitAction = (dispatch: typeof store.dispatch, payload: { }) => {
+  dispatch(unit({ type: "GET_UNIT", payload: payload || [] }));
+};
+
+export const GetUnitMembersAction = (dispatch: typeof store.dispatch, payload: { id: string }) => {
+  getUnit(payload.id).then((response) => {
+    dispatch(unitMembers({ type: "GET_UNIT_MEMBERS", payload: response?.members || [] }));
+  });
+};
+
+export const GetUnitGroupsAction = (dispatch: typeof store.dispatch, payload: { id: string }) => {
+  getUnit(payload.id).then((response) => {
+    dispatch(unitGroups({ type: "GET_UNIT_GROUPS", payload: response?.groups || [] }));
+  });
+};
+
+export const GetUsersAction = (dispatch: typeof store.dispatch, payload: { query: string }) => {
+  getUsers(payload.query).then((response) => {
+    dispatch(users({ type: "GET_USERS", payload: response?.data || [] }));
+  });
+};
+
+export const GetUserAction = (dispatch: typeof store.dispatch, payload: { mail: string }) => {
+  getUser(payload.mail).then((response) => {
+    dispatch(user({ type: "GET_USER", payload: response?.data || [] }));
+  });
+};
+
+export const UpdateUserPermission = (dispatch: typeof store.dispatch, payload: boolean) => {
+  dispatch(isAdmin({ type: "IS_ADMIN", payload: payload }));
 };

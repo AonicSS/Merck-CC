@@ -56,5 +56,10 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Models
         /// Gets or sets the Created DateTime value.
         /// </summary>
         public DateTime CreatedDateTime { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Unit Id value.
+        /// </summary>
+        public string UnitId { get; set; }
     }
 }

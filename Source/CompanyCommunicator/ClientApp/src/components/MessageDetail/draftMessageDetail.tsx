@@ -29,33 +29,42 @@ import {
   SendRegular,
 } from "@fluentui/react-icons";
 import * as microsoftTeams from "@microsoft/teams-js";
-import { GetDraftMessagesSilentAction, GetSentMessagesSilentAction } from "../../actions";
+import { GetDraftMessagesSilentAction, GetSentMessagesSilentAction, GetUnitDraftMessagesAction, GetUnitSentMessagesAction } from "../../actions";
 import { deleteDraftNotification, duplicateDraftNotification, sendPreview } from "../../apis/messageListApi";
 import { getBaseUrl } from "../../configVariables";
 import { ROUTE_PARTS, ROUTE_QUERY_PARAMS } from "../../routes";
-import { useAppDispatch } from "../../store";
+import { RootState, useAppDispatch, useAppSelector } from "../../store";
 
 export const DraftMessageDetail = (draftMessages: any) => {
   const { t } = useTranslation();
   const keyboardNavAttr = useArrowNavigationGroup({ axis: "grid" });
   const [teamsTeamId, setTeamsTeamId] = React.useState("");
   const [teamsChannelId, setTeamsChannelId] = React.useState("");
+  const [userPrincipalName, setUserPrincipalName] = React.useState<string | undefined>(undefined);
+  const isAdmin: boolean = useAppSelector((state: RootState) => state.messages).isAdmin.payload;
+  const currentUnit: any = useAppSelector((state: RootState) => state.messages).unit.payload;
   const dispatch = useAppDispatch();
   const sendUrl = (id: string) =>
     getBaseUrl() + `/${ROUTE_PARTS.SEND_CONFIRMATION}/${id}?${ROUTE_QUERY_PARAMS.LOCALE}={locale}`;
-  const editUrl = (id: string) =>
-    getBaseUrl() + `/${ROUTE_PARTS.NEW_MESSAGE}/${id}?${ROUTE_QUERY_PARAMS.LOCALE}={locale}`;
+  const editUrl = (id: string, unitId: string) =>
+    getBaseUrl() + `/${ROUTE_PARTS.NEW_MESSAGE}/${id}?${ROUTE_QUERY_PARAMS.LOCALE}={locale}&unit=${unitId}`;
 
   React.useEffect(() => {
     microsoftTeams.getContext((context: microsoftTeams.Context) => {
       setTeamsTeamId(context.teamId || "");
       setTeamsChannelId(context.channelId || "");
+      setUserPrincipalName(context.userPrincipalName);
     });
   }, []);
 
   const submitHandler = (err: any, result: any) => {
-    GetDraftMessagesSilentAction(dispatch);
-    GetSentMessagesSilentAction(dispatch);
+    if (!isAdmin) {
+      GetUnitDraftMessagesAction(dispatch, { id: currentUnit.id });
+      GetUnitSentMessagesAction(dispatch, { id: currentUnit.id });
+    } else {
+      GetDraftMessagesSilentAction(dispatch);
+      GetSentMessagesSilentAction(dispatch);
+    }
   };
 
   const onOpenTaskModule = (event: any, url: string, title: string) => {
@@ -123,7 +132,7 @@ export const DraftMessageDetail = (draftMessages: any) => {
                 truncate
                 media={<Chat20Regular />}
                 style={{ cursor: 'pointer' }}
-                onClick={() => onOpenTaskModule(null, editUrl(item.id), t('EditMessage'))}
+                onClick={() => onOpenTaskModule(null, editUrl(item.id, item.unitId), t('EditMessage'))}
               >
                 {item.title}
               </TableCellLayout>
@@ -136,20 +145,20 @@ export const DraftMessageDetail = (draftMessages: any) => {
                   </MenuTrigger>
                   <MenuPopover>
                     <MenuList>
-                      <MenuItem
+                      {(isAdmin || userPrincipalName !== item.createdBy) && <MenuItem
                         icon={<SendRegular />}
                         key={'sendConfirmationKey'}
                         onClick={() => onOpenTaskModule(null, sendUrl(item.id), t('SendConfirmation'))}
                       >
                         {t('Send')}
-                      </MenuItem>
+                      </MenuItem>}
                       <MenuItem key={'previewInThisChannelKey'} icon={<OpenRegular />} onClick={() => checkPreviewMessage(item.id)}>
                         {t('PreviewInThisChannel')}
                       </MenuItem>
                       <MenuItem
                         icon={<EditRegular />}
                         key={'editMessageKey'}
-                        onClick={() => onOpenTaskModule(null, editUrl(item.id), t('EditMessage'))}
+                        onClick={() => onOpenTaskModule(null, editUrl(item.id, item.unitId), t('EditMessage'))}
                       >
                         {t('Edit')}
                       </MenuItem>

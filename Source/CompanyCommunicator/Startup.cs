@@ -3,6 +3,10 @@
 // Licensed under the MIT License.
 // </copyright>
 
+using Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.Unit;
+using Microsoft.Teams.Apps.CompanyCommunicator.Services;
+using Microsoft.Teams.Apps.CompanyCommunicator.Services.UnitData;
+
 namespace Microsoft.Teams.Apps.CompanyCommunicator
 {
     using System;
@@ -172,6 +176,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator
             services.AddSingleton<IExportDataRepository, ExportDataRepository>();
             services.AddSingleton<IAppConfigRepository, AppConfigRepository>();
             services.AddSingleton<ISendingNotificationDataRepository, SendingNotificationDataRepository>();
+            services.AddSingleton<IUnitDataRepository, UnitDataRepository>();
 
             // Add service bus message queues.
             services.AddSingleton<IPrepareToSendQueue, PrepareToSendQueue>();
@@ -194,6 +199,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator
                 sp.GetService<IHttpProvider>()));
             services.AddScoped<IGraphServiceFactory, GraphServiceFactory>();
             services.AddScoped<IGroupsService>(sp => sp.GetRequiredService<IGraphServiceFactory>().GetGroupsService());
+            services.AddScoped<IUsersService>(sp => sp.GetRequiredService<IGraphServiceFactory>().GetUsersService());
             services.AddScoped<IAppCatalogService>(sp => sp.GetRequiredService<IGraphServiceFactory>().GetAppCatalogService());
 
             // Add Application Insights telemetry.
@@ -208,6 +214,8 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator
             services.AddTransient<CCBotAdapterBase, CCBotAdapter>();
             services.AddTransient<IStorageClientFactory, StorageClientFactory>();
             services.AddTransient<IBlobStorageProvider, BlobStorageProvider>();
+
+            services.AddScoped<IUnitDataService, UnitDataService>();
         }
 
         /// <summary>

@@ -21,6 +21,10 @@ import SignInSimpleEnd from './components/SignInPage/signInSimpleEnd';
 import SignInSimpleStart from './components/SignInPage/signInSimpleStart';
 import { ViewStatusTask } from './components/ViewStatusTask/viewStatusTask';
 import { ROUTE_PARAMS, ROUTE_PARTS } from './routes';
+import RequestAccess from './components/RequestAccess/requestAccess';
+import SelectUnit from './components/SelectUnit/selectUnit';
+import { UnitContainer } from './components/UnitContainer/unitContainer';
+import { ManageUnit } from './components/ManageUnit/manageUnit';
 
 export const App = () => {
   const [fluentUITheme, setFluentUITheme] = React.useState(teamsLightTheme);
@@ -60,8 +64,12 @@ export const App = () => {
         <Suspense fallback={<div></div>}>
           <BrowserRouter>
             <Switch>
+              <Route exact path={`/${ROUTE_PARTS.SELECT_UNIT}`} render={() => <SelectUnit theme={fluentUITheme} />} />
               <Route exact path={`/${ROUTE_PARTS.CONFIG_TAB}`} component={Configuration} />
+              <Route exact path={`/${ROUTE_PARTS.REQUEST_ACCESS}`} component={RequestAccess} />
               <Route exact path={`/${ROUTE_PARTS.MESSAGES}`} render={() => <MainContainer theme={fluentUITheme} />} />
+              <Route exact path={`/${ROUTE_PARTS.UNIT_MESSAGES}`} render={() => <UnitContainer theme={fluentUITheme} />} />
+              <Route exact path={`/${ROUTE_PARTS.MANAGE_UNIT}`} component={ManageUnit} />
               <Route exact path={`/${ROUTE_PARTS.NEW_MESSAGE}`} component={NewMessage} />
               <Route exact path={`/${ROUTE_PARTS.NEW_MESSAGE}/:${ROUTE_PARAMS.ID}`} component={NewMessage} />
               <Route exact path={`/${ROUTE_PARTS.VIEW_STATUS}/:${ROUTE_PARAMS.ID}`} component={ViewStatusTask} />

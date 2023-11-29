@@ -66,7 +66,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
                 throw new ArgumentNullException(nameof(loginHint));
             }
 
-            if (!Regex.IsMatch(loginHint, loginHintPattern))
+            if (!Regex.IsMatch(loginHint, loginHintPattern, RegexOptions.IgnoreCase))
             {
                 throw new ArgumentException("Invalid loginHint parameter.");
             }

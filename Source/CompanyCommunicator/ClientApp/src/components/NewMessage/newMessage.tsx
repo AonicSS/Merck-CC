@@ -31,8 +31,8 @@ import { InfoLabel } from '@fluentui/react-components/unstable';
 import { ArrowUpload24Regular, Dismiss12Regular } from '@fluentui/react-icons';
 import * as microsoftTeams from '@microsoft/teams-js';
 
-import { GetDraftMessagesSilentAction, GetGroupsAction, GetTeamsDataAction, SearchGroupsAction, VerifyGroupAccessAction } from '../../actions';
-import { createDraftNotification, getDraftNotification, updateDraftNotification } from '../../apis/messageListApi';
+import { GetDraftMessagesSilentAction, GetGroupsAction, GetTeamsDataAction, GetUnitAction, SearchGroupsAction, VerifyGroupAccessAction } from '../../actions';
+import { createDraftNotification, getDraftNotification, sendDraftNotification, updateDraftNotification } from '../../apis/messageListApi';
 import { getBaseUrl } from '../../configVariables';
 import { RootState, useAppDispatch, useAppSelector } from '../../store';
 import { getInitAdaptiveCard, setCardAuthor, setCardBtn, setCardImageLink, setCardSummary, setCardTitle } from '../AdaptiveCard/adaptiveCard';
@@ -51,11 +51,13 @@ interface IMessageState {
   rosters: any[];
   groups: any[];
   allUsers: boolean;
+  unitId: any;
 }
 
 interface ITeamTemplate {
   id: string;
   name: string;
+  memberCount: number;
 }
 
 const useComboboxStyles = makeStyles({
@@ -110,7 +112,8 @@ export const NewMessage = () => {
   const groups = useAppSelector((state: RootState) => state.messages).groups.payload;
   const queryGroups = useAppSelector((state: RootState) => state.messages).queryGroups.payload;
   const canAccessGroups = useAppSelector((state: RootState) => state.messages).verifyGroup.payload;
-  const [selectedRadioButton, setSelectedRadioButton] = React.useState(AudienceSelection.None);
+  const unit: any = useAppSelector((state: RootState) => state.messages).unit.payload;
+  const [selectedRadioButton, setSelectedRadioButton] = React.useState(AudienceSelection.Groups);
   const [pageSelection, setPageSelection] = React.useState(CurrentPageSelection.CardCreation);
   const [allUsersState, setAllUsersState] = React.useState(false);
   const [imageFileName, setImageFileName] = React.useState('');
@@ -127,7 +130,16 @@ export const NewMessage = () => {
     rosters: [],
     groups: [],
     allUsers: false,
+    unitId: {},
   });
+  const [filteredQueryGroups, setFilteredQueryGroups] = React.useState<ITeamTemplate[]>([]);
+
+  const getUnit = () => {
+    const search = window.location.search;
+    const params = new URLSearchParams(search);
+    const unit = params.get("unit");
+    return unit ? unit : "0";
+  }
 
   // Handle selectedOptions both when an option is selected or deselected in the Combobox,
   // and when an option is removed by clicking on a tag
@@ -138,7 +150,23 @@ export const NewMessage = () => {
   React.useEffect(() => {
     GetTeamsDataAction(dispatch);
     VerifyGroupAccessAction(dispatch);
+    GetUnitAction(dispatch, { id: getUnit() });
   }, []);
+
+  React.useEffect(() => {
+    if (unit && unit?.groups?.length > 0) {
+      const groupNames = unit.groups;
+      groupNames.forEach((groupName: any) => {
+        const q = encodeURIComponent(groupName.name);
+        SearchGroupsAction(dispatch, { query: q });
+      });
+    }
+    setMessageState({ ...messageState, unitId: unit.id })
+  }, [dispatch, unit]);
+
+  React.useEffect(() => {
+    setFilteredQueryGroups(prevFilteredGroups => [...prevFilteredGroups, ...queryGroups]);
+  }, [queryGroups]);
 
   React.useEffect(() => {
     if (t) {
@@ -198,7 +226,6 @@ export const NewMessage = () => {
     try {
       await getDraftNotification(id).then((response) => {
         const draftMessageDetail = response.data;
-
         if (draftMessageDetail.teams.length > 0) {
           setSelectedRadioButton(AudienceSelection.Teams);
         } else if (draftMessageDetail.rosters.length > 0) {
@@ -221,6 +248,7 @@ export const NewMessage = () => {
           rosters: draftMessageDetail.rosters,
           groups: draftMessageDetail.groups,
           allUsers: draftMessageDetail.allUsers,
+          unitId: draftMessageDetail.unit,
         });
 
         setCardTitle(card, draftMessageDetail.title);
@@ -388,7 +416,31 @@ export const NewMessage = () => {
     if (id) {
       editDraftMessage(finalMessage);
     } else {
-      postDraftMessage(finalMessage);
+      finalMessage.groups.forEach(group => {
+        const message = {
+          title: finalMessage.title,
+          teams: finalMessage.teams,
+          rosters: finalMessage.rosters,
+          groups: [group],
+          allUsers: finalMessage.allUsers,
+          unitId: finalMessage.unitId
+        };
+        const memberCount = filteredQueryGroups.filter(item => item.id === group);
+        if (memberCount[0].memberCount < 10) {
+          createDraftNotification(message)
+            .then((draftNotification) => {
+              getDraftNotification(draftNotification.data)
+                .then((response) => {
+                  sendDraftNotification(response.data)
+                    .then(() => {
+                      microsoftTeams.tasks.submitTask();
+                    });
+                });
+            });
+        } else {
+          postDraftMessage(message);
+        }
+      });
     }
   };
 
@@ -534,7 +586,8 @@ export const NewMessage = () => {
 
   const onSearchSelect: ComboboxProps['onOptionSelect'] = (event, data: any) => {
     if (data.optionText && !searchSelectedOptions.find((x) => x.id === data.optionValue)) {
-      setSearchSelectedOptions([...searchSelectedOptions, { id: data.optionValue, name: data.optionText }]);
+      const selectedGroup = filteredQueryGroups.filter(group => group.id === data.optionValue);
+      setSearchSelectedOptions([...searchSelectedOptions, { id: data.optionValue, name: data.optionText, memberCount: selectedGroup[0].memberCount }]);
     }
   };
 
@@ -739,110 +792,6 @@ export const NewMessage = () => {
                 {t('SendHeadingText')}
               </Label>
               <RadioGroup defaultValue={selectedRadioButton} aria-labelledby='audienceSelectionGroupLabelId' onChange={audienceSelectionChange}>
-                <Radio id='radio1' value={AudienceSelection.Teams} label={t('SendToGeneralChannel')} />
-                {selectedRadioButton === AudienceSelection.Teams && (
-                  <div className={cmb_styles.root}>
-                    <Label id={teamsComboId}>Pick team(s)</Label>
-                    {teamsSelectedOptions.length ? (
-                      <ul id={teamsSelectedListId} className={cmb_styles.tagsList} ref={teamsSelectedListRef}>
-                        {/* The "Remove" span is used for naming the buttons without affecting the Combobox name */}
-                        <span id={`${teamsComboId}-remove`} hidden>
-                          Remove
-                        </span>
-                        {teamsSelectedOptions.map((option, i) => (
-                          <li key={option.id}>
-                            <Button
-                              size='small'
-                              shape='rounded'
-                              appearance='subtle'
-                              icon={<Dismiss12Regular />}
-                              iconPosition='after'
-                              onClick={() => onTeamsTagClick(option, i)}
-                              id={`${teamsComboId}-remove-${i}`}
-                              aria-labelledby={`${teamsComboId}-remove ${teamsComboId}-remove-${i}`}
-                            >
-                              <Persona name={option.name} secondaryText={'Team'} avatar={{ shape: 'square', color: 'colorful' }} />
-                            </Button>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <></>
-                    )}
-                    <Combobox
-                      multiselect={true}
-                      selectedOptions={teamsSelectedOptions.map((op) => op.id)}
-                      appearance='filled-darker'
-                      size='large'
-                      onOptionSelect={onTeamsSelect}
-                      ref={teamsComboboxInputRef}
-                      aria-labelledby={teamsLabelledBy}
-                      placeholder={teams.length !== 0 ? 'Pick one or more teams' : t('NoMatchMessage')}
-                    >
-                      {teams.map((opt) => (
-                        <Option text={opt.name} value={opt.id} key={opt.id}>
-                          <Persona name={opt.name} secondaryText={'Team'} avatar={{ shape: 'square', color: 'colorful' }} />
-                        </Option>
-                      ))}
-                    </Combobox>
-                  </div>
-                )}
-                <Radio id='radio2' value={AudienceSelection.Rosters} label={t('SendToRosters')} />
-                {selectedRadioButton === AudienceSelection.Rosters && (
-                  <div className={cmb_styles.root}>
-                    <Label id={rostersComboId}>Pick team(s)</Label>
-                    {rostersSelectedOptions.length ? (
-                      <ul id={rostersSelectedListId} className={cmb_styles.tagsList} ref={rostersSelectedListRef}>
-                        {/* The "Remove" span is used for naming the buttons without affecting the Combobox name */}
-                        <span id={`${rostersComboId}-remove`} hidden>
-                          Remove
-                        </span>
-                        {rostersSelectedOptions.map((option, i) => (
-                          <li key={option.id}>
-                            <Button
-                              size='small'
-                              shape='rounded'
-                              appearance='subtle'
-                              icon={<Dismiss12Regular />}
-                              iconPosition='after'
-                              onClick={() => onRostersTagClick(option, i)}
-                              id={`${rostersComboId}-remove-${i}`}
-                              aria-labelledby={`${rostersComboId}-remove ${rostersComboId}-remove-${i}`}
-                            >
-                              <Persona name={option.name} secondaryText={'Team'} avatar={{ shape: 'square', color: 'colorful' }} />
-                            </Button>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <></>
-                    )}
-                    <Combobox
-                      multiselect={true}
-                      selectedOptions={rostersSelectedOptions.map((op) => op.id)}
-                      appearance='filled-darker'
-                      size='large'
-                      onOptionSelect={onRostersSelect}
-                      ref={rostersComboboxInputRef}
-                      aria-labelledby={rostersLabelledBy}
-                      placeholder={teams.length !== 0 ? 'Pick one or more teams' : t('NoMatchMessage')}
-                    >
-                      {teams.map((opt) => (
-                        <Option text={opt.name} value={opt.id} key={opt.id}>
-                          <Persona name={opt.name} secondaryText={'Team'} avatar={{ shape: 'square', color: 'colorful' }} />
-                        </Option>
-                      ))}
-                    </Combobox>
-                  </div>
-                )}
-                <Radio id='radio3' value={AudienceSelection.AllUsers} label={t('SendToAllUsers')} />
-                <div className={cmb_styles.root}>
-                  {selectedRadioButton === AudienceSelection.AllUsers && (
-                    <Text id='radio3Note' role={allUsersAria} className='info-text'>
-                      {t('SendToAllUsersNote')}
-                    </Text>
-                  )}
-                </div>
                 <Radio id='radio4' value={AudienceSelection.Groups} label={t('SendToGroups')} />
                 {selectedRadioButton === AudienceSelection.Groups && (
                   <div className={cmb_styles.root}>
@@ -884,11 +833,11 @@ export const NewMessage = () => {
                           appearance='filled-darker'
                           size='large'
                           onOptionSelect={onSearchSelect}
-                          onChange={onSearchChange}
                           aria-labelledby={searchLabelledBy}
                           placeholder={'Search for groups'}
+
                         >
-                          {queryGroups.map((opt) => (
+                          {filteredQueryGroups?.map((opt) => (
                             <Option text={opt.name} value={opt.id} key={opt.id}>
                               <Persona name={opt.name} secondaryText={'Group'} avatar={{ color: 'colorful' }} />
                             </Option>

@@ -9,11 +9,12 @@ export interface IConfigState {
   url: string;
 }
 
+
 class Configuration extends React.Component<{}, IConfigState> {
   constructor(props: {}) {
     super(props);
     this.state = {
-      url: getBaseUrl() + "/messages?locale={locale}",
+      url: getBaseUrl() + "/selectunit?locale={locale}",
     };
   }
 
