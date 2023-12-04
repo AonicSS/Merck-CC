@@ -26,6 +26,20 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.Notificat
         public Task<IEnumerable<NotificationDataEntity>> GetAllDraftNotificationsAsync();
 
         /// <summary>
+        /// Get all draft notification entities from the table storage.
+        /// </summary>
+        /// <param name="unitId">Unit Id.</param>
+        /// <returns>All draft notification entities.</returns>
+        public Task<IEnumerable<NotificationDataEntity>> GetAllDraftNotificationsOfUnitAsync(string unitId);
+
+        /// <summary>
+        /// Get all sent notification entities from the table storage.
+        /// </summary>
+        /// <param name="unitId">Unit Id.</param>
+        /// <returns>All draft notification entities.</returns>
+        public Task<IEnumerable<NotificationDataEntity>> GetAllSentNotificationsOfUnitAsync(string unitId);
+
+        /// <summary>
         /// Get the top 25 most recently sent notification entities from the table storage.
         /// </summary>
         /// <returns>The top 25 most recently sent notification entities.</returns>

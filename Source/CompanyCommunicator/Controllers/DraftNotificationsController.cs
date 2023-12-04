@@ -168,6 +168,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
                 AllUsers = notification.AllUsers,
                 IsScheduled = notification.IsScheduled,
                 ScheduledDate = notification.ScheduledDate,
+                UnitId = notification.UnitId,
             };
 
             if (!string.IsNullOrEmpty(notification.ImageLink) && notification.ImageLink.StartsWith(Constants.ImageBase64Format))
@@ -226,6 +227,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
                 {
                     Id = notificationEntity.Id,
                     Title = notificationEntity.Title,
+                    UnitId = notificationEntity.UnitId,
                 };
 
                 result.Add(summary);
@@ -274,6 +276,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
                 AllUsers = notificationEntity.AllUsers,
                 IsScheduled = notificationEntity.IsScheduled,
                 ScheduledDate = notificationEntity.ScheduledDate,
+                UnitId = notificationEntity.UnitId,
             };
 
             // In case we have blob name instead of URL to public image.

@@ -239,5 +239,9 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.Notificat
         /// </summary>
         public DateTime? ScheduledDate { get; set; }
 
+        /// <summary>
+        /// Gets or sets the unit id.
+        /// </summary>
+        public string UnitId { get; set; }
     }
 }

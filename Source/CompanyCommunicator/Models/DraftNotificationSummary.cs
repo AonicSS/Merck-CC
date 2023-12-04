@@ -26,5 +26,10 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Models
         /// Gets or sets ScheduledDate value.
         /// </summary>
         public DateTime? ScheduledDate { get; set; }
+
+        /// <summary>
+        /// Gets or sets Unit Id value.
+        /// </summary>
+        public string UnitId { get; set; }
     }
 }

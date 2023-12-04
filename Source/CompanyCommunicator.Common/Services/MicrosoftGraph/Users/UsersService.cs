@@ -103,6 +103,77 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.MicrosoftGrap
             return users;
         }
 
+        /// <summary>
+        /// Get user by mail.
+        /// </summary>
+        /// <param name="mail">The user's email.</param>
+        /// <returns>The user data.</returns>
+        public async Task<User> GetUserByMailAsync(string mail)
+        {
+            var graphResult = await this.graphServiceClient
+                    .Users
+                    .Request()
+                    .Filter($"mail eq '{mail}'")
+                    .Select(user => new
+                    {
+                        user.Id,
+                        user.DisplayName,
+                        user.UserPrincipalName,
+                        user.UserType,
+                    })
+                    .WithMaxRetry(GraphConstants.MaxRetry)
+                    .GetAsync();
+            return graphResult.FirstOrDefault();
+        }
+
+        /// <inheritdoc/>
+        public async Task<User> GetUserByUpnAsync(string upn)
+        {
+            var graphResult = await this.graphServiceClient
+                .Users
+                .Request()
+                .Filter($"userPrincipalName eq '{upn}'")
+                .Select(user => new
+                {
+                    user.Id,
+                    user.DisplayName,
+                    user.UserPrincipalName,
+                    user.UserType,
+                })
+                .WithMaxRetry(GraphConstants.MaxRetry)
+                .GetAsync();
+            return graphResult.FirstOrDefault();
+        }
+
+        /// <inheritdoc/>
+        public async Task<List<string>> GetUsersGroupIdsAsync(string userId)
+        {
+            var groups = await this.graphServiceClient
+                .Users[userId]
+                .MemberOf
+                .Request()
+                .WithMaxRetry(GraphConstants.MaxRetry)
+                .GetAsync();
+
+            var groupIds = new List<string>();
+            while (groups.Count > 0)
+            {
+                groupIds.AddRange(groups.OfType<Group>().Select(g => g.Id));
+
+                if (groups.NextPageRequest != null)
+                {
+                    groups = await groups.NextPageRequest.GetAsync();
+                }
+                else
+                {
+                    break; // No more pages, exit the loop
+                }
+            }
+
+            return groupIds;
+        }
+
+
         /// <inheritdoc/>
         public async IAsyncEnumerable<IEnumerable<User>> GetUsersAsync(string filter = null)
         {

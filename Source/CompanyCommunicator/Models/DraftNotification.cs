@@ -54,6 +54,11 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Models
         public DateTime? ScheduledDate { get; set; }
 
         /// <summary>
+        /// Gets or sets a value of created by.
+        /// </summary>
+        public string CreatedBy { get; set; }
+
+        /// <summary>
         /// Validates a draft notification.
         /// Teams and Rosters property should not contain more than 20 items.
         /// </summary>

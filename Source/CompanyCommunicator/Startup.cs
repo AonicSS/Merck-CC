@@ -31,6 +31,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.NotificationData;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.SentNotificationData;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.TeamData;
+    using Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.Unit;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.UserData;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Secrets;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Services;
@@ -47,6 +48,8 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator
     using Microsoft.Teams.Apps.CompanyCommunicator.Controllers.Options;
     using Microsoft.Teams.Apps.CompanyCommunicator.DraftNotificationPreview;
     using Microsoft.Teams.Apps.CompanyCommunicator.Localization;
+    using Microsoft.Teams.Apps.CompanyCommunicator.Services;
+    using Microsoft.Teams.Apps.CompanyCommunicator.Services.UnitData;
 
     /// <summary>
     /// Register services in DI container, and set up middle-wares in the pipeline.
@@ -173,6 +176,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator
             services.AddSingleton<IExportDataRepository, ExportDataRepository>();
             services.AddSingleton<IAppConfigRepository, AppConfigRepository>();
             services.AddSingleton<ISendingNotificationDataRepository, SendingNotificationDataRepository>();
+            services.AddSingleton<IUnitDataRepository, UnitDataRepository>();
             services.AddSingleton<ICleanUpHistoryRepository, CleanUpHistoryRepository>();
 
             // Add service bus message queues.
@@ -196,10 +200,11 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator
                 sp.GetService<IHttpProvider>()));
             services.AddScoped<IGraphServiceFactory, GraphServiceFactory>();
             services.AddScoped<IGroupsService>(sp => sp.GetRequiredService<IGraphServiceFactory>().GetGroupsService());
+            services.AddScoped<IUsersService>(sp => sp.GetRequiredService<IGraphServiceFactory>().GetUsersService());
             services.AddScoped<IAppCatalogService>(sp => sp.GetRequiredService<IGraphServiceFactory>().GetAppCatalogService());
 
             // Add Application Insights telemetry.
-            services.AddApplicationInsightsTelemetry();
+            // services.AddApplicationInsightsTelemetry();
 
             // Add miscellaneous dependencies.
             services.AddTransient<TableRowKeyGenerator>();
@@ -210,6 +215,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator
             services.AddTransient<CCBotAdapterBase, CCBotAdapter>();
             services.AddTransient<IStorageClientFactory, StorageClientFactory>();
             services.AddTransient<IBlobStorageProvider, BlobStorageProvider>();
+            services.AddScoped<IUnitDataService, UnitDataService>();
         }
 
         /// <summary>

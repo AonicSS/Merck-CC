@@ -56,6 +56,28 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.Notificat
         }
 
         /// <inheritdoc/>
+        public async Task<IEnumerable<NotificationDataEntity>> GetAllDraftNotificationsOfUnitAsync(string unitId)
+        {
+            var filter = TableQuery.GenerateFilterCondition(
+                nameof(NotificationDataEntity.UnitId),
+                QueryComparisons.Equal,
+                unitId);
+            var result = await this.GetWithFilterAsync(filter, NotificationDataTableNames.DraftNotificationsPartition);
+            return result;
+        }
+
+        /// <inheritdoc/>
+        public async Task<IEnumerable<NotificationDataEntity>> GetAllSentNotificationsOfUnitAsync(string unitId)
+        {
+            var filter = TableQuery.GenerateFilterCondition(
+                nameof(NotificationDataEntity.UnitId),
+                QueryComparisons.Equal,
+                unitId);
+            var result = await this.GetWithFilterAsync(filter, NotificationDataTableNames.SentNotificationsPartition);
+            return result;
+        }
+
+        /// <inheritdoc/>
         public async Task<IEnumerable<NotificationDataEntity>> GetMostRecentSentNotificationsAsync()
         {
             var result = await this.GetAllAsync(NotificationDataTableNames.SentNotificationsPartition, 25);

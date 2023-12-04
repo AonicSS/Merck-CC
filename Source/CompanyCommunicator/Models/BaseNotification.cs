@@ -61,5 +61,10 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Models
         /// Gets or sets a value indicating whether gets or sets the IsScheduled value.
         /// </summary>
         public bool IsScheduled { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Unit Id value.
+        /// </summary>
+        public string UnitId { get; set; }
     }
 }
