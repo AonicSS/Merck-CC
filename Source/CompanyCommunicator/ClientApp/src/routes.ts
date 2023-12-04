@@ -14,6 +14,9 @@ export enum ROUTE_PARTS {
   SIGN_IN_SIMPLE_START = 'signin-simple-start',
   SIGN_IN_SIMPLE_END = 'signin-simple-end',
   PREVIEW_MESSAGE_CONFIRMATION = 'previewMessageConfirmation',
+  REQUEST_ACCESS = 'requestaccess',
+  SELECT_UNIT = "selectunit",
+  MANAGE_UNIT = "manageunit",
 }
 
 export enum ROUTE_PARAMS {

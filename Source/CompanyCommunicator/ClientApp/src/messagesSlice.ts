@@ -19,6 +19,13 @@ export interface MessagesState {
   hostClientType: { action: string; payload?: HostClientType };
   scheduledMessages: { action: string; payload: [] };
   isScheduledMessagesFetchOn: { action: string; payload: boolean };
+  units: { action: string, payload: any[] };
+  unit: { action: string, payload: {} };
+  unitMembers: { action: string; payload: any[] };
+  unitGroups: { action: string; payload: any[] };
+  users: { action: string; payload: any[] };
+  user: { action: string; payload: any[] }
+  isAdmin: { action: string; payload: boolean };
 }
 
 const initialState: MessagesState = {
@@ -36,6 +43,13 @@ const initialState: MessagesState = {
   hostClientType: { action: 'HOST_CLIENT_TYPE' },
   scheduledMessages: { action: 'FETCH_SCHEDULED_MESSAGES', payload: [] },
   isScheduledMessagesFetchOn: { action: 'SCHEDULED_MESSAGES_FETCH_STATUS', payload: false },
+  units: { action: "GET_UNITS", payload: [] },
+  unit: { action: "GET_UNIT", payload: {} },
+  unitMembers: { action: "GET_UNIT_MEMBERS", payload: [] },
+  unitGroups: { action: "GET_UNIT_GROUPS", payload: [] },
+  users: { action: "GET_UNIT_GROUPS", payload: [] },
+  user: { action: "GET_USER", payload: [] },
+  isAdmin: { action: "IS_ADMIN", payload: false }
 };
 
 export const messagesSlice = createSlice({
@@ -84,6 +98,27 @@ export const messagesSlice = createSlice({
     isScheduledMessagesFetchOn: (state, action) => {
       state.isScheduledMessagesFetchOn = action.payload;
     },
+    units: (state, action) => {
+      state.units = action.payload;
+    },
+    unit: (state, action) => {
+      state.unit = action.payload;
+    },
+    unitMembers: (state, action) => {
+      state.unitMembers = action.payload;
+    },
+    unitGroups: (state, action) => {
+      state.unitGroups = action.payload;
+    },
+    users: (state, action) => {
+      state.users = action.payload;
+    },
+    user: (state, action) => {
+      state.user = action.payload;
+    },
+    isAdmin: (state, action) => {
+      state.isAdmin = action.payload;
+    },
   },
 });
 
@@ -102,6 +137,13 @@ export const {
   hostClientType,
   scheduledMessages,
   isScheduledMessagesFetchOn,
+  units,
+  unit,
+  unitMembers,
+  unitGroups,
+  users,
+  user,
+  isAdmin,
 } = messagesSlice.actions;
 
 export default messagesSlice.reducer;
