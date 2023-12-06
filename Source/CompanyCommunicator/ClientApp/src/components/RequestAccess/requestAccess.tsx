@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import "./requestAccess.scss";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { Button, Text } from "@fluentui/react-components";

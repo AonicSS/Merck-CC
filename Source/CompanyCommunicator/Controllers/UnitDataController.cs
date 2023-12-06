@@ -82,7 +82,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
         public async Task<IActionResult> DeleteUnitDataAsync(string id)
         {
             var success = await this.unitDataRepository.TryDeleteAsync(id);
-            return success ? (IActionResult)this.Ok() : this.NotFound();
+            return success ? (IActionResult)this.Ok(success) : this.NotFound();
         }
 
         /// <summary>

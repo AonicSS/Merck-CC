@@ -1,0 +1,22 @@
+.cc-user-homepage-header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.cc-unit-name {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.cc-unit-dropdown {
+    display: flex;
+    flex-direction: column;
+}
+
+.cc-unit-item {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    cursor: pointer;
+}

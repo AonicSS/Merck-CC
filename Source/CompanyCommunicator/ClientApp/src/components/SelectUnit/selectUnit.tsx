@@ -21,9 +21,11 @@ import {
   Theme,
 } from "@fluentui/react-components";
 import { useNavigate } from 'react-router-dom';
-import { GetUnitsAction, GetUserAction, GetUserUnitsAction, UpdateUserPermission } from "../../actions";
-import * as microsoftTeams from '@microsoft/teams-js';
+import { GetUnitAction, GetUnitsAction, GetUserAction, GetUserUnitsAction, UpdateUserPermission } from "../../actions";
+import { app } from '@microsoft/teams-js';
 import { Header } from "../Shared/header";
+import { IUser } from "../../models/user";
+import { IUnit } from "../../models/unit";
 
 interface ISelectUnit {
   theme: Theme;
@@ -38,20 +40,24 @@ const SelectUnit = (props: ISelectUnit) => {
 
   const [userPrincipalName, setUserPrincipalName] = React.useState<string | undefined>(undefined);
 
+  const getUpn = async () => {
+    const ctx = await app.getContext();
+    const upn = ctx.user?.userPrincipalName;
+    setUserPrincipalName(upn);
+  }
 
   React.useEffect(() => {
-    microsoftTeams.getContext(function (context) {
-      setUserPrincipalName(context.userPrincipalName);
-    });
+    getUpn();
   }, []);
 
 
-  function onSelectUnit(props: string) {
-    navigate(`/unitmessages?unit=${props}`);
+  const onSelectUnit = (props: string) => {
+    GetUnitAction(dispatch, { id: props });
+    navigate(`/unitmessages`);
   }
 
-  const currentUser: any = useAppSelector((state: RootState) => state.messages).user.payload;
-  const currentUserUnits = useAppSelector((state: RootState) => state.messages).units.payload;
+  const currentUser: IUser = useAppSelector((state: RootState) => state.messages).user.payload;
+  const currentUserUnits: IUnit[] = useAppSelector((state: RootState) => state.messages).units.payload;
   const [unitFetched, setUnitFetched] = React.useState(false);
 
   // get the current user
@@ -64,7 +70,7 @@ const SelectUnit = (props: ISelectUnit) => {
 
   // get the current users unit
   React.useEffect(() => {
-    if (Object.keys(currentUser).length !== 0) {
+    if (currentUser.id.length !== 0) {
       GetUserUnitsAction(dispatch, { id: currentUser.id });
       setUnitFetched(true);
     }
@@ -82,9 +88,12 @@ const SelectUnit = (props: ISelectUnit) => {
 
   React.useEffect(() => {
     if (isAdmin) {
+      const adminUnit = currentUserUnits.filter(unit => unit.name === "Admin Unit");
+      GetUnitsAction(dispatch);
+      GetUnitAction(dispatch, { id: adminUnit[0].id });
       navigate(`/messages`);
     }
-  }, [navigate, isAdmin]);
+  }, [isAdmin]);
 
   return (
     <>

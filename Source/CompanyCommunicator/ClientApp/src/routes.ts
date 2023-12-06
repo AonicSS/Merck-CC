@@ -17,6 +17,7 @@ export enum ROUTE_PARTS {
   REQUEST_ACCESS = 'requestaccess',
   SELECT_UNIT = "selectunit",
   MANAGE_UNIT = "manageunit",
+  UNIT_MESSAGES = "unitmessages",
 }
 
 export enum ROUTE_PARAMS {
@@ -24,6 +25,7 @@ export enum ROUTE_PARAMS {
   DELETION_TYPE = 'deletionType',
   DELETION_FROM_DATE = 'deletionFromDate',
   DELETION_TO_DATE = 'deletionToDate',
+  IS_NEW = "isNew",
 }
 
 export enum ROUTE_QUERY_PARAMS {

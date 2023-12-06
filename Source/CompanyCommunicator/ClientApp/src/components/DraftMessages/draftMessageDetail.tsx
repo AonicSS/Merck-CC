@@ -30,17 +30,22 @@ import {
   SendRegular,
 } from '@fluentui/react-icons';
 import { app, dialog, DialogDimension, UrlDialogInfo } from '@microsoft/teams-js';
-import { GetDraftMessagesSilentAction, GetSentMessagesSilentAction } from '../../actions';
+import { GetDraftMessagesSilentAction, GetSentMessagesSilentAction, GetUnitDraftMessagesAction, GetUnitSentMessagesAction } from '../../actions';
 import { deleteDraftNotification, duplicateDraftNotification, sendPreview } from '../../apis/messageListApi';
 import { getBaseUrl } from '../../configVariables';
 import { ROUTE_PARTS, ROUTE_QUERY_PARAMS } from '../../routes';
-import { useAppDispatch } from '../../store';
+import { RootState, useAppDispatch, useAppSelector } from '../../store';
+import { IUnit } from '../../models/unit';
+import { IUser } from '../../models/user';
 
 export const DraftMessageDetail = (draftMessages: any) => {
   const { t } = useTranslation();
   const keyboardNavAttr = useArrowNavigationGroup({ axis: 'grid' });
+  const isAdmin: boolean = useAppSelector((state: RootState) => state.messages).isAdmin.payload;
+  const currentUnit: IUnit = useAppSelector((state: RootState) => state.messages).unit.payload;
   const [teamsTeamId, setTeamsTeamId] = React.useState('');
   const [teamsChannelId, setTeamsChannelId] = React.useState('');
+  const [userPrincipalName, setUserPrincipalName] = React.useState<string | undefined>(undefined);
   const dispatch = useAppDispatch();
   const sendUrl = (id: string) => getBaseUrl() + `/${ROUTE_PARTS.SEND_CONFIRMATION}/${id}?${ROUTE_QUERY_PARAMS.LOCALE}={locale}`;
   const editUrl = (id: string) => getBaseUrl() + `/${ROUTE_PARTS.NEW_MESSAGE}/${id}?${ROUTE_QUERY_PARAMS.LOCALE}={locale}`;
@@ -51,6 +56,7 @@ export const DraftMessageDetail = (draftMessages: any) => {
       void app.getContext().then((context: app.Context) => {
         setTeamsTeamId(context.team?.internalId ?? '');
         setTeamsChannelId(context.channel?.id ?? '');
+        setUserPrincipalName(context.user?.userPrincipalName ?? '');
       });
     }
   }, []);
@@ -64,8 +70,13 @@ export const DraftMessageDetail = (draftMessages: any) => {
     };
 
     const submitHandler: dialog.DialogSubmitHandler = (result: dialog.ISdkResponse) => {
-      GetDraftMessagesSilentAction(dispatch);
-      GetSentMessagesSilentAction(dispatch);
+      if (!isAdmin) {
+        GetUnitDraftMessagesAction(dispatch, { id: currentUnit.id });
+        GetUnitSentMessagesAction(dispatch, { id: currentUnit.id });
+      } else {
+        GetDraftMessagesSilentAction(dispatch);
+        GetSentMessagesSilentAction(dispatch);
+      }
     };
 
     // now open the dialog
@@ -156,7 +167,7 @@ export const DraftMessageDetail = (draftMessages: any) => {
                   </MenuTrigger>
                   <MenuPopover>
                     <MenuList>
-                      <MenuItem
+                      {(isAdmin || userPrincipalName !== item.createdBy) && <MenuItem
                         icon={<SendRegular />}
                         key={'sendConfirmationKey'}
                         onClick={() => {
@@ -164,7 +175,7 @@ export const DraftMessageDetail = (draftMessages: any) => {
                         }}
                       >
                         {t('Send')}
-                      </MenuItem>
+                      </MenuItem>}
                       {
                         // eslint-disable-next-line @typescript-eslint/no-misused-promises, @typescript-eslint/promise-function-async
                         <MenuItem key={'previewInThisChannelKey'} icon={<OpenRegular />} onClick={() => checkPreviewMessage(item.id)}>

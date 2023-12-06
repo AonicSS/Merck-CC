@@ -159,8 +159,6 @@ export const updateUnit = async (unitData: { id: string; name: string; users: an
     UserIds,
     GroupIds,
   };
-  console.log(postData);
-
   if (postData.id) {
     return await apiCall.putAndGetJsonResponse(url, postData);
   } else {
@@ -172,7 +170,8 @@ export const updateUnit = async (unitData: { id: string; name: string; users: an
 // delete a single unit, return 200 ok
 export const deleteUnit = async (id: string): Promise<any> => {
   const url = baseAxiosUrl + "/unitData/" + id;
-  return await apiCall.deleteAndGetJsonResponse(url);
+  const response = await apiCall.deleteAndGetJsonResponse(url);
+  return response;
 };
 
 

@@ -3,6 +3,8 @@
 
 import { HostClientType } from '@microsoft/teams-js';
 import { createSlice } from '@reduxjs/toolkit';
+import { IUnit } from './models/unit';
+import { IUser } from './models/user';
 
 export interface MessagesState {
   draftMessages: { action: string; payload: [] };
@@ -19,12 +21,12 @@ export interface MessagesState {
   hostClientType: { action: string; payload?: HostClientType };
   scheduledMessages: { action: string; payload: [] };
   isScheduledMessagesFetchOn: { action: string; payload: boolean };
-  units: { action: string, payload: any[] };
-  unit: { action: string, payload: {} };
+  units: { action: string, payload: IUnit[] };
+  unit: { action: string, payload: IUnit };
   unitMembers: { action: string; payload: any[] };
   unitGroups: { action: string; payload: any[] };
-  users: { action: string; payload: any[] };
-  user: { action: string; payload: any[] }
+  users: { action: string; payload: IUser[] };
+  user: { action: string; payload: IUser }
   isAdmin: { action: string; payload: boolean };
 }
 
@@ -44,11 +46,11 @@ const initialState: MessagesState = {
   scheduledMessages: { action: 'FETCH_SCHEDULED_MESSAGES', payload: [] },
   isScheduledMessagesFetchOn: { action: 'SCHEDULED_MESSAGES_FETCH_STATUS', payload: false },
   units: { action: "GET_UNITS", payload: [] },
-  unit: { action: "GET_UNIT", payload: {} },
+  unit: { action: "GET_UNIT", payload: {id: '', name: '', size: 0, users: [], groups: []} },
   unitMembers: { action: "GET_UNIT_MEMBERS", payload: [] },
   unitGroups: { action: "GET_UNIT_GROUPS", payload: [] },
   users: { action: "GET_UNIT_GROUPS", payload: [] },
-  user: { action: "GET_USER", payload: [] },
+  user: { action: "GET_USER", payload: {id: '', mail: '', name: ''} },
   isAdmin: { action: "IS_ADMIN", payload: false }
 };
 

@@ -205,7 +205,8 @@ export const GetUnitDraftMessagesAction = (dispatch: typeof store.dispatch, payl
   DraftMessageFetchStatusAction(dispatch, true);
   getUnitDraftNotification(payload.id)
     .then((response) => {
-      dispatch(draftMessages({ type: "FETCH_DRAFT_MESSAGES", payload: response?.data || [] }));
+      console.log(response);
+      dispatch(draftMessages({ type: "FETCH_DRAFT_MESSAGES", payload: response || [] }));
     })
     .finally(() => {
       DraftMessageFetchStatusAction(dispatch, false);
@@ -216,7 +217,7 @@ export const GetUnitSentMessagesAction = (dispatch: typeof store.dispatch, paylo
   SentMessageFetchStatusAction(dispatch, true);
   getUnitSentNotification(payload.id)
     .then((response) => {
-      dispatch(sentMessages({ type: "FETCH_MESSAGES", payload: response?.data || [] }));
+      dispatch(sentMessages({ type: "FETCH_MESSAGES", payload: response || [] }));
     })
     .finally(() => {
       SentMessageFetchStatusAction(dispatch, false);
@@ -225,20 +226,19 @@ export const GetUnitSentMessagesAction = (dispatch: typeof store.dispatch, paylo
 
 export const GetUnitsAction = (dispatch: typeof store.dispatch) => {
   getUnits().then((response) => {
-    console.log(response);
-    dispatch(units({ type: "GET_UNITS", payload: response?.data || [] }));
+    dispatch(units({ type: "GET_UNITS", payload: response || [] }));
   });
 };
 
 export const GetUserUnitsAction = (dispatch: typeof store.dispatch, payload: { id: string }) => {
   getUserUnits(payload.id).then((response) => {
-    dispatch(units({ type: "GET_UNITS", payload: response?.data || [] }));
+    dispatch(units({ type: "GET_UNITS", payload: response || [] }));
   });
 };
 
 export const GetUnitAction = (dispatch: typeof store.dispatch, payload: { id: string }) => {
   getUnit(payload.id).then((response) => {
-    dispatch(unit({ type: "GET_UNIT", payload: response?.data || [] }));
+    dispatch(unit({ type: "GET_UNIT", payload: response || [] }));
   });
 };
 
@@ -260,13 +260,13 @@ export const GetUnitGroupsAction = (dispatch: typeof store.dispatch, payload: { 
 
 export const GetUsersAction = (dispatch: typeof store.dispatch, payload: { query: string }) => {
   getUsers(payload.query).then((response) => {
-    dispatch(users({ type: "GET_USERS", payload: response?.data || [] }));
+    dispatch(users({ type: "GET_USERS", payload: response || [] }));
   });
 };
 
 export const GetUserAction = (dispatch: typeof store.dispatch, payload: { mail: string }) => {
   getUser(payload.mail).then((response) => {
-    dispatch(user({ type: "GET_USER", payload: response?.data || [] }));
+    dispatch(user({ type: "GET_USER", payload: response || {} }));
   });
 };
 

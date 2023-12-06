@@ -42,6 +42,7 @@ import {
   SearchGroupsAction,
   VerifyGroupAccessAction,
   GetScheduledMessagesSilentAction,
+  GetUnitAction,
 } from '../../actions';
 import { createDraftNotification, getDraftNotification, updateDraftNotification } from '../../apis/messageListApi';
 import { getBaseUrl } from '../../configVariables';
@@ -54,6 +55,7 @@ import {
   setCardSummary,
   setCardTitle,
 } from '../AdaptiveCard/adaptiveCard';
+import { IUnit } from '../../models/unit';
 
 const validImageTypes = ['image/gif', 'image/jpeg', 'image/png', 'image/jpg'];
 
@@ -71,6 +73,7 @@ interface IMessageState {
   allUsers: boolean;
   isScheduled?: boolean;
   scheduledDate?: string;
+  unitId: any;
 }
 
 interface ITeamTemplate {
@@ -132,6 +135,8 @@ export const NewMessage = () => {
   const groups = useAppSelector((state: RootState) => state.messages).groups.payload;
   const queryGroups = useAppSelector((state: RootState) => state.messages).queryGroups.payload;
   const canAccessGroups = useAppSelector((state: RootState) => state.messages).verifyGroup.payload;
+  const unit: IUnit = useAppSelector((state: RootState) => state.messages).unit.payload;
+
   const [selectedRadioButton, setSelectedRadioButton] = React.useState(AudienceSelection.None);
   const [pageSelection, setPageSelection] = React.useState(CurrentPageSelection.CardCreation);
   const [allUsersState, setAllUsersState] = React.useState(false);
@@ -149,7 +154,16 @@ export const NewMessage = () => {
     rosters: [],
     groups: [],
     allUsers: false,
+    unitId: {},
   });
+  const [filteredQueryGroups, setFilteredQueryGroups] = React.useState<ITeamTemplate[]>([]);
+
+  const getUnit = () => {
+    const search = window.location.search;
+    const params = new URLSearchParams(search);
+    const unitId = params.get("unitId");
+    return unitId ? unitId : "0";
+  }
 
   // Handle selectedOptions both when an option is selected or deselected in the Combobox,
   // and when an option is removed by clicking on a tag
@@ -170,7 +184,15 @@ export const NewMessage = () => {
   React.useEffect(() => {
     GetTeamsDataAction(dispatch);
     VerifyGroupAccessAction(dispatch);
+    GetUnitAction(dispatch, { id: getUnit() });
   }, []);
+
+  React.useEffect(() => {
+    if (unit && unit?.groups?.length > 0) {
+      setFilteredQueryGroups(unit.groups);
+    }
+    setMessageState({ ...messageState, unitId: unit.id })
+  }, [dispatch, unit]);
 
   React.useEffect(() => {
     if (
@@ -273,6 +295,7 @@ export const NewMessage = () => {
           allUsers: draftMessageDetail.allUsers,
           isScheduled: draftMessageDetail.isScheduled,
           scheduledDate: draftMessageDetail.scheduledDate,
+          unitId: draftMessageDetail.unit,
         });
         setScheduleSendCheckBox(draftMessageDetail.isScheduled);
         if (draftMessageDetail.scheduledDate !== null) {
@@ -493,7 +516,17 @@ export const NewMessage = () => {
     if (id) {
       editDraftMessage(finalMessage);
     } else {
-      postDraftMessage(finalMessage);
+      finalMessage.groups.forEach(group => {
+        const message = {
+          title: finalMessage.title,
+          teams: finalMessage.teams,
+          rosters: finalMessage.rosters,
+          groups: [group],
+          allUsers: finalMessage.allUsers,
+          unitId: finalMessage.unitId
+        };
+        postDraftMessage(message);
+      });
     }
   };
 
@@ -895,136 +928,6 @@ export const NewMessage = () => {
                 aria-labelledby='audienceSelectionGroupLabelId'
                 onChange={audienceSelectionChange}
               >
-                <Radio id='radio1' value={AudienceSelection.Teams} label={t('SendToGeneralChannel')} />
-                {selectedRadioButton === AudienceSelection.Teams && (
-                  <div className={cmbStyles.root}>
-                    <Label id={teamsComboId}>{t('pickTeams')}</Label>
-                    {
-                      // eslint-disable-next-line multiline-ternary
-                      teamsSelectedOptions.length ? (
-                        <ul id={teamsSelectedListId} className={cmbStyles.tagsList} ref={teamsSelectedListRef}>
-                          {/* The "Remove" span is used for naming the buttons without affecting the Combobox name */}
-                          <span id={`${teamsComboId}-remove`} hidden>
-                            {t('remove')}
-                          </span>
-                          {teamsSelectedOptions.map((option, i) => (
-                            <li key={option.id}>
-                              <Button
-                                size='small'
-                                shape='rounded'
-                                appearance='subtle'
-                                icon={<Dismiss12Regular />}
-                                iconPosition='after'
-                                // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
-                                onClick={() => onTeamsTagClick(option, i)}
-                                id={`${teamsComboId}-remove-${i}`}
-                                aria-labelledby={`${teamsComboId}-remove ${teamsComboId}-remove-${i}`}
-                              >
-                                <Persona
-                                  name={option.name}
-                                  secondaryText={'Team'}
-                                  avatar={{ shape: 'square', color: 'colorful' }}
-                                />
-                              </Button>
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <></>
-                      )
-                    }
-                    <Combobox
-                      multiselect={true}
-                      selectedOptions={teamsSelectedOptions.map((op) => op.id)}
-                      appearance='filled-darker'
-                      size='large'
-                      onOptionSelect={onTeamsSelect}
-                      ref={teamsComboboxInputRef}
-                      aria-labelledby={teamsLabelledBy}
-                      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                      placeholder={teams.length !== 0 ? t('pickOneOrMoreTeams')! : t('NoMatchMessage')!}
-                    >
-                      {teams.map((opt) => (
-                        <Option text={opt.name} value={opt.id} key={opt.id}>
-                          <Persona
-                            name={opt.name}
-                            secondaryText={'Team'}
-                            avatar={{ shape: 'square', color: 'colorful' }}
-                          />
-                        </Option>
-                      ))}
-                    </Combobox>
-                  </div>
-                )}
-                <Radio id='radio2' value={AudienceSelection.Rosters} label={t('SendToRosters')} />
-                {selectedRadioButton === AudienceSelection.Rosters && (
-                  <div className={cmbStyles.root}>
-                    <Label id={rostersComboId}>{t('pickTeams')}</Label>
-                    {
-                      // eslint-disable-next-line multiline-ternary
-                      rostersSelectedOptions.length ? (
-                        <ul id={rostersSelectedListId} className={cmbStyles.tagsList} ref={rostersSelectedListRef}>
-                          {/* The "Remove" span is used for naming the buttons without affecting the Combobox name */}
-                          <span id={`${rostersComboId}-remove`} hidden>
-                            {t('remove')}
-                          </span>
-                          {rostersSelectedOptions.map((option, i) => (
-                            <li key={option.id}>
-                              <Button
-                                size='small'
-                                shape='rounded'
-                                appearance='subtle'
-                                icon={<Dismiss12Regular />}
-                                iconPosition='after'
-                                // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
-                                onClick={() => onRostersTagClick(option, i)}
-                                id={`${rostersComboId}-remove-${i}`}
-                                aria-labelledby={`${rostersComboId}-remove ${rostersComboId}-remove-${i}`}
-                              >
-                                <Persona
-                                  name={option.name}
-                                  secondaryText={'Team'}
-                                  avatar={{ shape: 'square', color: 'colorful' }}
-                                />
-                              </Button>
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <></>
-                      )
-                    }
-                    <Combobox
-                      multiselect={true}
-                      selectedOptions={rostersSelectedOptions.map((op) => op.id)}
-                      appearance='filled-darker'
-                      size='large'
-                      onOptionSelect={onRostersSelect}
-                      ref={rostersComboboxInputRef}
-                      aria-labelledby={rostersLabelledBy}
-                      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                      placeholder={teams.length !== 0 ? t('pickOneOrMoreTeams')! : t('NoMatchMessage')!}
-                    >
-                      {teams.map((opt) => (
-                        <Option text={opt.name} value={opt.id} key={opt.id}>
-                          <Persona
-                            name={opt.name}
-                            secondaryText={'Team'}
-                            avatar={{ shape: 'square', color: 'colorful' }}
-                          />
-                        </Option>
-                      ))}
-                    </Combobox>
-                  </div>
-                )}
-                <Radio id='radio3' value={AudienceSelection.AllUsers} label={t('SendToAllUsers')} />
-                <div className={cmbStyles.root}>
-                  {selectedRadioButton === AudienceSelection.AllUsers && (
-                    <Text id='radio3Note' role={allUsersAria} className='info-text'>
-                      {t('SendToAllUsersNote')}
-                    </Text>
-                  )}
-                </div>
                 <Radio id='radio4' value={AudienceSelection.Groups} label={t('SendToGroups')} />
                 {selectedRadioButton === AudienceSelection.Groups && (
                   <div className={cmbStyles.root}>
@@ -1078,7 +981,7 @@ export const NewMessage = () => {
                           aria-labelledby={searchLabelledBy}
                           placeholder={t('searchForGroups') ?? ''}
                         >
-                          {queryGroups.map((opt) => (
+                          {filteredQueryGroups?.map((opt) => (
                             <Option text={opt.name} value={opt.id} key={opt.id}>
                               <Persona name={opt.name} secondaryText={'Group'} avatar={{ color: 'colorful' }} />
                             </Option>
@@ -1095,62 +998,6 @@ export const NewMessage = () => {
               <div>
                 <></>
               </div>
-              <div>
-                <Label size='large' id='MoreOptionsLabelId'>
-                  {t('MoreOptions')}
-                </Label>
-              </div>
-              <Checkbox
-                id='ScheduleCheckbox'
-                label={t('ScheduleSend')}
-                defaultChecked={scheduleSendCheckBox}
-                onChange={handleScheduleSendCheckBox}
-              />
-              {scheduleSendCheckBox && (
-                <div>
-                  <Label
-                    id='ScheduleSection'
-                    className='info-text'
-                    style={{ marginBottom: '5px', display: 'block', marginLeft: '36px' }}
-                  >
-                    {t('ScheduleSection')}
-                  </Label>
-                  <Text
-                    id='ScheduleNote'
-                    className='info-text'
-                    style={{ marginBottom: '5px', display: 'block', marginLeft: '36px' }}
-                  >
-                    {t('ScheduleNote')}
-                  </Text>
-                  <div className='flex-container schedulesend-datetime'>
-                    <DatePicker
-                      value={scheduledDatePicker}
-                      onSelectDate={handleScheduleSendDate}
-                      minDate={new Date()}
-                      placeholder='Select a date'
-                      ariaLabel={'Scheduled Date required'}
-                      className='schedule-datepicker'
-                      calloutProps={{ className: 'incidentdatepicker-callout' }}
-                    />
-                    <TimePicker
-                      dateAnchor={scheduledDatePicker}
-                      value={scheduledTimePicker}
-                      placeholder='Select a time'
-                      onChange={handleScheduleSendTime}
-                      calloutProps={{ directionalHintFixed: true, doNotLayer: true }}
-                      ariaLabel={'Scheduled Time required'}
-                      className='schedule-timepicker'
-                      useHour12={true}
-                      allowFreeform={false}
-                    />
-                  </div>
-                  {scheduledSendTimeValidation && (
-                    <div className='validationText'>
-                      <Text role='alert'>{t('ScheduleTimeValidation')}</Text>
-                    </div>
-                  )}
-                </div>
-              )}
             </div>
             <div className='card-area'>
               <div className={cardAreaBorderClass}>

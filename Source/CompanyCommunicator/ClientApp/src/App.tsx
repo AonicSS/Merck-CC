@@ -24,6 +24,8 @@ import { hostClientType } from './messagesSlice';
 import { PreviewMessageConfirmation } from './components/PreviewMessageConfirmation/previewMessageConfirmation';
 import RequestAccess from './components/RequestAccess/requestAccess';
 import SelectUnit from './components/SelectUnit/selectUnit';
+import { ManageUnit } from './components/ManageUnit/manageUnit';
+import { UserHomePage } from './components/Home/userHomePage';
 
 export const App = () => {
   const [fluentUITheme, setFluentUITheme] = React.useState(teamsLightTheme);
@@ -111,6 +113,8 @@ export const App = () => {
                 <Route path={`/${ROUTE_PARTS.SIGN_IN_SIMPLE_END}`} element={<SignInSimpleEnd />} />
                 <Route path={`/${ROUTE_PARTS.ERROR_PAGE}`} element={<ErrorPage />} />
                 <Route path={`/${ROUTE_PARTS.ERROR_PAGE}/:${ROUTE_PARAMS.ID}`} element={<ErrorPage />} />
+                <Route path={`/${ROUTE_PARTS.UNIT_MESSAGES}`} element={<UserHomePage theme={fluentUITheme} />} />
+                <Route path={`/${ROUTE_PARTS.MANAGE_UNIT}/:${ROUTE_PARAMS.ID}/:${ROUTE_PARAMS.IS_NEW}`} element={<ManageUnit />} />
               </Routes>
             </BrowserRouter>
           </Suspense>
