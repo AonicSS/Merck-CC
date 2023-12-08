@@ -98,7 +98,8 @@ const SelectUnit = (props: ISelectUnit) => {
   return (
     <>
       <Header theme={props.theme} />
-      <h3>{t('SelectUnitText')}</h3>
+      <h3>Select your unit</h3>
+      <br/>
       <Table {...keyboardNavAttr} role='grid' aria-label='Select unit table with grid keyboard navigation'>
         <TableHeader>
           <TableRow>
@@ -124,7 +125,7 @@ const SelectUnit = (props: ISelectUnit) => {
           ))}
         </TableBody>
       </Table>
-      <div>Note: you can switch units from your dashboard by clicking on your units name</div>
+      <div style={{ padding: '15px 0px' }}>Note: you can switch units from your dashboard by clicking on your units name</div>
     </>
   );
 };

@@ -6,7 +6,7 @@ import './userHomePage.scss';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { Accordion, AccordionHeader, AccordionItem, AccordionPanel, Button, Theme, Body1Stronger } from '@fluentui/react-components';
+import { Accordion, AccordionHeader, AccordionItem, AccordionPanel, Button, Theme, Body1Stronger, Dropdown, DropdownProps, Option } from '@fluentui/react-components';
 import { Settings24Filled, Status24Regular, PeopleAudience24Regular, ChevronDown24Filled } from '@fluentui/react-icons';
 import { app, dialog, DialogDimension, UrlDialogInfo } from '@microsoft/teams-js';
 import { GetDraftMessagesSilentAction, GetUnitAction } from '../../actions';
@@ -72,12 +72,8 @@ export const UserHomePage = (props: IHomePage) => {
     }
   };
 
-  const handleToggleDropdown = () => {
-    setIsOpen(!isOpen);
-  };
-
-  const handleSelectUnit = (unit: IUnit) => {
-    GetUnitAction(dispatch, { id: unit.id });
+  const onDropdownSelect: DropdownProps['onOptionSelect'] = (event: any, data: any) => {
+    GetUnitAction(dispatch, { id: data.optionValue });
     setIsOpen(false);
   };
 
@@ -86,28 +82,27 @@ export const UserHomePage = (props: IHomePage) => {
       <Header theme={props.theme} />
       <div className="cc-user-homepage-header">
         <div className="cc-unit-dropdown">
-          <div onClick={handleToggleDropdown} className="cc-unit-item">
-            <PeopleAudience24Regular />
-            <h2>{currentUnit.name}</h2>
-            <ChevronDown24Filled />
-          </div>
-          {isOpen && (
-            <ul style={{ listStyleType: 'none', margin: 0, padding: 0 }}>
-              {currentUserUnits.filter(unit => unit.id !== currentUnit.id).map((unit) => (
-                <li key={unit.id} onClick={() => handleSelectUnit(unit)} className="cc-unit-item">
-                  <PeopleAudience24Regular />
-                  <div>{unit.name}</div>
-                </li>
-              ))}
-            </ul>
-          )}
+          <label id={`dropdown-outline`}>Select a unit:</label>
+          <Dropdown
+            aria-labelledby={`dropdown-outline`}
+            placeholder={currentUnit.name}
+            appearance="outline"
+            onOptionSelect={onDropdownSelect}
+          >
+            {currentUserUnits.filter(unit => unit.id !== currentUnit.id).map((unit) => (
+              <Option key={unit.id} value={unit.id} text={unit.name}>
+                <PeopleAudience24Regular style={{ marginLeft: "-20px" }} />
+                {unit.name}
+              </Option>
+            ))}
+          </Dropdown>
         </div>
         <div>
           <Button id='newMessageButtonId' className='cc-button' icon={<Status24Regular />} appearance='primary' onClick={onNewMessage}>
             {t('NewMessage')}
           </Button>
           {<Button id='manageUnitButtonId' className='cc-button' icon={<Settings24Filled />} appearance='primary' onClick={onManageUnit}>
-            Manage Units
+            Manage Unit
           </Button>
           }
         </div>
