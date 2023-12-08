@@ -25,18 +25,22 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
     {
         private readonly INotificationDataRepository notificationDataRepository;
         private readonly IGroupsService groupsService;
+        private readonly IGroupMembersService groupMembersService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GroupDataController"/> class.
         /// </summary>
         /// <param name="notificationDataRepository">Notification data repository instance.</param>
         /// <param name="groupsService">Microsoft Graph service instance.</param>
+        /// <param name="groupMembersService">Microsoft Graph service instance for group members</param>
         public GroupDataController(
             INotificationDataRepository notificationDataRepository,
-            IGroupsService groupsService)
+            IGroupsService groupsService,
+            IGroupMembersService groupMembersService)
         {
             this.notificationDataRepository = notificationDataRepository ?? throw new ArgumentNullException(nameof(notificationDataRepository));
             this.groupsService = groupsService ?? throw new ArgumentNullException(nameof(groupsService));
+            this.groupMembersService = groupMembersService ?? throw new ArgumentNullException(nameof(groupMembersService));
         }
 
         /// <summary>
@@ -66,12 +70,26 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
             }
 
             var groups = await this.groupsService.SearchAsync(query);
-            return groups.Select(group => new GroupData()
+            var groupDataList = new List<GroupData>(); // List to store GroupData objects
+
+            foreach (var group in groups)
             {
-                Id = group.Id,
-                Name = group.DisplayName,
-                Mail = group.Mail,
-            });
+                var members = await this.groupMembersService.GetGroupMembersAsync(group.Id);
+                var memberCount = members.Count();
+
+                // Create GroupData object with memberCount included
+                var groupData = new GroupData
+                {
+                    Id = group.Id,
+                    Name = group.DisplayName,
+                    Mail = group.Mail,
+                    MemberCount = memberCount, // Add the memberCount property
+                };
+
+                groupDataList.Add(groupData); // Add the GroupData object to the list
+            }
+
+            return groupDataList;
         }
 
         /// <summary>

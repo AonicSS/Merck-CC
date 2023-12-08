@@ -24,5 +24,10 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Models
         /// Gets or sets mail.
         /// </summary>
         public string Mail { get; set; }
+
+        /// <summary>
+        /// Gets or sets member count.
+        /// </summary>
+        public int MemberCount { get; set; }
     }
 }

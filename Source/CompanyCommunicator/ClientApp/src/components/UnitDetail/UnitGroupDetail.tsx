@@ -34,6 +34,7 @@ import {
 import { SearchGroupsAction, UpdateUnitAction } from "../../actions";
 import { useAppDispatch, useAppSelector, RootState } from "../../store";
 import { IGroup } from "../../models/group";
+import { IUnit } from "../../models/unit";
 
 
 export const UnitGroupDetail = () => {
@@ -43,15 +44,15 @@ export const UnitGroupDetail = () => {
   const dispatch = useAppDispatch();
 
   // Get current units of the user from api endpoint
-  const currentUnit: any = useAppSelector((state: RootState) => state.messages).unit.payload;
-  const queryGroups = useAppSelector((state: RootState) => state.messages).queryGroups.payload;
+  const currentUnit: IUnit = useAppSelector((state: RootState) => state.messages).unit.payload;
+  const queryGroups: IGroup[] = useAppSelector((state: RootState) => state.messages).queryGroups.payload;
   const isAdmin: boolean = useAppSelector((state: RootState) => state.messages).isAdmin.payload;
-  const unitGroups = currentUnit.groups;
+  const unitGroups: IGroup[] = currentUnit.groups;
   const [filteredQueryGroups, setFilteredQueryGroups] = React.useState<IGroup[]>([]);
 
 
   React.useEffect(() => {
-    const filteredItems = queryGroups.filter(item => !unitGroups.some((group: any) => group.name === item.name));
+    const filteredItems = queryGroups.filter(item => !unitGroups.some((group: IGroup) => group.name === item.name));
     setFilteredQueryGroups(filteredItems);
   }, [queryGroups, currentUnit]);
 
@@ -70,7 +71,7 @@ export const UnitGroupDetail = () => {
   const deleteGroup = async (groupId: string) => {
     try {
       const updatedUnit = { ...currentUnit };
-      updatedUnit.groups = updatedUnit.groups.filter((group: any) => group.id !== groupId);
+      updatedUnit.groups = updatedUnit.groups.filter((group: IGroup) => group.id !== groupId);
       UpdateUnitAction(dispatch, updatedUnit);
     } catch (error) {
       return error;
@@ -85,13 +86,16 @@ export const UnitGroupDetail = () => {
   };
 
   const onSearchSelect: ComboboxProps['onOptionSelect'] = (event, data: any) => {
+    const selectedGroupCount = filteredQueryGroups.filter(group => group.id === data.optionValue);
     const itemToAdd = {
       id: data.optionValue,
-      name: data.optionText
+      name: data.optionText,
+      memberCount: selectedGroupCount[0].memberCount,
     }
     addGroup(itemToAdd);
   };
 
+  console.log(filteredQueryGroups);
   const comboId = useId("combo-default");
 
   return (
