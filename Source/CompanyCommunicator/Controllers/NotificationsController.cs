@@ -58,6 +58,11 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
 
             foreach (var entity in entities)
             {
+                var groupNames = await this.groupsService
+                    .GetByIdsAsync(entity.Groups)
+                    .Select(x => x.DisplayName)
+                    .ToListAsync();
+
                 var result = new DraftNotification
                 {
                     Id = entity.Id,
@@ -75,6 +80,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
                     AllUsers = entity.AllUsers,
                     UnitId = entity.UnitId,
                     CreatedBy = entity.CreatedBy,
+                    GroupNames = groupNames,
                 };
 
                 // In case we have blob name instead of URL to public image.

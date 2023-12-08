@@ -44,7 +44,7 @@ import {
   GetScheduledMessagesSilentAction,
   GetUnitAction,
 } from '../../actions';
-import { createDraftNotification, getDraftNotification, updateDraftNotification } from '../../apis/messageListApi';
+import { createDraftNotification, getDraftNotification, sendDraftNotification, updateDraftNotification } from '../../apis/messageListApi';
 import { getBaseUrl } from '../../configVariables';
 import { RootState, useAppDispatch, useAppSelector } from '../../store';
 import {
@@ -56,6 +56,7 @@ import {
   setCardTitle,
 } from '../AdaptiveCard/adaptiveCard';
 import { IUnit } from '../../models/unit';
+import { IGroup } from '../../models/group';
 
 const validImageTypes = ['image/gif', 'image/jpeg', 'image/png', 'image/jpg'];
 
@@ -79,6 +80,7 @@ interface IMessageState {
 interface ITeamTemplate {
   id: string;
   name: string;
+  memberCount: number;
 }
 
 const useComboboxStyles = makeStyles({
@@ -137,7 +139,7 @@ export const NewMessage = () => {
   const canAccessGroups = useAppSelector((state: RootState) => state.messages).verifyGroup.payload;
   const unit: IUnit = useAppSelector((state: RootState) => state.messages).unit.payload;
 
-  const [selectedRadioButton, setSelectedRadioButton] = React.useState(AudienceSelection.None);
+  const [selectedRadioButton, setSelectedRadioButton] = React.useState(AudienceSelection.Groups);
   const [pageSelection, setPageSelection] = React.useState(CurrentPageSelection.CardCreation);
   const [allUsersState, setAllUsersState] = React.useState(false);
   const [imageFileName, setImageFileName] = React.useState('');
@@ -156,7 +158,8 @@ export const NewMessage = () => {
     allUsers: false,
     unitId: {},
   });
-  const [filteredQueryGroups, setFilteredQueryGroups] = React.useState<ITeamTemplate[]>([]);
+  const [filteredQueryGroups, setFilteredQueryGroups] = React.useState<IGroup[]>([]);
+  const [comboboxText, setComboboxText] = React.useState('');
 
   const getUnit = () => {
     const search = window.location.search;
@@ -189,10 +192,31 @@ export const NewMessage = () => {
 
   React.useEffect(() => {
     if (unit && unit?.groups?.length > 0) {
-      setFilteredQueryGroups(unit.groups);
+      const groupNames = unit.groups;
+      groupNames.forEach((groupName: any) => {
+        const q = encodeURIComponent(groupName.name);
+        SearchGroupsAction(dispatch, { query: q });
+      });
     }
     setMessageState({ ...messageState, unitId: unit.id })
-  }, [dispatch, unit]);
+  }, [unit]);
+
+  React.useEffect(() => {
+    setFilteredQueryGroups(prevFilteredGroups => {
+      const existingGroupsSet = new Set(prevFilteredGroups.map(group => JSON.stringify(group)));
+
+      // Filter the queryGroups array to include only unique groups that are not already in prevFilteredGroups
+      const uniqueNewGroups = queryGroups.filter(group => {
+        // Check if the group is not in the existingGroupsSet and also check if it's in unit.groups
+        const isNewGroup = !existingGroupsSet.has(JSON.stringify(group));
+        const isGroupInUnit = unit.groups.some(unitGroup => unitGroup.id === group.id);
+        return isNewGroup && isGroupInUnit;
+      });
+
+      return [...prevFilteredGroups, ...uniqueNewGroups];
+    });
+  }, [queryGroups]);
+
 
   React.useEffect(() => {
     if (
@@ -480,7 +504,7 @@ export const NewMessage = () => {
     }
   };
 
-  const onSave = () => {
+  const onSave = async () => {
     let finalSelectedTeams: string[] = [];
     let finalSelectedRosters: string[] = [];
     let finalSelectedGroups: string[] = [];
@@ -516,17 +540,28 @@ export const NewMessage = () => {
     if (id) {
       editDraftMessage(finalMessage);
     } else {
-      finalMessage.groups.forEach(group => {
+      for (const group of finalMessage.groups) {
         const message = {
-          title: finalMessage.title,
-          teams: finalMessage.teams,
-          rosters: finalMessage.rosters,
+          ...finalMessage,
           groups: [group],
-          allUsers: finalMessage.allUsers,
-          unitId: finalMessage.unitId
         };
-        postDraftMessage(message);
-      });
+
+        const memberCount = filteredQueryGroups.filter(item => item.id === group);
+
+        if (memberCount[0].memberCount >= 2) {
+          await postDraftMessage(message);
+        } else {
+          try {
+            const draftNotification = await createDraftNotification(message);
+            const response = await getDraftNotification(draftNotification);
+            await sendDraftNotification(response);
+          } catch (error) {
+            // Handle any error that occurred during the asynchronous operations
+            console.error('Error:', error);
+          }
+        }
+      }
+      dialog.url.submit();
     }
   };
 
@@ -561,7 +596,7 @@ export const NewMessage = () => {
         })
         .finally(() => {
           setShowMsgDraftingSpinner(false);
-          dialog.url.submit();
+          
         });
     } catch (error) {
       return error;
@@ -676,14 +711,18 @@ export const NewMessage = () => {
 
   const onSearchSelect: ComboboxProps['onOptionSelect'] = (event, data: any) => {
     if (data.optionText && !searchSelectedOptions.find((x) => x.id === data.optionValue)) {
-      setSearchSelectedOptions([...searchSelectedOptions, { id: data.optionValue, name: data.optionText }]);
+      const selectedGroup = filteredQueryGroups.filter(group => group.id === data.optionValue);
+      setSearchSelectedOptions([...searchSelectedOptions, { id: data.optionValue, name: data.optionText, memberCount: selectedGroup[0].memberCount }]);
     }
   };
 
   const onSearchChange = (event: any) => {
     if (event?.target?.value) {
       const q = encodeURIComponent(event.target.value);
+      setComboboxText(event.target.value);
       SearchGroupsAction(dispatch, { query: q });
+    } else {
+      setComboboxText('');
     }
   };
 
@@ -980,6 +1019,7 @@ export const NewMessage = () => {
                           onChange={onSearchChange}
                           aria-labelledby={searchLabelledBy}
                           placeholder={t('searchForGroups') ?? ''}
+                          value={comboboxText}
                         >
                           {filteredQueryGroups?.map((opt) => (
                             <Option text={opt.name} value={opt.id} key={opt.id}>

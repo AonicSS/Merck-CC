@@ -18,7 +18,8 @@ import {
   TableHeaderCell,
   TableRow,
   useArrowNavigationGroup,
-  Body1Strong
+  Body1Strong,
+  Persona
 } from '@fluentui/react-components';
 import {
   DeleteRegular,
@@ -48,7 +49,7 @@ export const DraftMessageDetail = (draftMessages: any) => {
   const [userPrincipalName, setUserPrincipalName] = React.useState<string | undefined>(undefined);
   const dispatch = useAppDispatch();
   const sendUrl = (id: string) => getBaseUrl() + `/${ROUTE_PARTS.SEND_CONFIRMATION}/${id}?${ROUTE_QUERY_PARAMS.LOCALE}={locale}`;
-  const editUrl = (id: string) => getBaseUrl() + `/${ROUTE_PARTS.NEW_MESSAGE}/${id}?${ROUTE_QUERY_PARAMS.LOCALE}={locale}`;
+  const editUrl = (id: string) => getBaseUrl() + `/${ROUTE_PARTS.NEW_MESSAGE}/${id}?${ROUTE_QUERY_PARAMS.LOCALE}={locale}&unitId=${currentUnit?.id}`;
   const previewConfirmationUrl = () => getBaseUrl() + `/${ROUTE_PARTS.PREVIEW_MESSAGE_CONFIRMATION}?${ROUTE_QUERY_PARAMS.LOCALE}={locale}`;
 
   React.useEffect(() => {
@@ -131,12 +132,34 @@ export const DraftMessageDetail = (draftMessages: any) => {
       });
   };
 
+  const formatDate = (dateString:string): string => {
+    const date = new Date(dateString); // Assuming dateString is in ISO 8601 format or a parsable date format
+
+    // Format the date as desired, for example:
+    const formattedDate = date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+
+    return formattedDate;
+  };
+
   return (
     <Table {...keyboardNavAttr} role='grid' aria-label={t('draftMessagesGridNavigation') ?? ''}>
       <TableHeader>
         <TableRow>
           <TableHeaderCell key='title'>
             <Body1Strong>{t('TitleText')}</Body1Strong>
+          </TableHeaderCell>
+          <TableHeaderCell key='groupName'>
+            <b>Send to Group</b>
+          </TableHeaderCell>
+          <TableHeaderCell key='createdBy'>
+            <b>{t('CreatedBy')}</b>
+          </TableHeaderCell>
+          <TableHeaderCell key='createdOn'>
+            <b>Created On</b>
           </TableHeaderCell>
           <TableHeaderCell key='actions' style={{ width: '50px' }}>
             <Body1Strong>{t('actions')}</Body1Strong>
@@ -157,6 +180,21 @@ export const DraftMessageDetail = (draftMessages: any) => {
                 }}
               >
                 <Body1Strong style={{ whiteSpace: 'nowrap' }}>{item.title}</Body1Strong>
+              </TableCellLayout>
+            </TableCell>
+            <TableCell tabIndex={0} role='gridcell'>
+              <TableCellLayout truncate title={item.groupNames}>
+                <div>{item.groupNames??[0]}</div>
+              </TableCellLayout>
+            </TableCell>
+            <TableCell tabIndex={0} role='gridcell'>
+              <TableCellLayout truncate title={item.createdBy}>
+                <Persona size='extra-small' textAlignment='center' name={item.createdBy} secondaryText={'Member'} avatar={{ color: 'colorful' }} />
+              </TableCellLayout>
+            </TableCell>
+            <TableCell tabIndex={0} role='gridcell'>
+              <TableCellLayout truncate title={item.createdDateTime}>
+                <div>{formatDate(item.createdDateTime)}</div>
               </TableCellLayout>
             </TableCell>
             <TableCell role='gridcell' style={{ width: '50px' }}>

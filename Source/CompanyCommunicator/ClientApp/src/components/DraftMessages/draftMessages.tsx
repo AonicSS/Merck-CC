@@ -25,6 +25,9 @@ export const DraftMessages = () => {
     }
   }, [dispatch, currentUnit, isAdmin]);
 
+  console.log(draftMessages);
+
+
   return (
     <>
       {loader && <Spinner labelPosition='below' label={t('fetching')} />}

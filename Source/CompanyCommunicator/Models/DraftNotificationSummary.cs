@@ -6,6 +6,7 @@
 namespace Microsoft.Teams.Apps.CompanyCommunicator.Models
 {
     using System;
+    using System.Collections.Generic;
 
     /// <summary>
     /// Draft Notification Summary model class.
@@ -31,5 +32,20 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Models
         /// Gets or sets Unit Id value.
         /// </summary>
         public string UnitId { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value of created by.
+        /// </summary>
+        public string CreatedBy { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value of created on.
+        /// </summary>
+        public DateTime CreatedDateTime { get; set; }
+
+        /// <summary>
+        /// Gets or sets Groups audience name collection.
+        /// </summary>
+        public IEnumerable<string> GroupNames { get; set; }
     }
 }

@@ -59,6 +59,11 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Models
         public string CreatedBy { get; set; }
 
         /// <summary>
+        /// Gets or sets Groups audience name collection.
+        /// </summary>
+        public IEnumerable<string> GroupNames { get; set; }
+
+        /// <summary>
         /// Validates a draft notification.
         /// Teams and Rosters property should not contain more than 20 items.
         /// </summary>
