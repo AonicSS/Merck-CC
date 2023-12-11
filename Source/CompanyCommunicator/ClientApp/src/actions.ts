@@ -204,7 +204,6 @@ export const GetUnitDraftMessagesAction = (dispatch: typeof store.dispatch, payl
   DraftMessageFetchStatusAction(dispatch, true);
   getUnitDraftNotification(payload.id)
     .then((response) => {
-      console.log(response);
       dispatch(draftMessages({ type: 'FETCH_DRAFT_MESSAGES', payload: response || [] }));
     })
     .finally(() => {

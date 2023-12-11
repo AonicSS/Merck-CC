@@ -98,7 +98,7 @@ export const DraftMessageDetail = (draftMessages: any) => {
   const duplicateDraftMessage = async (id: number) => {
     try {
       await duplicateDraftNotification(id).then(() => {
-        GetDraftMessagesSilentAction(dispatch);
+        GetUnitDraftMessagesAction(dispatch, { id: currentUnit.id });
       });
     } catch (error) {
       return error;
@@ -108,7 +108,7 @@ export const DraftMessageDetail = (draftMessages: any) => {
   const deleteDraftMessage = async (id: number) => {
     try {
       await deleteDraftNotification(id).then(() => {
-        GetDraftMessagesSilentAction(dispatch);
+        GetUnitDraftMessagesAction(dispatch, { id: currentUnit.id });
       });
     } catch (error) {
       return error;

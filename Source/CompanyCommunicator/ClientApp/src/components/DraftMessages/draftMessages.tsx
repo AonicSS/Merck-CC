@@ -27,8 +27,6 @@ export const DraftMessages = () => {
     }
   }, [dispatch, currentUnit, isAdmin]);
 
-  console.log(draftMessages);
-
   CustomHooks.useInterval(() => {
     if (!isAdmin) {
       GetUnitDraftMessagesAction(dispatch, { id: currentUnit.id });

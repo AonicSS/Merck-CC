@@ -43,7 +43,7 @@ import {
   GetUnitAction,
   GetUnitDraftMessagesAction,
 } from '../../actions';
-import { createDraftNotification, getDraftNotification, sendDraftNotification, updateDraftNotification } from '../../apis/messageListApi';
+import { createDraftNotification, getDraftNotification, updateDraftNotification } from '../../apis/messageListApi';
 import { getBaseUrl } from '../../configVariables';
 import { RootState, useAppDispatch, useAppSelector } from '../../store';
 import {
@@ -512,14 +512,10 @@ export const NewMessage = () => {
     let finalAllUsers: boolean = false;
 
     if (selectedRadioButton === AudienceSelection.Teams) {
-      finalSelectedTeams = [
-        ...teams.filter((t1) => teamsSelectedOptions.some((sp) => sp.id === t1.id)).map((t2) => t2.id),
-      ];
+      finalSelectedTeams = [...teams.filter((t1) => teamsSelectedOptions.some((sp) => sp.id === t1.id)).map((t2) => t2.id)];
     }
     if (selectedRadioButton === AudienceSelection.Rosters) {
-      finalSelectedRosters = [
-        ...teams.filter((t1) => rostersSelectedOptions.some((sp) => sp.id === t1.id)).map((t2) => t2.id),
-      ];
+      finalSelectedRosters = [...teams.filter((t1) => rostersSelectedOptions.some((sp) => sp.id === t1.id)).map((t2) => t2.id)];
     }
     if (selectedRadioButton === AudienceSelection.Groups) {
       finalSelectedGroups = [...searchSelectedOptions.map((g) => g.id)];
@@ -541,28 +537,30 @@ export const NewMessage = () => {
     if (id) {
       editDraftMessage(finalMessage);
     } else {
-      for (const group of finalMessage.groups) {
+      const promises = finalMessage.groups.map(async (group) => {
         const message = {
-          ...finalMessage,
+          title: finalMessage.title,
+          teams: finalMessage.teams,
+          rosters: finalMessage.rosters,
           groups: [group],
+          allUsers: finalMessage.allUsers,
+          unitId: finalMessage.unitId
         };
 
         const memberCount = filteredQueryGroups.filter(item => item.id === group);
+        console.log(memberCount);
+        await postDraftMessage(message);
+      });
 
-        if (memberCount[0].memberCount >= 1) {
-          await postDraftMessage(message);
-        } else {
-          try {
-            const draftNotification = await createDraftNotification(message);
-            const response = await getDraftNotification(draftNotification);
-            await sendDraftNotification(response);
-          } catch (error) {
-            // Handle any error that occurred during the asynchronous operations
-            console.error('Error:', error);
-          }
-        }
-      }
-      dialog.url.submit();
+      // Wait for all postDraftMessage promises to resolve
+      const promiseDone = await Promise.all(promises);
+      console.log(promiseDone);
+
+      // After all messages have been posted, trigger GetUnitDraftMessagesAction
+      setTimeout(() => {
+        dialog.url.submit();
+        GetUnitDraftMessagesAction(dispatch, { id: unit.id });
+      }, 1000);
     }
   };
 
@@ -599,6 +597,7 @@ export const NewMessage = () => {
           setShowMsgDraftingSpinner(false);
         });
     } catch (error) {
+      console.log(error);
       return error;
     }
   };
