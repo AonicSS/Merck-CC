@@ -84,8 +84,6 @@ const SelectUnit = (props: ISelectUnit) => {
     if (isAdmin) {
       const adminUnit = currentUserUnits.filter(unit => unit.name === 'Admin Unit');
       GetUnitsAction(dispatch);
-      GetUnitAction(dispatch, { id: adminUnit[0].id });
-      navigate('/messages');
     }
   }, [isAdmin]);
 

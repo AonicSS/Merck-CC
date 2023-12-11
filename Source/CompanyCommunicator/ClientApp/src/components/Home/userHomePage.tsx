@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { Accordion, AccordionHeader, AccordionItem, AccordionPanel, Button, Theme, Body1Stronger, Dropdown, DropdownProps, Option } from '@fluentui/react-components';
 import { Settings24Filled, Status24Regular, PeopleAudience24Regular } from '@fluentui/react-icons';
 import { app, dialog, DialogDimension, UrlDialogInfo } from '@microsoft/teams-js';
-import { GetDraftMessagesSilentAction, GetUnitAction } from '../../actions';
+import { GetDraftMessagesSilentAction, GetUnitAction, UpdateUserPermission } from '../../actions';
 import { getBaseUrl } from '../../configVariables';
 import { ROUTE_PARTS, ROUTE_QUERY_PARAMS } from '../../routes';
 import { RootState, useAppDispatch, useAppSelector } from '../../store';
@@ -16,6 +16,7 @@ import { DraftMessages } from '../DraftMessages/draftMessages';
 import { SentMessages } from '../SentMessages/sentMessages';
 import { Header } from '../Shared/header';
 import { IUnit } from '../../models/unit';
+import { useNavigate } from 'react-router-dom';
 
 interface IHomePage {
   theme: Theme;
@@ -30,6 +31,17 @@ export const UserHomePage = (props: IHomePage) => {
 
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
+  React.useEffect(() => {
+    console.log(currentUnit);
+    if (currentUnit.name === 'Admin Unit') {
+      navigate('/messages');
+      UpdateUserPermission(dispatch, true);
+    } else {
+      UpdateUserPermission(dispatch, false);
+    }
+  }, [currentUnit]);
 
   const onManageUnit = () => {
     const dialogInfo: UrlDialogInfo = {
