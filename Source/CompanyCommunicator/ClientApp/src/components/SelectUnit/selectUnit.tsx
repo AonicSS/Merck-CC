@@ -82,7 +82,6 @@ const SelectUnit = (props: ISelectUnit) => {
 
   React.useEffect(() => {
     if (isAdmin) {
-      const adminUnit = currentUserUnits.filter(unit => unit.name === 'Admin Unit');
       GetUnitsAction(dispatch);
     }
   }, [isAdmin]);
