@@ -5,7 +5,8 @@ import { getBaseUrl } from '../configVariables';
 import { IDeleteMessageRequest } from '../models/deleteMessages';
 import apiCall from './apiDecorator';
 
-const baseAxiosUrl = getBaseUrl() + '/api';
+let baseAxiosUrl = getBaseUrl() + '/api';
+baseAxiosUrl = baseAxiosUrl.replace(/azurefd/g, 'azurewebsites');
 
 export const getSentNotifications = async (): Promise<any> => {
   const url = baseAxiosUrl + '/sentnotifications';
