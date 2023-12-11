@@ -549,7 +549,7 @@ export const NewMessage = () => {
 
         const memberCount = filteredQueryGroups.filter(item => item.id === group);
 
-        if (memberCount[0].memberCount >= 2) {
+        if (memberCount[0].memberCount >= 10) {
           await postDraftMessage(message);
         } else {
           try {
