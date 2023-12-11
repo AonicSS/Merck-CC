@@ -179,7 +179,7 @@ export const ManageUnit = () => {
         </Menu>}
       </div>
       <Divider />
-      <div>Organize, edit and view your unit and all the AD groups you can send a message to.
+      <div className="cc-unit">Organize, edit and view your unit and all the AD groups you can send a message to.
         If you would like to add a member to your unit or request access to a new AD Group,
         use the request button belwo</div>
       <Accordion defaultOpenItems={["1", "2"]} multiple collapsible>

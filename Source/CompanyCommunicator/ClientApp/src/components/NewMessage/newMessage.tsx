@@ -43,6 +43,7 @@ import {
   VerifyGroupAccessAction,
   GetScheduledMessagesSilentAction,
   GetUnitAction,
+  GetUnitDraftMessagesAction,
 } from '../../actions';
 import { createDraftNotification, getDraftNotification, sendDraftNotification, updateDraftNotification } from '../../apis/messageListApi';
 import { getBaseUrl } from '../../configVariables';
@@ -572,7 +573,7 @@ export const NewMessage = () => {
           if (msg.isScheduled) {
             GetScheduledMessagesSilentAction(dispatch);
           } else {
-            GetDraftMessagesSilentAction(dispatch);
+            GetUnitDraftMessagesAction(dispatch, { id: unit.id });
           }
         })
         .finally(() => {
@@ -591,12 +592,12 @@ export const NewMessage = () => {
           if (msg.isScheduled) {
             GetScheduledMessagesSilentAction(dispatch);
           } else {
-            GetDraftMessagesSilentAction(dispatch);
+            GetUnitDraftMessagesAction(dispatch, { id: unit.id });
           }
         })
         .finally(() => {
           setShowMsgDraftingSpinner(false);
-          
+
         });
     } catch (error) {
       return error;
@@ -977,7 +978,9 @@ export const NewMessage = () => {
                     )}
                     {canAccessGroups && (
                       <>
-                        <Label id={searchComboId}>{t('pickGroups')}</Label>
+                        <br />
+                        <Label id={searchComboId}>Select the AD Groups you would like to send your message to:</Label>
+                        <br />
                         {
                           // eslint-disable-next-line multiline-ternary
                           searchSelectedOptions.length ? (
@@ -1027,6 +1030,7 @@ export const NewMessage = () => {
                             </Option>
                           ))}
                         </Combobox>
+                        <br />
                         <Text role={groupsAria} className='info-text'>
                           {t('SendToGroupsNote')}
                         </Text>

@@ -8,6 +8,7 @@ import { GetDraftMessagesAction, GetUnitDraftMessagesAction } from '../../action
 import { RootState, useAppDispatch, useAppSelector } from '../../store';
 import { DraftMessageDetail } from './draftMessageDetail';
 import { IUnit } from '../../models/unit';
+import * as CustomHooks from '../../useInterval';
 
 export const DraftMessages = () => {
   const { t } = useTranslation();
@@ -16,6 +17,7 @@ export const DraftMessages = () => {
   const draftMessages = useAppSelector((state: RootState) => state.messages).draftMessages.payload;
   const loader = useAppSelector((state: RootState) => state.messages).isDraftMessagesFetchOn.payload;
   const dispatch = useAppDispatch();
+  const delay = 60000;
 
   React.useEffect(() => {
     if (!isAdmin) {
@@ -27,6 +29,13 @@ export const DraftMessages = () => {
 
   console.log(draftMessages);
 
+  CustomHooks.useInterval(() => {
+    if (!isAdmin) {
+      GetUnitDraftMessagesAction(dispatch, { id: currentUnit.id });
+    } else {
+      GetDraftMessagesAction(dispatch)
+    }
+  }, delay);
 
   return (
     <>
