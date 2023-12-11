@@ -23,7 +23,7 @@ export const SentMessages = () => {
     if (!isAdmin) {
       GetUnitSentMessagesAction(dispatch, { id: currentUnit.id });
     } else {
-      GetSentMessagesAction(dispatch)
+      GetSentMessagesAction(dispatch);
     }
   }, [dispatch, currentUnit, isAdmin]);
 
@@ -31,7 +31,7 @@ export const SentMessages = () => {
     if (!isAdmin) {
       GetUnitSentMessagesAction(dispatch, { id: currentUnit.id });
     } else {
-      GetSentMessagesSilentAction(dispatch)
+      GetSentMessagesSilentAction(dispatch);
     }
   }, delay);
 

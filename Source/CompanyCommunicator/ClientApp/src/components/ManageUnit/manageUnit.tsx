@@ -1,6 +1,6 @@
 import './manageUnit.scss';
-import * as React from "react";
-import { useTranslation } from "react-i18next";
+import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Accordion,
   AccordionHeader,
@@ -22,18 +22,18 @@ import {
   DialogBody,
   DialogActions,
   DialogContent,
-} from "@fluentui/react-components";
+} from '@fluentui/react-components';
 import * as microsoftTeams from '@microsoft/teams-js';
-import { PeopleAudience24Regular, MoreHorizontal24Filled, DeleteRegular, Pen24Regular } from "@fluentui/react-icons";
-import { useAppDispatch, useAppSelector, RootState } from "../../store";
-import { GetUnitAction, GetUnitsAction, GetUserAction, GetUserUnitsAction, UpdateUnitAction, UpdateUserPermission } from "../../actions";
+import { PeopleAudience24Regular, MoreHorizontal24Filled, DeleteRegular, Pen24Regular } from '@fluentui/react-icons';
+import { useAppDispatch, useAppSelector, RootState } from '../../store';
+import { GetUnitAction, GetUnitsAction, GetUserAction, GetUserUnitsAction, UpdateUnitAction, UpdateUserPermission } from '../../actions';
 import { deleteUnit, updateUnit } from '../../apis/messageListApi';
 import { useParams } from 'react-router-dom';
-import { IUnit } from "../../models/unit";
-import { UnitMemberDetail } from "../UnitDetail/UnitMemberDetail";
-import { UnitGroupDetail } from "../UnitDetail/UnitGroupDetail";
-import { app } from "@microsoft/teams-js";
-import { IUser } from "../../models/user";
+import { IUnit } from '../../models/unit';
+import { UnitMemberDetail } from '../UnitDetail/UnitMemberDetail';
+import { UnitGroupDetail } from '../UnitDetail/UnitGroupDetail';
+import { app } from '@microsoft/teams-js';
+import { IUser } from '../../models/user';
 
 export const ManageUnit = () => {
   const { id, isNew } = useParams() as any;
@@ -45,7 +45,6 @@ export const ManageUnit = () => {
   const currentUser: IUser = useAppSelector((state: RootState) => state.messages).user.payload;
   const currentUserUnits: IUnit[] = useAppSelector((state: RootState) => state.messages).units.payload;
 
-  const [unitFetched, setUnitFetched] = React.useState(false);
   const [userPrincipalName, setUserPrincipalName] = React.useState<string | undefined>(undefined);
   const [currentUnit, setCurrentUnit]: any = React.useState(unit || []);
   const [isEditing, setIsEditing] = React.useState(false);
@@ -54,10 +53,10 @@ export const ManageUnit = () => {
     const ctx = await app.getContext();
     const upn = ctx.user?.userPrincipalName;
     setUserPrincipalName(upn);
-  }
+  };
 
   React.useEffect(() => {
-    getUpn();
+    void getUpn();
     if (unit.id.length === 0) {
       GetUnitAction(dispatch, { id: id });
     }
@@ -70,28 +69,25 @@ export const ManageUnit = () => {
     }
   }, [dispatch, userPrincipalName]);
 
-
   // get the current users unit
   React.useEffect(() => {
     if (currentUser.id.length !== 0) {
       GetUserUnitsAction(dispatch, { id: currentUser.id });
-      setUnitFetched(true);
     }
   }, [dispatch, currentUser]);
 
   // check if current user unit is empty after fetching
   React.useEffect(() => {
     if (currentUserUnits && currentUserUnits.length !== 0) {
-      const isInAdmin = currentUserUnits.some(unit => unit.name === "Admin Unit");
+      const isInAdmin = currentUserUnits.some(unit => unit.name === 'Admin Unit');
       UpdateUserPermission(dispatch, isInAdmin);
     }
   }, [dispatch, currentUserUnits]);
 
-
   React.useEffect(() => {
-    if (unit.name === "Admin Unit" && isNew === "true") {
+    if (unit.name === 'Admin Unit' && isNew === 'true') {
       UpdateUnitAction(dispatch, {
-        name: "New_Unit",
+        name: 'New_Unit',
         users: [],
         groups: [],
       });
@@ -131,18 +127,16 @@ export const ManageUnit = () => {
     }
   };
 
-  const inputId = useId("input");
+  const inputId = useId('input');
 
   return (
     <>
-      <div className="cc-unit">
-        <div className="cc-unit-name">
+      <div className='cc-unit'>
+        <div className='cc-unit-name'>
           <PeopleAudience24Regular />
-          {isEditing ? (
-            <Input placeholder={currentUnit?.name} id={inputId} onChange={(event) => handleInputChange(event)} />
-          ) : (
-            <h2>{currentUnit?.name}</h2>
-          )}
+          {isEditing
+            ? (<Input placeholder={currentUnit?.name} id={inputId} onChange={(event) => { handleInputChange(event); }} />)
+            : (<h2>{currentUnit?.name}</h2>)}
         </div>
         {isAdmin && <Menu>
           <MenuTrigger disableButtonEnhancement>
@@ -155,7 +149,7 @@ export const ManageUnit = () => {
               </MenuItem>}
               <Dialog>
                 <DialogTrigger>
-                  <Button className="delete-dialog" icon={<DeleteRegular />}>{t('Delete')}</Button>
+                  <Button className='delete-dialog' icon={<DeleteRegular />}>{t('Delete')}</Button>
                 </DialogTrigger>
                 <DialogSurface>
                   <DialogBody>
@@ -165,10 +159,10 @@ export const ManageUnit = () => {
                     </DialogContent>
                     <DialogActions>
                       <DialogTrigger disableButtonEnhancement>
-                        <Button appearance="secondary">Close</Button>
+                        <Button appearance='secondary'>Close</Button>
                       </DialogTrigger>
                       <DialogTrigger>
-                        <Button onClick={() => removeUnit()} appearance="primary">Delete</Button>
+                        <Button onClick={() => { void removeUnit(); }} appearance='primary'>Delete</Button>
                       </DialogTrigger>
                     </DialogActions>
                   </DialogBody>
@@ -179,31 +173,33 @@ export const ManageUnit = () => {
         </Menu>}
       </div>
       <Divider />
-      <div className="cc-unit">Organize, edit and view your unit and all the AD groups you can send a message to.
+      <div className='cc-unit'>Organize, edit and view your unit and all the AD groups you can send a message to.
         If you would like to add a member to your unit or request access to a new AD Group,
         use the request button belwo</div>
-      <Accordion defaultOpenItems={["1", "2"]} multiple collapsible>
-        <AccordionItem value="1" key="unitMemberKey">
+      <Accordion defaultOpenItems={['1', '2']} multiple collapsible>
+        <AccordionItem value='1' key='unitMemberKey'>
           <AccordionHeader>Unit</AccordionHeader>
-          <AccordionPanel className="cc-accordion-panel">
+          <AccordionPanel className='cc-accordion-panel'>
             <UnitMemberDetail />
           </AccordionPanel>
         </AccordionItem>
-        <AccordionItem value="2" key="unitGroupKey">
+        <AccordionItem value='2' key='unitGroupKey'>
           <AccordionHeader>AD Groups</AccordionHeader>
-          <AccordionPanel className="cc-accordion-panel">
+          <AccordionPanel className='cc-accordion-panel'>
             <UnitGroupDetail />
           </AccordionPanel>
         </AccordionItem>
       </Accordion>
       {isAdmin && <div className='fixed-footer'>
         <div className='footer-action-right'>
-          <Button id='saveBtn' onClick={onNext} appearance='primary'>
-            Save
-          </Button>
+          { // eslint-disable-next-line @typescript-eslint/no-misused-promises
+            <Button id='saveBtn' onClick={onNext} appearance='primary'>
+              Save
+            </Button>
+          }
         </div>
       </div>
       }
     </>
-  )
-}
+  );
+};

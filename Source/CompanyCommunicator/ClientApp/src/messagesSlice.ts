@@ -45,13 +45,13 @@ const initialState: MessagesState = {
   hostClientType: { action: 'HOST_CLIENT_TYPE' },
   scheduledMessages: { action: 'FETCH_SCHEDULED_MESSAGES', payload: [] },
   isScheduledMessagesFetchOn: { action: 'SCHEDULED_MESSAGES_FETCH_STATUS', payload: false },
-  units: { action: "GET_UNITS", payload: [] },
-  unit: { action: "GET_UNIT", payload: {id: '', name: '', size: 0, users: [], groups: []} },
-  unitMembers: { action: "GET_UNIT_MEMBERS", payload: [] },
-  unitGroups: { action: "GET_UNIT_GROUPS", payload: [] },
-  users: { action: "GET_UNIT_GROUPS", payload: [] },
-  user: { action: "GET_USER", payload: {id: '', mail: '', name: ''} },
-  isAdmin: { action: "IS_ADMIN", payload: false }
+  units: { action: 'GET_UNITS', payload: [] },
+  unit: { action: 'GET_UNIT', payload: { id: '', name: '', size: 0, users: [], groups: [] } },
+  unitMembers: { action: 'GET_UNIT_MEMBERS', payload: [] },
+  unitGroups: { action: 'GET_UNIT_GROUPS', payload: [] },
+  users: { action: 'GET_UNIT_GROUPS', payload: [] },
+  user: { action: 'GET_USER', payload: { id: '', mail: '', name: '' } },
+  isAdmin: { action: 'IS_ADMIN', payload: false }
 };
 
 export const messagesSlice = createSlice({

@@ -23,7 +23,7 @@ export const DraftMessages = () => {
     if (!isAdmin) {
       GetUnitDraftMessagesAction(dispatch, { id: currentUnit.id });
     } else {
-      GetDraftMessagesAction(dispatch)
+      GetDraftMessagesAction(dispatch);
     }
   }, [dispatch, currentUnit, isAdmin]);
 
@@ -33,7 +33,7 @@ export const DraftMessages = () => {
     if (!isAdmin) {
       GetUnitDraftMessagesAction(dispatch, { id: currentUnit.id });
     } else {
-      GetDraftMessagesAction(dispatch)
+      GetDraftMessagesAction(dispatch);
     }
   }, delay);
 

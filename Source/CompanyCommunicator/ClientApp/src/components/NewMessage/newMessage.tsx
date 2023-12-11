@@ -28,15 +28,13 @@ import {
   Textarea,
   tokens,
   useId,
-  Checkbox,
 } from '@fluentui/react-components';
 import { InfoLabel } from '@fluentui/react-components/unstable';
-import { TimePicker, DatePicker, IComboBox } from '@fluentui/react';
+import { IComboBox } from '@fluentui/react';
 import { initializeIcons } from '@fluentui/react/lib/Icons';
 import { ArrowUpload24Regular, Dismiss12Regular } from '@fluentui/react-icons';
 import { dialog } from '@microsoft/teams-js';
 import {
-  GetDraftMessagesSilentAction,
   GetGroupsAction,
   GetTeamsDataAction,
   SearchGroupsAction,
@@ -125,8 +123,6 @@ enum CurrentPageSelection {
 
 let card: any;
 
-const MAX_SELECTED_TEAMS_NUM: number = 20;
-
 initializeIcons(/* optional base url */);
 
 export const NewMessage = () => {
@@ -148,6 +144,7 @@ export const NewMessage = () => {
   const [titleErrorMessage, setTitleErrorMessage] = React.useState('');
   const [btnLinkErrorMessage, setBtnLinkErrorMessage] = React.useState('');
   const [showMsgDraftingSpinner, setShowMsgDraftingSpinner] = React.useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [allUsersAria, setAllUserAria] = React.useState('none');
   const [groupsAria, setGroupsAria] = React.useState('none');
   const [cardAreaBorderClass, setCardAreaBorderClass] = React.useState('');
@@ -165,9 +162,9 @@ export const NewMessage = () => {
   const getUnit = () => {
     const search = window.location.search;
     const params = new URLSearchParams(search);
-    const unitId = params.get("unitId");
-    return unitId ? unitId : "0";
-  }
+    const unitId = params.get('unitId');
+    return unitId ?? '0';
+  };
 
   // Handle selectedOptions both when an option is selected or deselected in the Combobox,
   // and when an option is removed by clicking on a tag
@@ -183,6 +180,7 @@ export const NewMessage = () => {
   );
   const [dbscheduledDate, setDbscheduledDate] = React.useState('');
   const [scheduledSendValidation, setscheduledSendValidation] = React.useState(true);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [scheduledSendTimeValidation, setscheduledSendTimeValidation] = React.useState(false);
 
   React.useEffect(() => {
@@ -199,7 +197,7 @@ export const NewMessage = () => {
         SearchGroupsAction(dispatch, { query: q });
       });
     }
-    setMessageState({ ...messageState, unitId: unit.id })
+    setMessageState({ ...messageState, unitId: unit.id });
   }, [unit]);
 
   React.useEffect(() => {
@@ -217,7 +215,6 @@ export const NewMessage = () => {
       return [...prevFilteredGroups, ...uniqueNewGroups];
     });
   }, [queryGroups]);
-
 
   React.useEffect(() => {
     if (
@@ -355,6 +352,7 @@ export const NewMessage = () => {
   };
 
   // update the state variable whenever the checkbox is checked or unchecked
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleScheduleSendCheckBox = (event: any) => {
     setScheduleSendCheckBox((scheduleSendCheckBox) => !scheduleSendCheckBox);
     if (event.target.checked) {
@@ -372,6 +370,7 @@ export const NewMessage = () => {
   };
 
   // update the state variable whenever the date is changed in the date picker control
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleScheduleSendDate = (selectedDate: Date | null | undefined) => {
     if (selectedDate) {
       setScheduledDatePicker(selectedDate);
@@ -391,6 +390,7 @@ export const NewMessage = () => {
     }
   };
   // update the state variable whenever the time is changed in the time picker control
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleScheduleSendTime = (_ev: React.FormEvent<IComboBox>, selectedTime: Date) => {
     if (selectedTime) {
       if (scheduledDatePicker && selectedTime !== scheduledDatePicker) {
@@ -597,7 +597,6 @@ export const NewMessage = () => {
         })
         .finally(() => {
           setShowMsgDraftingSpinner(false);
-
         });
     } catch (error) {
       return error;
@@ -679,36 +678,11 @@ export const NewMessage = () => {
   };
 
   // generate ids for handling labelling
-  const teamsComboId = useId('teams-combo-multi');
-  const teamsSelectedListId = `${teamsComboId}-selection`;
-
-  const rostersComboId = useId('rosters-combo-multi');
-  const rostersSelectedListId = `${rostersComboId}-selection`;
-
   const searchComboId = useId('search-combo-multi');
   const searchSelectedListId = `${searchComboId}-selection`;
 
-  // refs for managing focus when removing tags
-  const teamsSelectedListRef = React.useRef<HTMLUListElement>(null);
-  const teamsComboboxInputRef = React.useRef<HTMLInputElement>(null);
-
-  const rostersSelectedListRef = React.useRef<HTMLUListElement>(null);
-  const rostersComboboxInputRef = React.useRef<HTMLInputElement>(null);
-
   const searchSelectedListRef = React.useRef<HTMLUListElement>(null);
   const searchComboboxInputRef = React.useRef<HTMLInputElement>(null);
-
-  const onTeamsSelect: ComboboxProps['onOptionSelect'] = (event, data) => {
-    if (data.selectedOptions.length <= MAX_SELECTED_TEAMS_NUM) {
-      setTeamsSelectedOptions(teams.filter((t1) => data.selectedOptions.some((t2) => t2 === t1.id)));
-    }
-  };
-
-  const onRostersSelect: ComboboxProps['onOptionSelect'] = (event, data) => {
-    if (data.selectedOptions.length <= MAX_SELECTED_TEAMS_NUM) {
-      setRostersSelectedOptions(teams.filter((t1) => data.selectedOptions.some((t2) => t2 === t1.id)));
-    }
-  };
 
   const onSearchSelect: ComboboxProps['onOptionSelect'] = (event, data: any) => {
     if (data.optionText && !searchSelectedOptions.find((x) => x.id === data.optionValue)) {
@@ -727,34 +701,6 @@ export const NewMessage = () => {
     }
   };
 
-  const onTeamsTagClick = (option: ITeamTemplate, index: number) => {
-    // remove selected option
-    setTeamsSelectedOptions(teamsSelectedOptions.filter((o) => o.id !== option.id));
-
-    // focus previous or next option, defaulting to focusing back to the combo input
-    const indexToFocus = index === 0 ? 1 : index - 1;
-    const optionToFocus = teamsSelectedListRef.current?.querySelector(`#${teamsComboId}-remove-${indexToFocus}`);
-    if (optionToFocus) {
-      (optionToFocus as HTMLButtonElement).focus();
-    } else {
-      teamsComboboxInputRef.current?.focus();
-    }
-  };
-
-  const onRostersTagClick = (option: ITeamTemplate, index: number) => {
-    // remove selected option
-    setRostersSelectedOptions(rostersSelectedOptions.filter((o) => o.id !== option.id));
-
-    // focus previous or next option, defaulting to focusing back to the combo input
-    const indexToFocus = index === 0 ? 1 : index - 1;
-    const optionToFocus = rostersSelectedListRef.current?.querySelector(`#${rostersComboId}-remove-${indexToFocus}`);
-    if (optionToFocus) {
-      (optionToFocus as HTMLButtonElement).focus();
-    } else {
-      rostersComboboxInputRef.current?.focus();
-    }
-  };
-
   const onSearchTagClick = (option: ITeamTemplate, index: number) => {
     // remove selected option
     setSearchSelectedOptions(searchSelectedOptions.filter((o) => o.id !== option.id));
@@ -769,9 +715,6 @@ export const NewMessage = () => {
     }
   };
 
-  const teamsLabelledBy = teamsSelectedOptions.length > 0 ? `${teamsComboId} ${teamsSelectedListId}` : teamsComboId;
-  const rostersLabelledBy =
-    rostersSelectedOptions.length > 0 ? `${rostersComboId} ${rostersSelectedListId}` : rostersComboId;
   const searchLabelledBy =
     searchSelectedOptions.length > 0 ? `${searchComboId} ${searchSelectedListId}` : searchComboId;
 
@@ -1075,6 +1018,7 @@ export const NewMessage = () => {
                     style={{ marginLeft: '16px' }}
                     disabled={isSaveBtnDisabled() || showMsgDraftingSpinner}
                     id='saveBtn'
+                    // eslint-disable-next-line @typescript-eslint/no-misused-promises
                     onClick={onSave}
                     appearance='primary'
                   >

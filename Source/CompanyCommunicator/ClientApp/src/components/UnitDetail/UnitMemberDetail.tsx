@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import * as React from "react";
-import { useTranslation } from "react-i18next";
+import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Button,
   Menu,
@@ -23,22 +23,21 @@ import {
   useId,
   ComboboxProps,
   Link,
-} from "@fluentui/react-components";
+} from '@fluentui/react-components';
 
 import {
   DeleteRegular,
   PeopleAudience24Regular,
   MoreHorizontal24Filled,
   Add24Filled
-} from "@fluentui/react-icons";
-import { GetUsersAction, UpdateUnitAction } from "../../actions";
-import { useAppDispatch, useAppSelector, RootState } from "../../store";
-import { IUser } from "../../models/user";
-
+} from '@fluentui/react-icons';
+import { GetUsersAction, UpdateUnitAction } from '../../actions';
+import { useAppDispatch, useAppSelector, RootState } from '../../store';
+import { IUser } from '../../models/user';
 
 export const UnitMemberDetail = () => {
   const { t } = useTranslation();
-  const keyboardNavAttr = useArrowNavigationGroup({ axis: "grid" });
+  const keyboardNavAttr = useArrowNavigationGroup({ axis: 'grid' });
 
   const dispatch = useAppDispatch();
 
@@ -48,7 +47,6 @@ export const UnitMemberDetail = () => {
   const isAdmin: boolean = useAppSelector((state: RootState) => state.messages).isAdmin.payload;
   const unitUsers = currentUnit.users;
   const [filteredQueryUsers, setFilteredQueryUsers] = React.useState<IUser[]>([]);
-
 
   React.useEffect(() => {
     const filteredItems = queryUsers.filter(item => !unitUsers.some((user: any) => user.name === item.name));
@@ -65,7 +63,7 @@ export const UnitMemberDetail = () => {
         return error;
       }
     }
-  }
+  };
 
   const deleteUser = async (userId: string) => {
     try {
@@ -84,17 +82,16 @@ export const UnitMemberDetail = () => {
     }
   };
 
-
   const onSearchSelect: ComboboxProps['onOptionSelect'] = (event, data: any) => {
     const itemToAdd = {
       id: data.optionValue,
       name: data.optionText,
       mail: data.optionValue,
-    }
-    addUser(itemToAdd);
+    };
+    void addUser(itemToAdd);
   };
 
-  const comboId = useId("combo-default");
+  const comboId = useId('combo-default');
 
   return (
     <>
@@ -110,7 +107,7 @@ export const UnitMemberDetail = () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {currentUnit?.users?.map((item: any) => (
+          {currentUnit?.users?.map((item: IUser) => (
             <TableRow key={'user' + item.id + 'key'}>
               <TableCell tabIndex={0} role='gridcell'>
                 <TableCellLayout
@@ -128,7 +125,7 @@ export const UnitMemberDetail = () => {
                     </MenuTrigger>
                     <MenuPopover>
                       <MenuList>
-                        <MenuItem key={'deleteKey'} icon={<DeleteRegular />} onClick={() => deleteUser(item.id)}>
+                        <MenuItem key={'deleteKey'} icon={<DeleteRegular />} onClick={() => { void deleteUser(item.id); }}>
                           {t('Delete')}
                         </MenuItem>
                       </MenuList>
@@ -141,7 +138,7 @@ export const UnitMemberDetail = () => {
           ))}
         </TableBody>
       </Table>
-      <div style={{ display: "flex", alignItems: "center", gap: "15px", marginTop: "15px" }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginTop: '15px' }}>
         <Add24Filled />
         {isAdmin && <Combobox
           appearance='filled-darker'
@@ -149,21 +146,19 @@ export const UnitMemberDetail = () => {
           onOptionSelect={onSearchSelect}
           onChange={onSearchChange}
           aria-labelledby={comboId}
-          placeholder="searchForUsers"
+          placeholder='searchForUsers'
         >
           {filteredQueryUsers.map((opt) => (
             <Option text={opt.name} value={opt.id} key={opt.id}>
               {opt.name}
             </Option>
           ))}
-          {filteredQueryUsers?.length === 0 ? (
-            <Option key="no-results" text="">
-              No results found
-            </Option>
-          ) : null}
+          {filteredQueryUsers?.length === 0
+            ? (<Option key='no-results' text=''>No results found</Option>)
+            : null}
         </Combobox>
         }
-        {!isAdmin && <Link href="https://www.google.com" target="_blank">
+        {!isAdmin && <Link href='https://www.google.com' target='_blank'>
           Add Users
         </Link>}
       </div>

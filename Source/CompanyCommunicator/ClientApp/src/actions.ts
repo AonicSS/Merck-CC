@@ -200,13 +200,12 @@ export const ScheduledMessageFetchStatusAction = (dispatch: typeof store.dispatc
   dispatch(isScheduledMessagesFetchOn({ type: 'SCHEDULED_MESSAGES_FETCH_STATUS', payload }));
 };
 
-
 export const GetUnitDraftMessagesAction = (dispatch: typeof store.dispatch, payload: { id: string }) => {
   DraftMessageFetchStatusAction(dispatch, true);
   getUnitDraftNotification(payload.id)
     .then((response) => {
       console.log(response);
-      dispatch(draftMessages({ type: "FETCH_DRAFT_MESSAGES", payload: response || [] }));
+      dispatch(draftMessages({ type: 'FETCH_DRAFT_MESSAGES', payload: response || [] }));
     })
     .finally(() => {
       DraftMessageFetchStatusAction(dispatch, false);
@@ -217,7 +216,7 @@ export const GetUnitSentMessagesAction = (dispatch: typeof store.dispatch, paylo
   SentMessageFetchStatusAction(dispatch, true);
   getUnitSentNotification(payload.id)
     .then((response) => {
-      dispatch(sentMessages({ type: "FETCH_MESSAGES", payload: response || [] }));
+      dispatch(sentMessages({ type: 'FETCH_MESSAGES', payload: response || [] }));
     })
     .finally(() => {
       SentMessageFetchStatusAction(dispatch, false);
@@ -225,51 +224,51 @@ export const GetUnitSentMessagesAction = (dispatch: typeof store.dispatch, paylo
 };
 
 export const GetUnitsAction = (dispatch: typeof store.dispatch) => {
-  getUnits().then((response) => {
-    dispatch(units({ type: "GET_UNITS", payload: response || [] }));
+  void getUnits().then((response) => {
+    dispatch(units({ type: 'GET_UNITS', payload: response || [] }));
   });
 };
 
 export const GetUserUnitsAction = (dispatch: typeof store.dispatch, payload: { id: string }) => {
-  getUserUnits(payload.id).then((response) => {
-    dispatch(units({ type: "GET_UNITS", payload: response || [] }));
+  void getUserUnits(payload.id).then((response) => {
+    dispatch(units({ type: 'GET_UNITS', payload: response || [] }));
   });
 };
 
 export const GetUnitAction = (dispatch: typeof store.dispatch, payload: { id: string }) => {
-  getUnit(payload.id).then((response) => {
-    dispatch(unit({ type: "GET_UNIT", payload: response || [] }));
+  void getUnit(payload.id).then((response) => {
+    dispatch(unit({ type: 'GET_UNIT', payload: response || [] }));
   });
 };
 
-export const UpdateUnitAction = (dispatch: typeof store.dispatch, payload: {}) => {
-  dispatch(unit({ type: "GET_UNIT", payload: payload || [] }));
+export const UpdateUnitAction = (dispatch: typeof store.dispatch, payload: Record<string, unknown>) => {
+  dispatch(unit({ type: 'GET_UNIT', payload: payload || [] }));
 };
 
 export const GetUnitMembersAction = (dispatch: typeof store.dispatch, payload: { id: string }) => {
-  getUnit(payload.id).then((response) => {
-    dispatch(unitMembers({ type: "GET_UNIT_MEMBERS", payload: response?.members || [] }));
+  void getUnit(payload.id).then((response) => {
+    dispatch(unitMembers({ type: 'GET_UNIT_MEMBERS', payload: response?.members || [] }));
   });
 };
 
 export const GetUnitGroupsAction = (dispatch: typeof store.dispatch, payload: { id: string }) => {
-  getUnit(payload.id).then((response) => {
-    dispatch(unitGroups({ type: "GET_UNIT_GROUPS", payload: response?.groups || [] }));
+  void getUnit(payload.id).then((response) => {
+    dispatch(unitGroups({ type: 'GET_UNIT_GROUPS', payload: response?.groups || [] }));
   });
 };
 
 export const GetUsersAction = (dispatch: typeof store.dispatch, payload: { query: string }) => {
-  getUsers(payload.query).then((response) => {
-    dispatch(users({ type: "GET_USERS", payload: response || [] }));
+  void getUsers(payload.query).then((response) => {
+    dispatch(users({ type: 'GET_USERS', payload: response || [] }));
   });
 };
 
 export const GetUserAction = (dispatch: typeof store.dispatch, payload: { mail: string }) => {
-  getUser(payload.mail).then((response) => {
-    dispatch(user({ type: "GET_USER", payload: response || {} }));
+  void getUser(payload.mail).then((response) => {
+    dispatch(user({ type: 'GET_USER', payload: response || {} }));
   });
 };
 
 export const UpdateUserPermission = (dispatch: typeof store.dispatch, payload: boolean) => {
-  dispatch(isAdmin({ type: "IS_ADMIN", payload: payload }));
+  dispatch(isAdmin({ type: 'IS_ADMIN', payload: payload }));
 };

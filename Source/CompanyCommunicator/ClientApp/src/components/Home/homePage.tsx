@@ -4,18 +4,16 @@
 import '../Shared/main.scss';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import { Accordion, AccordionHeader, AccordionItem, AccordionPanel, Button, Theme, Body1Stronger } from '@fluentui/react-components';
 import { AddCircle24Regular } from '@fluentui/react-icons';
 import { app, dialog, DialogDimension, UrlDialogInfo } from '@microsoft/teams-js';
-import { GetDraftMessagesSilentAction, GetUnitsAction } from '../../actions';
+import { GetUnitsAction } from '../../actions';
 import { getBaseUrl } from '../../configVariables';
-import { ROUTE_PARTS, ROUTE_QUERY_PARAMS } from '../../routes';
+import { ROUTE_PARTS } from '../../routes';
 import { RootState, useAppDispatch, useAppSelector } from '../../store';
 import { DraftMessages } from '../DraftMessages/draftMessages';
 import { SentMessages } from '../SentMessages/sentMessages';
 import { Header } from '../Shared/header';
-import { ScheduledMessages } from '../ScheduledMessages/scheduledMessages';
 import { IUnit } from '../../models/unit';
 import { UnitList } from '../UnitDetail/UnitList';
 
@@ -28,12 +26,11 @@ export const HomePage = (props: IHomePage) => {
   const url = getBaseUrl() + `/${ROUTE_PARTS.MANAGE_UNIT}/${currentUnit.id}/true`;
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
 
   const onManageUnit = () => {
     const dialogInfo: UrlDialogInfo = {
       url,
-      title: "ManageUnit",
+      title: 'ManageUnit',
       size: { height: DialogDimension.Large, width: DialogDimension.Large },
       fallbackUrl: url,
     };
@@ -54,15 +51,15 @@ export const HomePage = (props: IHomePage) => {
       <Button
         className='cc-button'
         icon={<AddCircle24Regular />}
-        appearance="primary"
+        appearance='primary'
         onClick={onManageUnit}
       >
         Create new unit
       </Button>
       <Accordion defaultOpenItems={['1', '2', '3']} multiple collapsible>
-        <AccordionItem value="1" key="unitsKey">
+        <AccordionItem value='1' key='unitsKey'>
           <AccordionHeader>List of Units</AccordionHeader>
-          <AccordionPanel className="cc-accordion-panel">
+          <AccordionPanel className='cc-accordion-panel'>
             <UnitList />
           </AccordionPanel>
         </AccordionItem>

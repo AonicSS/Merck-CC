@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import * as React from "react";
-import { useTranslation } from "react-i18next";
+import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Button,
   Menu,
@@ -25,25 +25,25 @@ import {
   DialogBody,
   DialogActions,
   DialogContent,
-} from "@fluentui/react-components";
+} from '@fluentui/react-components';
 
 import {
   DeleteRegular,
   PeopleAudience24Regular,
   MoreHorizontal24Filled,
   Pen24Regular,
-} from "@fluentui/react-icons";
-import * as microsoftTeams from "@microsoft/teams-js";
-import { useAppDispatch, useAppSelector, RootState } from "../../store";
-import { GetUnitsAction } from "../../actions";
-import { getBaseUrl } from "../../configVariables";
-import { ROUTE_PARTS, ROUTE_QUERY_PARAMS } from "../../routes";
-import { deleteUnit } from "../../apis/messageListApi";
-
+} from '@fluentui/react-icons';
+import * as microsoftTeams from '@microsoft/teams-js';
+import { useAppDispatch, useAppSelector, RootState } from '../../store';
+import { GetUnitsAction } from '../../actions';
+import { getBaseUrl } from '../../configVariables';
+import { ROUTE_PARTS } from '../../routes';
+import { deleteUnit } from '../../apis/messageListApi';
+import { IUnit } from '../../models/unit';
 
 export const UnitList = () => {
   const { t } = useTranslation();
-  const keyboardNavAttr = useArrowNavigationGroup({ axis: "grid" });
+  const keyboardNavAttr = useArrowNavigationGroup({ axis: 'grid' });
   const dispatch = useAppDispatch();
 
   const currentUserUnits = useAppSelector((state: RootState) => state.messages).units.payload;
@@ -54,28 +54,27 @@ export const UnitList = () => {
     }
   }, []);
 
-
   const onManageUnit = (id: string) => {
     const unitUrl = getBaseUrl() + `/${ROUTE_PARTS.MANAGE_UNIT}/${id}/false`;
-    let taskInfo: microsoftTeams.TaskInfo = {
+    const taskInfo: microsoftTeams.TaskInfo = {
       url: unitUrl,
-      title: "ManageUnit",
+      title: 'ManageUnit',
       height: microsoftTeams.TaskModuleDimension.Large,
       width: microsoftTeams.TaskModuleDimension.Large,
       fallbackUrl: unitUrl
     };
 
-    let submitHandler = (err: any, result: any) => {
+    const submitHandler = (result: any) => {
       if (result === null) {
-        document.getElementById("manageUnitId")?.focus();
+        document.getElementById('manageUnitId')?.focus();
       } else {
-        //TODO: handle manage unit and groups
+        // TODO: handle manage unit and groups
         GetUnitsAction(dispatch);
       }
     };
 
     microsoftTeams.tasks.startTask(taskInfo, submitHandler);
-  }
+  };
 
   const removeUnit = async (id: string) => {
     try {
@@ -84,7 +83,7 @@ export const UnitList = () => {
     } catch (error) {
       return error;
     }
-  }
+  };
 
   return (
     <>
@@ -103,14 +102,14 @@ export const UnitList = () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {currentUserUnits?.map((unit: any) => (
+          {currentUserUnits?.map((unit: IUnit) => (
             <TableRow key={unit.id + 'key'}>
               <TableCell tabIndex={0} role='gridcell'>
                 <TableCellLayout
                   truncate
                   media={<PeopleAudience24Regular />}
                   style={{ cursor: 'pointer' }}
-                  onClick={() => onManageUnit(unit.id)}
+                  onClick={() => { onManageUnit(unit.id); }}
                 >
                   {unit.name}
                 </TableCellLayout>
@@ -126,12 +125,12 @@ export const UnitList = () => {
                     </MenuTrigger>
                     <MenuPopover>
                       <MenuList>
-                        <MenuItem key={'editKey'} icon={<Pen24Regular />} onClick={() => onManageUnit(unit.id)}>
+                        <MenuItem key={'editKey'} icon={<Pen24Regular />} onClick={() => { onManageUnit(unit.id); }}>
                           Edit
                         </MenuItem>
                         <Dialog>
                           <DialogTrigger>
-                            <Button className="delete-dialog" icon={<DeleteRegular />}>{t('Delete')}</Button>
+                            <Button className='delete-dialog' icon={<DeleteRegular />}>{t('Delete')}</Button>
                           </DialogTrigger>
                           <DialogSurface>
                             <DialogBody>
@@ -141,10 +140,10 @@ export const UnitList = () => {
                               </DialogContent>
                               <DialogActions>
                                 <DialogTrigger disableButtonEnhancement>
-                                  <Button appearance="secondary">Close</Button>
+                                  <Button appearance='secondary'>Close</Button>
                                 </DialogTrigger>
                                 <DialogTrigger>
-                                  <Button onClick={() => removeUnit(unit.id)} appearance="primary">Delete</Button>
+                                  <Button onClick={() => { void removeUnit(unit.id); }} appearance='primary'>Delete</Button>
                                 </DialogTrigger>
                               </DialogActions>
                             </DialogBody>

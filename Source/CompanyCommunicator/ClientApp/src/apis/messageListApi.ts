@@ -117,18 +117,18 @@ export const getScheduledDraftNotifications = async (): Promise<any> => {
 // get unit notification data
 
 export const getUnitDraftNotification = async (id: string): Promise<any> => {
-  const url = baseAxiosUrl + "/notifications/draft/" + id;
+  const url = baseAxiosUrl + '/notifications/draft/' + id;
   return await apiCall.getJsonResponse(url);
-}
+};
 
 export const getUnitSentNotification = async (id: string): Promise<any> => {
-  const url = baseAxiosUrl + "/notifications/sent/" + id;
+  const url = baseAxiosUrl + '/notifications/sent/' + id;
   return await apiCall.getJsonResponse(url);
-}
+};
 
 // get all units
 export const getUnits = async (): Promise<any> => {
-  const url = baseAxiosUrl + "/unitData";
+  const url = baseAxiosUrl + '/unitData';
   return await apiCall.getJsonResponse(url);
 };
 
@@ -136,12 +136,12 @@ export const getUnits = async (): Promise<any> => {
 export const getUserUnits = async (userId: string): Promise<any> => {
   const url = baseAxiosUrl + `/unitData/user/${userId}`;
   return await apiCall.getJsonResponse(url);
-}
+};
 
 // get a single unit
 export const getUnit = async (id: string): Promise<any> => {
-  const url = baseAxiosUrl + "/unitData/" + id;
-  if (id === "new") {
+  const url = baseAxiosUrl + '/unitData/' + id;
+  if (id === 'new') {
     return [];
   }
   return await apiCall.getJsonResponse(url);
@@ -149,7 +149,7 @@ export const getUnit = async (id: string): Promise<any> => {
 
 // update a single unit, return updated data
 export const updateUnit = async (unitData: { id: string; name: string; users: any; groups: any }): Promise<any> => {
-  const url = baseAxiosUrl + "/unitData";
+  const url = baseAxiosUrl + '/unitData';
   const UserIds = unitData.users.map((user: any) => user.id);
   const GroupIds = unitData.groups.map((group: any) => group.id);
 
@@ -166,24 +166,21 @@ export const updateUnit = async (unitData: { id: string; name: string; users: an
   }
 };
 
-
 // delete a single unit, return 200 ok
 export const deleteUnit = async (id: string): Promise<any> => {
-  const url = baseAxiosUrl + "/unitData/" + id;
+  const url = baseAxiosUrl + '/unitData/' + id;
   const response = await apiCall.deleteAndGetJsonResponse(url);
   return response;
 };
 
-
 // get all users
 export const getUsers = async (query: string): Promise<any> => {
-  const url = baseAxiosUrl + "/userData/search/startswith(userPrincipalName,'" + query + "')";
+  const url = baseAxiosUrl + '/userData/search/startswith(userPrincipalName,"' + query + '")';
   return await apiCall.getJsonResponse(url);
 };
 
-
 // get single user
 export const getUser = async (mail: string): Promise<any> => {
-  const url = baseAxiosUrl + "/userData/" + mail;
+  const url = baseAxiosUrl + '/userData/' + mail;
   return await apiCall.getJsonResponse(url);
 };

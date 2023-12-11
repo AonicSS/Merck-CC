@@ -5,18 +5,16 @@ import '../Shared/main.scss';
 import './userHomePage.scss';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import { Accordion, AccordionHeader, AccordionItem, AccordionPanel, Button, Theme, Body1Stronger, Dropdown, DropdownProps, Option } from '@fluentui/react-components';
-import { Settings24Filled, Status24Regular, PeopleAudience24Regular, ChevronDown24Filled } from '@fluentui/react-icons';
+import { Settings24Filled, Status24Regular, PeopleAudience24Regular } from '@fluentui/react-icons';
 import { app, dialog, DialogDimension, UrlDialogInfo } from '@microsoft/teams-js';
 import { GetDraftMessagesSilentAction, GetUnitAction } from '../../actions';
 import { getBaseUrl } from '../../configVariables';
-import { ROUTE_PARAMS, ROUTE_PARTS, ROUTE_QUERY_PARAMS } from '../../routes';
+import { ROUTE_PARTS, ROUTE_QUERY_PARAMS } from '../../routes';
 import { RootState, useAppDispatch, useAppSelector } from '../../store';
 import { DraftMessages } from '../DraftMessages/draftMessages';
 import { SentMessages } from '../SentMessages/sentMessages';
 import { Header } from '../Shared/header';
-import { ScheduledMessages } from '../ScheduledMessages/scheduledMessages';
 import { IUnit } from '../../models/unit';
 
 interface IHomePage {
@@ -32,20 +30,17 @@ export const UserHomePage = (props: IHomePage) => {
 
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
-
-  const [isOpen, setIsOpen] = React.useState(false);
 
   const onManageUnit = () => {
     const dialogInfo: UrlDialogInfo = {
       url: unitUrl,
-      title: "ManageUnit",
+      title: 'ManageUnit',
       size: { height: DialogDimension.Large, width: DialogDimension.Large },
       fallbackUrl: unitUrl,
     };
 
     const submitHandler: dialog.DialogSubmitHandler = (result: dialog.ISdkResponse) => {
-      console.log("Handle here..");
+      console.log('Handle here..');
     };
 
     // now open the dialog
@@ -74,24 +69,23 @@ export const UserHomePage = (props: IHomePage) => {
 
   const onDropdownSelect: DropdownProps['onOptionSelect'] = (event: any, data: any) => {
     GetUnitAction(dispatch, { id: data.optionValue });
-    setIsOpen(false);
   };
 
   return (
     <>
       <Header theme={props.theme} />
-      <div className="cc-user-homepage-header">
-        <div className="cc-unit-dropdown">
-          <label id={`dropdown-outline`}>Select a unit:</label>
+      <div className='cc-user-homepage-header'>
+        <div className='cc-unit-dropdown'>
+          <label id={'dropdown-outline'}>Select a unit:</label>
           <Dropdown
-            aria-labelledby={`dropdown-outline`}
+            aria-labelledby={'dropdown-outline'}
             placeholder={currentUnit.name}
-            appearance="outline"
+            appearance='outline'
             onOptionSelect={onDropdownSelect}
           >
             {currentUserUnits.filter(unit => unit.id !== currentUnit.id).map((unit) => (
               <Option key={unit.id} value={unit.id} text={unit.name}>
-                <PeopleAudience24Regular style={{ marginLeft: "-20px" }} />
+                <PeopleAudience24Regular style={{ marginLeft: '-20px' }} />
                 {unit.name}
               </Option>
             ))}

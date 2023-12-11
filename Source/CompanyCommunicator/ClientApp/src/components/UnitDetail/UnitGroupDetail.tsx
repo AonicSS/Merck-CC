@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import * as React from "react";
-import { useTranslation } from "react-i18next";
+import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Button,
   Menu,
@@ -23,23 +23,22 @@ import {
   useId,
   ComboboxProps,
   Link,
-} from "@fluentui/react-components";
+} from '@fluentui/react-components';
 
 import {
   DeleteRegular,
   PeopleAudience24Regular,
   MoreHorizontal24Filled,
   Add24Filled
-} from "@fluentui/react-icons";
-import { SearchGroupsAction, UpdateUnitAction } from "../../actions";
-import { useAppDispatch, useAppSelector, RootState } from "../../store";
-import { IGroup } from "../../models/group";
-import { IUnit } from "../../models/unit";
-
+} from '@fluentui/react-icons';
+import { SearchGroupsAction, UpdateUnitAction } from '../../actions';
+import { useAppDispatch, useAppSelector, RootState } from '../../store';
+import { IGroup } from '../../models/group';
+import { IUnit } from '../../models/unit';
 
 export const UnitGroupDetail = () => {
   const { t } = useTranslation();
-  const keyboardNavAttr = useArrowNavigationGroup({ axis: "grid" });
+  const keyboardNavAttr = useArrowNavigationGroup({ axis: 'grid' });
 
   const dispatch = useAppDispatch();
 
@@ -50,7 +49,6 @@ export const UnitGroupDetail = () => {
   const unitGroups: IGroup[] = currentUnit.groups;
   const [filteredQueryGroups, setFilteredQueryGroups] = React.useState<IGroup[]>([]);
 
-
   React.useEffect(() => {
     const filteredItems = queryGroups.filter(item => !unitGroups.some((group: IGroup) => group.name === item.name));
     setFilteredQueryGroups(filteredItems);
@@ -59,14 +57,14 @@ export const UnitGroupDetail = () => {
   const addGroup = async (item: IGroup) => {
     if (item) {
       try {
-        const updatedUnit = { ...currentUnit }
+        const updatedUnit = { ...currentUnit };
         updatedUnit.groups = [...updatedUnit.groups, item];
         UpdateUnitAction(dispatch, updatedUnit);
       } catch (error) {
         return error;
       }
     }
-  }
+  };
 
   const deleteGroup = async (groupId: string) => {
     try {
@@ -91,12 +89,12 @@ export const UnitGroupDetail = () => {
       id: data.optionValue,
       name: data.optionText,
       memberCount: selectedGroupCount[0].memberCount,
-    }
-    addGroup(itemToAdd);
+    };
+    void addGroup(itemToAdd);
   };
 
   console.log(filteredQueryGroups);
-  const comboId = useId("combo-default");
+  const comboId = useId('combo-default');
 
   return (
     <>
@@ -112,7 +110,7 @@ export const UnitGroupDetail = () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {currentUnit?.groups?.map((item: any) => (
+          {currentUnit?.groups?.map((item: IGroup) => (
             <TableRow key={'group' + item.id + 'key'}>
               <TableCell tabIndex={0} role='gridcell'>
                 <TableCellLayout
@@ -130,7 +128,7 @@ export const UnitGroupDetail = () => {
                     </MenuTrigger>
                     <MenuPopover>
                       <MenuList>
-                        <MenuItem key={'deleteKey'} icon={<DeleteRegular />} onClick={() => deleteGroup(item.id)}>
+                        <MenuItem key={'deleteKey'} icon={<DeleteRegular />} onClick={() => { void deleteGroup(item.id); }}>
                           {t('Delete')}
                         </MenuItem>
                       </MenuList>
@@ -143,7 +141,7 @@ export const UnitGroupDetail = () => {
           ))}
         </TableBody>
       </Table>
-      <div style={{ display: "flex", alignItems: "center", gap: "15px", marginTop: "15px" }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginTop: '15px' }}>
         <Add24Filled />
         {isAdmin && <Combobox
           appearance='filled-darker'
@@ -158,14 +156,12 @@ export const UnitGroupDetail = () => {
               {opt.name}
             </Option>
           ))}
-          {filteredQueryGroups?.length === 0 ? (
-            <Option key="no-results" text="">
-              No results found
-            </Option>
-          ) : null}
+          {filteredQueryGroups?.length === 0
+            ? (<Option key='no-results' text=''>No results found</Option>)
+            : null}
         </Combobox>
         }
-        {!isAdmin && <Link href="https://www.google.com" target="_blank">
+        {!isAdmin && <Link href='https://www.google.com' target='_blank'>
           Add AD Groups
         </Link>}
       </div>

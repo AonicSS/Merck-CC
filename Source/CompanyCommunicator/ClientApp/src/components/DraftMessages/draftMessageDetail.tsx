@@ -37,7 +37,6 @@ import { getBaseUrl } from '../../configVariables';
 import { ROUTE_PARTS, ROUTE_QUERY_PARAMS } from '../../routes';
 import { RootState, useAppDispatch, useAppSelector } from '../../store';
 import { IUnit } from '../../models/unit';
-import { IUser } from '../../models/user';
 
 export const DraftMessageDetail = (draftMessages: any) => {
   const { t } = useTranslation();
@@ -132,7 +131,8 @@ export const DraftMessageDetail = (draftMessages: any) => {
       });
   };
 
-  const formatDate = (dateString:string): string => {
+  // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+  const formatDate = (dateString: string): string => {
     const date = new Date(dateString); // Assuming dateString is in ISO 8601 format or a parsable date format
 
     // Format the date as desired, for example:
@@ -184,7 +184,9 @@ export const DraftMessageDetail = (draftMessages: any) => {
             </TableCell>
             <TableCell tabIndex={0} role='gridcell'>
               <TableCellLayout truncate title={item.groupNames}>
-                <div>{item.groupNames??[0]}</div>
+                {// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+                  <div>{item.groupNames ?? [0]}</div>
+                 }
               </TableCellLayout>
             </TableCell>
             <TableCell tabIndex={0} role='gridcell'>
