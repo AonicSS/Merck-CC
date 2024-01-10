@@ -539,6 +539,7 @@ export const NewMessage = () => {
     } else {
       const promises = finalMessage.groups.map(async (group) => {
         const message = {
+          ...finalMessage,
           title: finalMessage.title,
           teams: finalMessage.teams,
           rosters: finalMessage.rosters,
