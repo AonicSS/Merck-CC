@@ -181,6 +181,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
                     SendingStartedDate = notificationEntity.SendingStartedDate,
                     Status = notificationEntity.GetStatus(),
                     CreatedBy = notificationEntity.CreatedBy,
+                    UnitId = notificationEntity.UnitId,
                 };
 
                 result.Add(summary);

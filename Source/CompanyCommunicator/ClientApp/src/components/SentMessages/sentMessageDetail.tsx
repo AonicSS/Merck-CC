@@ -42,7 +42,7 @@ import {
 } from '@fluentui/react-icons';
 import { dialog, DialogDimension, UrlDialogInfo } from '@microsoft/teams-js';
 import { GetDraftMessagesSilentAction, GetSentMessagesSilentAction } from '../../actions';
-import { cancelSentNotification, duplicateDraftNotification } from '../../apis/messageListApi';
+import { cancelSentNotification, duplicateDraftNotification, getUnit } from '../../apis/messageListApi';
 import { getBaseUrl } from '../../configVariables';
 import { formatNumber } from '../../i18n';
 import { ROUTE_PARTS, ROUTE_QUERY_PARAMS } from '../../routes';
@@ -53,6 +53,23 @@ export const SentMessageDetail = (sentMessages: any) => {
   const keyboardNavAttr = useArrowNavigationGroup({ axis: 'grid' });
   const dispatch = useAppDispatch();
   const statusUrl = (id: string) => getBaseUrl() + `/${ROUTE_PARTS.VIEW_STATUS}/${id}?${ROUTE_QUERY_PARAMS.LOCALE}={locale}`;
+  type UnitNames = Record<number, string>;
+  const [unitNames, setUnitNames] = React.useState<UnitNames>({});
+
+  React.useEffect(() => {
+    const fetchUnitNames = async () => {
+      const names: UnitNames = {};
+      for (const message of sentMessages.sentMessages) {
+        const { unitId } = message;
+        if (!unitNames[unitId] && unitId) {
+          const unit = await getUnit(message.unitId);
+          names[unitId] = unit.name;
+        }
+      }
+      setUnitNames((prevNames) => ({ ...prevNames, ...names }));
+    };
+    void fetchUnitNames();
+  }, [sentMessages]);
 
   const renderSendingText = (message: any) => {
     let text = '';
@@ -252,6 +269,9 @@ export const SentMessageDetail = (sentMessages: any) => {
               <b>{t('TitleText')}</b>
             </TableHeaderCell>
             {countStatusMsg() > 0 && <TableHeaderCell key='status' aria-hidden='true' />}
+            <TableHeaderCell key='unitName'>
+              <b>Sent from Unit</b>
+            </TableHeaderCell>
             <TableHeaderCell key='recipients'>
               <b>{t('Recipients')}</b>
             </TableHeaderCell>
@@ -290,6 +310,13 @@ export const SentMessageDetail = (sentMessages: any) => {
                   </TableCellLayout>
                 </TableCell>
               )}
+              <TableCell tabIndex={0} role='gridcell'>
+                <TableCellLayout>
+                  {// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+                    <div>{unitNames[item.unitId]}</div>
+                  }
+                </TableCellLayout>
+              </TableCell>
               <TableCell tabIndex={0} role='gridcell'>
                 <TableCellLayout>
                   <div style={{ display: 'inline-block' }}>
