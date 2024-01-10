@@ -48,6 +48,7 @@ export const UnitGroupDetail = () => {
   const isAdmin: boolean = useAppSelector((state: RootState) => state.messages).isAdmin.payload;
   const unitGroups: IGroup[] = currentUnit.groups;
   const [filteredQueryGroups, setFilteredQueryGroups] = React.useState<IGroup[]>([]);
+  const [inputValue, setInputValue] = React.useState('');
 
   React.useEffect(() => {
     const filteredItems = queryGroups.filter(item => !unitGroups.some((group: IGroup) => group.name === item.name));
@@ -78,8 +79,11 @@ export const UnitGroupDetail = () => {
 
   const onSearchChange = (event: any) => {
     if (event?.target?.value) {
+      setInputValue(event.target.value);
       const q = encodeURIComponent(event.target.value);
       SearchGroupsAction(dispatch, { query: q });
+    } else {
+      setInputValue('');
     }
   };
 
@@ -88,12 +92,14 @@ export const UnitGroupDetail = () => {
     const itemToAdd = {
       id: data.optionValue,
       name: data.optionText,
-      memberCount: selectedGroupCount[0].memberCount,
+      memberCount: selectedGroupCount[0]?.memberCount,
     };
-    void addGroup(itemToAdd);
+    if (itemToAdd.id && itemToAdd.id.length) {
+      void addGroup(itemToAdd);
+    }
+    setInputValue('');
   };
 
-  console.log(filteredQueryGroups);
   const comboId = useId('combo-default');
 
   return (
@@ -150,6 +156,8 @@ export const UnitGroupDetail = () => {
           onChange={onSearchChange}
           aria-labelledby={comboId}
           placeholder={t('searchForGroups') ?? ''}
+          freeform
+          value={inputValue}
         >
           {filteredQueryGroups.map((opt) => (
             <Option text={opt.name} value={opt.id} key={opt.id}>

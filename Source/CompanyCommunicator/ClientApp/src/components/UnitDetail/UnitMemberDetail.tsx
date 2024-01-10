@@ -47,6 +47,7 @@ export const UnitMemberDetail = () => {
   const isAdmin: boolean = useAppSelector((state: RootState) => state.messages).isAdmin.payload;
   const unitUsers = currentUnit.users;
   const [filteredQueryUsers, setFilteredQueryUsers] = React.useState<IUser[]>([]);
+  const [inputValue, setInputValue] = React.useState('');
 
   React.useEffect(() => {
     const filteredItems = queryUsers.filter(item => !unitUsers.some((user: any) => user.name === item.name));
@@ -77,8 +78,11 @@ export const UnitMemberDetail = () => {
 
   const onSearchChange = (event: any) => {
     if (event?.target?.value) {
+      setInputValue(event.target.value);
       const q = encodeURIComponent(event.target.value);
       GetUsersAction(dispatch, { query: q });
+    } else {
+      setInputValue('');
     }
   };
 
@@ -88,7 +92,11 @@ export const UnitMemberDetail = () => {
       name: data.optionText,
       mail: data.optionValue,
     };
-    void addUser(itemToAdd);
+    /* prevent empty user addition */
+    if (itemToAdd.id && itemToAdd.id.length) {
+      void addUser(itemToAdd);
+    }
+    setInputValue('');
   };
 
   const comboId = useId('combo-default');
@@ -142,11 +150,13 @@ export const UnitMemberDetail = () => {
         <Add24Filled />
         {isAdmin && <Combobox
           appearance='filled-darker'
+          freeform
           size='large'
           onOptionSelect={onSearchSelect}
           onChange={onSearchChange}
           aria-labelledby={comboId}
-          placeholder='searchForUsers'
+          placeholder='Search for Users'
+          value={inputValue}
         >
           {filteredQueryUsers.map((opt) => (
             <Option text={opt.name} value={opt.id} key={opt.id}>
