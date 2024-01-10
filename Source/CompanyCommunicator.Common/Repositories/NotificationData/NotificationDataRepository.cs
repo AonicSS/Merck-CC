@@ -127,6 +127,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.Notificat
                     Status = NotificationStatus.Queued.ToString(),
                     IsScheduled = draftNotificationEntity.IsScheduled,
                     ScheduledDate = draftNotificationEntity.ScheduledDate,
+                    UnitId = draftNotificationEntity.UnitId,
                 };
                 await this.CreateOrUpdateAsync(sentNotificationEntity);
 
@@ -170,6 +171,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.Notificat
                     Groups = notificationEntity.Groups,
                     Rosters = notificationEntity.Rosters,
                     AllUsers = notificationEntity.AllUsers,
+                    UnitId = notificationEntity.UnitId,
                 };
 
                 if (!string.IsNullOrEmpty(notificationEntity.ImageBase64BlobName))

@@ -130,6 +130,7 @@ export const SendConfirmationTask = () => {
 
   const onSendMessage = () => {
     setDisableSendButton(true);
+    console.log(messageState);
     sendDraftNotification(messageState)
       .then(() => {
         dialog.url.submit();

@@ -34,7 +34,6 @@ export const UserHomePage = (props: IHomePage) => {
   const navigate = useNavigate();
 
   React.useEffect(() => {
-    console.log(currentUnit);
     if (currentUnit.name === 'Admin Unit') {
       navigate('/messages');
       UpdateUserPermission(dispatch, true);
