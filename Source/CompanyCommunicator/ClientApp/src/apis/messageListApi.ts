@@ -177,7 +177,7 @@ export const deleteUnit = async (id: string): Promise<any> => {
 // get all users
 export const getUsers = async (query: string): Promise<any> => {
   // eslint-disable-next-line @typescript-eslint/quotes
-  const url = baseAxiosUrl + `/userData/search/startswith(userPrincipalName,'` + query + `')`;
+  const url = baseAxiosUrl + `/userData/search/startswith(displayName,'` + query + `')`;
   return await apiCall.getJsonResponse(url);
 };
 
