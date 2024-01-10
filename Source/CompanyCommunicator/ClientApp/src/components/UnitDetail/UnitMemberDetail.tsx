@@ -93,9 +93,7 @@ export const UnitMemberDetail = () => {
       mail: data.optionValue,
     };
     /* prevent empty user addition */
-    if (itemToAdd.id && itemToAdd.id.length) {
-      void addUser(itemToAdd);
-    }
+    void (itemToAdd.id?.length && addUser(itemToAdd));
     setInputValue('');
   };
 

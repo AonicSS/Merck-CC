@@ -94,9 +94,7 @@ export const UnitGroupDetail = () => {
       name: data.optionText,
       memberCount: selectedGroupCount[0]?.memberCount,
     };
-    if (itemToAdd.id && itemToAdd.id.length) {
-      void addGroup(itemToAdd);
-    }
+    void (itemToAdd.id?.length && addGroup(itemToAdd));
     setInputValue('');
   };
 
