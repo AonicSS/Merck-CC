@@ -94,7 +94,7 @@ export const UnitList = () => {
               <b>Name</b>
             </TableHeaderCell>
             <TableHeaderCell key='userCount'>
-              <b>Number of Users</b>
+              <b>Number of Admins</b>
             </TableHeaderCell>
             <TableHeaderCell key='actions' style={{ width: '50px' }}>
               <b>Actions</b>

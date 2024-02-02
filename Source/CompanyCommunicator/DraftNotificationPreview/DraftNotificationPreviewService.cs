@@ -16,6 +16,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.DraftNotificationPreview
     using Microsoft.Teams.Apps.CompanyCommunicator.Bot;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.NotificationData;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.TeamData;
+    using Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.Unit;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.AdaptiveCard;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.CommonBot;
 
@@ -31,6 +32,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.DraftNotificationPreview
         private readonly string botAppId;
         private readonly AdaptiveCardCreator adaptiveCardCreator;
         private readonly CompanyCommunicatorBotAdapter companyCommunicatorBotAdapter;
+        private readonly IUnitDataRepository unitDataRepository;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DraftNotificationPreviewService"/> class.
@@ -38,10 +40,12 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.DraftNotificationPreview
         /// <param name="botOptions">The bot options.</param>
         /// <param name="adaptiveCardCreator">Adaptive card creator service.</param>
         /// <param name="companyCommunicatorBotAdapter">Bot framework http adapter instance.</param>
+        /// <param name="unitDataRepository">unit data repository</param>
         public DraftNotificationPreviewService(
             IOptions<BotOptions> botOptions,
             AdaptiveCardCreator adaptiveCardCreator,
-            CompanyCommunicatorBotAdapter companyCommunicatorBotAdapter)
+            CompanyCommunicatorBotAdapter companyCommunicatorBotAdapter,
+            IUnitDataRepository unitDataRepository)
         {
             var options = botOptions ?? throw new ArgumentNullException(nameof(botOptions));
             this.botAppId = options.Value.AuthorAppId;
@@ -52,6 +56,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.DraftNotificationPreview
 
             this.adaptiveCardCreator = adaptiveCardCreator ?? throw new ArgumentNullException(nameof(adaptiveCardCreator));
             this.companyCommunicatorBotAdapter = companyCommunicatorBotAdapter ?? throw new ArgumentNullException(nameof(companyCommunicatorBotAdapter));
+            this.unitDataRepository = unitDataRepository;
         }
 
         /// <inheritdoc/>
@@ -127,7 +132,10 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.DraftNotificationPreview
             ITurnContext turnContext,
             NotificationDataEntity draftNotificationEntity)
         {
+            var unitId = draftNotificationEntity.UnitId;
+            var unitDataEntity = await this.unitDataRepository.GetAsync(unitId);
             var reply = this.CreateReply(draftNotificationEntity);
+            reply.Summary = draftNotificationEntity.Author + " from " + unitDataEntity.Name + " sent a message ";
             await turnContext.SendActivityAsync(reply);
         }
 
