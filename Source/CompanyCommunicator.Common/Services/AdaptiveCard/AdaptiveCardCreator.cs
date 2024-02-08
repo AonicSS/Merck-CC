@@ -28,7 +28,8 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.AdaptiveCard
                 notificationDataEntity.Author,
                 notificationDataEntity.ButtonTitle,
                 notificationDataEntity.ButtonLink,
-                notificationDataEntity.Id);
+                notificationDataEntity.Id,
+                notificationDataEntity.UnitName);
         }
 
         /// <summary>
@@ -41,6 +42,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.AdaptiveCard
         /// <param name="buttonTitle">The adaptive card's button title value.</param>
         /// <param name="buttonUrl">The adaptive card's button url value.</param>
         /// <param name="notificationId">The notification id.</param>
+        /// <param name="unitName">The notification unit name.</param>
         /// <returns>The created adaptive card instance.</returns>
         public AdaptiveCard CreateAdaptiveCard(
             string title,
@@ -49,7 +51,8 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.AdaptiveCard
             string author,
             string buttonTitle,
             string buttonUrl,
-            string notificationId)
+            string notificationId,
+            string unitName)
         {
             var version = new AdaptiveSchemaVersion(1, 0);
             AdaptiveCard card = new AdaptiveCard(version);
@@ -105,6 +108,17 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.AdaptiveCard
                 {
                     Title = buttonTitle,
                     Url = new Uri(buttonUrl, UriKind.RelativeOrAbsolute),
+                });
+            }
+
+            if (!string.IsNullOrWhiteSpace(unitName))
+            {
+                card.Body.Add(new AdaptiveTextBlock()
+                {
+                    Text = unitName,
+                    Size = AdaptiveTextSize.Small,
+                    Weight = AdaptiveTextWeight.Lighter,
+                    Wrap = true,
                 });
             }
 
