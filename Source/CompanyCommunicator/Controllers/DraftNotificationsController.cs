@@ -169,6 +169,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
                 IsScheduled = notification.IsScheduled,
                 ScheduledDate = notification.ScheduledDate,
                 UnitId = notification.UnitId,
+                UnitName = notification.UnitName,
             };
 
             if (!string.IsNullOrEmpty(notification.ImageLink) && notification.ImageLink.StartsWith(Constants.ImageBase64Format))
@@ -233,6 +234,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
                     Id = notificationEntity.Id,
                     Title = notificationEntity.Title,
                     UnitId = notificationEntity.UnitId,
+                    UnitName = notificationEntity.UnitName,
                     CreatedBy = notificationEntity.CreatedBy,
                     GroupNames = groupNames,
                     CreatedDateTime = notificationEntity.CreatedDate,

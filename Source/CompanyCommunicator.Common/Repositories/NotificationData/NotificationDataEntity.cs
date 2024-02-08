@@ -243,5 +243,10 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.Notificat
         /// Gets or sets the unit id.
         /// </summary>
         public string UnitId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the unit name.
+        /// </summary>
+        public string UnitName { get; set; }
     }
 }

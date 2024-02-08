@@ -53,23 +53,6 @@ export const SentMessageDetail = (sentMessages: any) => {
   const keyboardNavAttr = useArrowNavigationGroup({ axis: 'grid' });
   const dispatch = useAppDispatch();
   const statusUrl = (id: string) => getBaseUrl() + `/${ROUTE_PARTS.VIEW_STATUS}/${id}?${ROUTE_QUERY_PARAMS.LOCALE}={locale}`;
-  type UnitNames = Record<number, string>;
-  const [unitNames, setUnitNames] = React.useState<UnitNames>({});
-
-  React.useEffect(() => {
-    const fetchUnitNames = async () => {
-      const names: UnitNames = {};
-      for (const message of sentMessages.sentMessages) {
-        const { unitId } = message;
-        if (!unitNames[unitId] && unitId) {
-          const unit = await getUnit(message.unitId);
-          names[unitId] = unit.name;
-        }
-      }
-      setUnitNames((prevNames) => ({ ...prevNames, ...names }));
-    };
-    void fetchUnitNames();
-  }, [sentMessages]);
 
   const renderSendingText = (message: any) => {
     let text = '';
@@ -313,7 +296,7 @@ export const SentMessageDetail = (sentMessages: any) => {
               <TableCell tabIndex={0} role='gridcell'>
                 <TableCellLayout>
                   {// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-                    <div>{unitNames[item.unitId]}</div>
+                    <div>${item.unitName}</div>
                   }
                 </TableCellLayout>
               </TableCell>

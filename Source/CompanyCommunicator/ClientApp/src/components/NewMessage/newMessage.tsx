@@ -74,6 +74,7 @@ interface IMessageState {
   isScheduled?: boolean;
   scheduledDate?: string;
   unitId: any;
+  unitName: string;
 }
 
 interface ITeamTemplate {
@@ -155,6 +156,7 @@ export const NewMessage = () => {
     groups: [],
     allUsers: false,
     unitId: {},
+    unitName: '',
   });
   const [filteredQueryGroups, setFilteredQueryGroups] = React.useState<IGroup[]>([]);
   const [comboboxText, setComboboxText] = React.useState('');
@@ -197,7 +199,7 @@ export const NewMessage = () => {
         SearchGroupsAction(dispatch, { query: q });
       });
     }
-    setMessageState({ ...messageState, unitId: unit.id });
+    setMessageState({ ...messageState, unitId: unit.id, unitName: unit.name });
   }, [unit]);
 
   React.useEffect(() => {
@@ -292,6 +294,7 @@ export const NewMessage = () => {
     try {
       await getDraftNotification(id).then((response) => {
         const draftMessageDetail = response;
+        console.log(draftMessageDetail);
 
         if (draftMessageDetail.teams.length > 0) {
           setSelectedRadioButton(AudienceSelection.Teams);
@@ -317,7 +320,8 @@ export const NewMessage = () => {
           allUsers: draftMessageDetail.allUsers,
           isScheduled: draftMessageDetail.isScheduled,
           scheduledDate: draftMessageDetail.scheduledDate,
-          unitId: draftMessageDetail.unit,
+          unitId: draftMessageDetail.unitId,
+          unitName: draftMessageDetail.unitName
         });
         setScheduleSendCheckBox(draftMessageDetail.isScheduled);
         if (draftMessageDetail.scheduledDate !== null) {
@@ -545,7 +549,8 @@ export const NewMessage = () => {
           rosters: finalMessage.rosters,
           groups: [group],
           allUsers: finalMessage.allUsers,
-          unitId: finalMessage.unitId
+          unitId: finalMessage.unitId,
+          unitName: finalMessage.unitName,
         };
 
         const memberCount = filteredQueryGroups.filter(item => item.id === group);

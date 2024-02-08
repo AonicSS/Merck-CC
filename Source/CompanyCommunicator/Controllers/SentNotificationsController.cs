@@ -182,6 +182,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
                     Status = notificationEntity.GetStatus(),
                     CreatedBy = notificationEntity.CreatedBy,
                     UnitId = notificationEntity.UnitId,
+                    UnitName = notificationEntity.UnitName,
                 };
 
                 result.Add(summary);
@@ -246,6 +247,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
                 SendingCompleted = notificationEntity.IsCompleted(),
                 CreatedBy = notificationEntity.CreatedBy,
                 UnitId = notificationEntity.UnitId,
+                UnitName = notificationEntity.UnitName,
             };
 
             // In case we have blob name instead of URL to public image.

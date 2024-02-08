@@ -79,6 +79,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
                     Groups = entity.Groups,
                     AllUsers = entity.AllUsers,
                     UnitId = entity.UnitId,
+                    UnitName = entity.UnitName,
                     CreatedBy = entity.CreatedBy,
                     GroupNames = groupNames,
                 };
@@ -143,6 +144,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
                     SendingCompleted = entity.IsCompleted(),
                     CreatedBy = entity.CreatedBy,
                     UnitId = entity.UnitId,
+                    UnitName = entity.UnitName,
                 };
 
                 // In case we have blob name instead of URL to public image.

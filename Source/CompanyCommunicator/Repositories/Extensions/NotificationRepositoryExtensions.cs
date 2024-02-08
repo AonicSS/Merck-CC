@@ -51,6 +51,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Repositories.Extensions
                 IsScheduled = notification.IsScheduled,
                 ScheduledDate = notification.ScheduledDate,
                 UnitId = notification.UnitId,
+                UnitName = notification.UnitName,
             };
 
             if (!string.IsNullOrEmpty(notification.ImageLink) && notification.ImageLink.StartsWith(Constants.ImageBase64Format))

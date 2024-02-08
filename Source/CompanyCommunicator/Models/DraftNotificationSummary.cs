@@ -34,6 +34,11 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Models
         public string UnitId { get; set; }
 
         /// <summary>
+        /// Gets or sets Unit name value.
+        /// </summary>
+        public string UnitName { get; set; }
+
+        /// <summary>
         /// Gets or sets a value of created by.
         /// </summary>
         public string CreatedBy { get; set; }
