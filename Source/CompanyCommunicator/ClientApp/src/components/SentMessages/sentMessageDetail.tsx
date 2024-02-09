@@ -42,7 +42,7 @@ import {
 } from '@fluentui/react-icons';
 import { dialog, DialogDimension, UrlDialogInfo } from '@microsoft/teams-js';
 import { GetDraftMessagesSilentAction, GetSentMessagesSilentAction } from '../../actions';
-import { cancelSentNotification, duplicateDraftNotification, getUnit } from '../../apis/messageListApi';
+import { cancelSentNotification, duplicateDraftNotification } from '../../apis/messageListApi';
 import { getBaseUrl } from '../../configVariables';
 import { formatNumber } from '../../i18n';
 import { ROUTE_PARTS, ROUTE_QUERY_PARAMS } from '../../routes';

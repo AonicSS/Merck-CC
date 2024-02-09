@@ -58,7 +58,7 @@ export const ManageUnit = () => {
   React.useEffect(() => {
     void getUpn();
     if (unit.id.length === 0) {
-      GetUnitAction(dispatch, { id: id });
+      GetUnitAction(dispatch, { id });
     }
   }, []);
 

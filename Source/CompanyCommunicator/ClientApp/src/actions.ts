@@ -269,5 +269,5 @@ export const GetUserAction = (dispatch: typeof store.dispatch, payload: { mail: 
 };
 
 export const UpdateUserPermission = (dispatch: typeof store.dispatch, payload: boolean) => {
-  dispatch(isAdmin({ type: 'IS_ADMIN', payload: payload }));
+  dispatch(isAdmin({ type: 'IS_ADMIN', payload }));
 };
