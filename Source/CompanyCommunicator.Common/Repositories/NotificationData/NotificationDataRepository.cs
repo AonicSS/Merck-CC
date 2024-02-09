@@ -173,6 +173,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.Notificat
                     Rosters = notificationEntity.Rosters,
                     AllUsers = notificationEntity.AllUsers,
                     UnitId = notificationEntity.UnitId,
+                    UnitName = notificationEntity.UnitName,
                 };
 
                 if (!string.IsNullOrEmpty(notificationEntity.ImageBase64BlobName))

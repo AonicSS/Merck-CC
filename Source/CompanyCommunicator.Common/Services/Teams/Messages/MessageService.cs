@@ -91,7 +91,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.Teams
                     try
                     {
                         // Send message.
-                        message.Summary = "A new message from CC";
+                        message.Summary = "A new message from " + message;
                         await policy.ExecuteAsync(async () => await turnContext.SendActivityAsync(message));
 
                         // Success.
