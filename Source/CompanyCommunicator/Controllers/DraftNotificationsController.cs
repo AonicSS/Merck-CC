@@ -287,6 +287,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
                 IsScheduled = notificationEntity.IsScheduled,
                 ScheduledDate = notificationEntity.ScheduledDate,
                 UnitId = notificationEntity.UnitId,
+                UnitName = notificationEntity.UnitName,
             };
 
             // In case we have blob name instead of URL to public image.

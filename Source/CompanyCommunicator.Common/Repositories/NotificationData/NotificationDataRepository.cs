@@ -128,6 +128,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.Notificat
                     IsScheduled = draftNotificationEntity.IsScheduled,
                     ScheduledDate = draftNotificationEntity.ScheduledDate,
                     UnitId = draftNotificationEntity.UnitId,
+                    UnitName = draftNotificationEntity.UnitName,
                 };
                 await this.CreateOrUpdateAsync(sentNotificationEntity);
 

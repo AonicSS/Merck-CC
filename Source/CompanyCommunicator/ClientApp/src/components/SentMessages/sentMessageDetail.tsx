@@ -296,7 +296,7 @@ export const SentMessageDetail = (sentMessages: any) => {
               <TableCell tabIndex={0} role='gridcell'>
                 <TableCellLayout>
                   {// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-                    <div>${item.unitName}</div>
+                    <div>{item.unitName}</div>
                   }
                 </TableCellLayout>
               </TableCell>
