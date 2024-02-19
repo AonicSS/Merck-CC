@@ -43,7 +43,7 @@ import {
   GetUnitAction,
   GetUnitDraftMessagesAction,
 } from '../../actions';
-import { createDraftNotification, getDraftNotification, updateDraftNotification } from '../../apis/messageListApi';
+import { createDraftNotification, getDraftNotification, sendDraftNotification, updateDraftNotification } from '../../apis/messageListApi';
 import { getBaseUrl } from '../../configVariables';
 import { RootState, useAppDispatch, useAppSelector } from '../../store';
 import {
@@ -553,20 +553,38 @@ export const NewMessage = () => {
           unitName: finalMessage.unitName,
         };
 
-        const memberCount = filteredQueryGroups.filter(item => item.id === group);
-        console.log(memberCount);
-        await postDraftMessage(message);
+        const selectedGroup = filteredQueryGroups.filter(item => item.id === group);
+
+        if (selectedGroup[0]?.memberCount > 50) {
+          await postDraftMessage(message);
+        } else {
+          try {
+            const draftNotificationId = await createDraftNotification(message);
+            console.log('Draft Notification ID:', draftNotificationId);
+
+            const draftNotification = await getDraftNotification(draftNotificationId);
+            console.log('Draft Notification:', draftNotification);
+
+            await sendDraftNotification(draftNotification);
+          } catch (error) {
+            console.error('Error:', error);
+            return error;
+          } finally {
+            setShowMsgDraftingSpinner(false);
+          }
+        }
       });
 
-      // Wait for all postDraftMessage promises to resolve
-      const promiseDone = await Promise.all(promises);
-      console.log(promiseDone);
-
-      // After all messages have been posted, trigger GetUnitDraftMessagesAction
-      setTimeout(() => {
-        dialog.url.submit();
-        GetUnitDraftMessagesAction(dispatch, { id: unit.id });
-      }, 1000);
+      try {
+        // Wait for all promises to resolve
+        const results = await Promise.all(promises);
+        console.log('Results:', results);
+        setTimeout(() => {
+          dialog.url.submit();
+        }, 1000);
+      } catch (error) {
+        console.error('Error processing groups:', error);
+      }
     }
   };
 

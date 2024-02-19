@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { Accordion, AccordionHeader, AccordionItem, AccordionPanel, Button, Theme, Body1Stronger, Dropdown, DropdownProps, Option } from '@fluentui/react-components';
 import { Settings24Filled, Status24Regular, PeopleAudience24Regular } from '@fluentui/react-icons';
 import { app, dialog, DialogDimension, UrlDialogInfo } from '@microsoft/teams-js';
-import { GetUnitAction, GetUnitDraftMessagesAction, UpdateUserPermission } from '../../actions';
+import { GetUnitAction, GetUnitDraftMessagesAction, GetUnitSentMessagesAction, UpdateUserPermission } from '../../actions';
 import { getBaseUrl } from '../../configVariables';
 import { ROUTE_PARTS, ROUTE_QUERY_PARAMS } from '../../routes';
 import { RootState, useAppDispatch, useAppSelector } from '../../store';
@@ -70,6 +70,7 @@ export const UserHomePage = (props: IHomePage) => {
 
     const submitHandler: dialog.DialogSubmitHandler = (result: dialog.ISdkResponse) => {
       GetUnitDraftMessagesAction(dispatch, { id: currentUnit.id });
+      GetUnitSentMessagesAction(dispatch, { id: currentUnit.id });
     };
 
     // now open the dialog
