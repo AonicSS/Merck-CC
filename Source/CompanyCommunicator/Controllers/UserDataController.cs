@@ -52,15 +52,22 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
         /// <param name="mail">user mail.</param>
         /// <returns>user data.</returns>
         [HttpGet("{mail:required}")]
-        public async Task<UserData> GetUserAsync(string mail)
+        public async Task<IActionResult> GetUserAsync(string mail)
         {
-            var user = await this.usersService.GetUserByMailAsync(mail);
-            return new UserData
+            var user = await this.usersService.GetUserByUpnAsync(mail);
+            if (user == null)
+            {
+                return this.NotFound(new { Message = "User not found." });
+            }
+
+            var userData = new UserData
             {
                 Id = user.Id,
                 Name = user.DisplayName,
                 Mail = user.Mail,
             };
+
+            return this.Ok(userData);
         }
     }
 }
