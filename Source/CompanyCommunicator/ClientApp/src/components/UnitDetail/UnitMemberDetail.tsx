@@ -80,7 +80,9 @@ export const UnitMemberDetail = () => {
     if (event?.target?.value) {
       setInputValue(event.target.value);
       const q = encodeURIComponent(event.target.value);
-      GetUsersAction(dispatch, { query: q });
+      if (q.length > 4) {
+        GetUsersAction(dispatch, { query: q });
+      }
     } else {
       setInputValue('');
     }

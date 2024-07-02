@@ -81,7 +81,9 @@ export const UnitGroupDetail = () => {
     if (event?.target?.value) {
       setInputValue(event.target.value);
       const q = encodeURIComponent(event.target.value);
-      SearchGroupsAction(dispatch, { query: q });
+      if (q.length > 1) {
+        SearchGroupsAction(dispatch, { query: q });
+      }
     } else {
       setInputValue('');
     }
