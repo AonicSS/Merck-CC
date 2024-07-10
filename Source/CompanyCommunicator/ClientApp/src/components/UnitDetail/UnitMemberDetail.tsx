@@ -23,6 +23,7 @@ import {
   useId,
   ComboboxProps,
   Link,
+  InfoLabel
 } from '@fluentui/react-components';
 
 import {
@@ -107,7 +108,15 @@ export const UnitMemberDetail = () => {
         <TableHeader>
           <TableRow>
             <TableHeaderCell key='title'>
-              <b>User</b>
+              <InfoLabel
+                info={
+                  <>
+                    Please provide atleast 5 characters to being searching for user.
+                  </>
+                }
+              >
+                User
+              </InfoLabel>
             </TableHeaderCell>
             <TableHeaderCell key='actions' style={{ width: '50px' }}>
               <b>Actions</b>

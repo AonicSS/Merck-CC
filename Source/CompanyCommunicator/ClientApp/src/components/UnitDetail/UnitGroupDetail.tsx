@@ -23,6 +23,7 @@ import {
   useId,
   ComboboxProps,
   Link,
+  InfoLabel,
 } from '@fluentui/react-components';
 
 import {
@@ -95,6 +96,7 @@ export const UnitGroupDetail = () => {
       id: data.optionValue,
       name: data.optionText,
       memberCount: selectedGroupCount[0]?.memberCount,
+      mail: selectedGroupCount[0]?.mail,
     };
     void (itemToAdd.id?.length && addGroup(itemToAdd));
     setInputValue('');
@@ -108,7 +110,15 @@ export const UnitGroupDetail = () => {
         <TableHeader>
           <TableRow>
             <TableHeaderCell key='title'>
-              <b>Group</b>
+              <InfoLabel
+                info={
+                  <>
+                    For precise results search using group email.
+                  </>
+                }
+              >
+                Group
+              </InfoLabel>
             </TableHeaderCell>
             <TableHeaderCell key='actions' style={{ width: '50px' }}>
               <b>Actions</b>
@@ -151,7 +161,7 @@ export const UnitGroupDetail = () => {
         <Add24Filled />
         {isAdmin && <Combobox
           appearance='filled-darker'
-          size='large'
+          style={{ width: '500px' }}
           onOptionSelect={onSearchSelect}
           onChange={onSearchChange}
           aria-labelledby={comboId}
@@ -161,7 +171,7 @@ export const UnitGroupDetail = () => {
         >
           {filteredQueryGroups.map((opt) => (
             <Option text={opt.name} value={opt.id} key={opt.id}>
-              {opt.name}
+              {opt.name} - {opt.mail}
             </Option>
           ))}
           {filteredQueryGroups?.length === 0
