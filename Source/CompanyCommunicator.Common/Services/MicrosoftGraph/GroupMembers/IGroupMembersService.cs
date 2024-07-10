@@ -22,6 +22,13 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.MicrosoftGrap
         Task<IEnumerable<User>> GetGroupMembersAsync(string groupId);
 
         /// <summary>
+        /// Get groups members display name.
+        /// </summary>
+        /// <param name="groupId">Group Id.</param>
+        /// <returns>Enumerator to iterate over a collection of <see cref="User"/>.</returns>
+        Task<int> GetGroupMembersCountAsync(string groupId);
+
+        /// <summary>
         /// get group members page by id.
         /// </summary>
         /// <param name="groupId">group id.</param>

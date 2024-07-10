@@ -80,5 +80,32 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.MicrosoftGrap
 
             return users;
         }
+
+        /// <summary>
+        /// get group members displayName.
+        /// </summary>
+        /// <param name="groupId">group id.</param>
+        /// <returns>group members page</returns>
+        public async Task<int> GetGroupMembersCountAsync(string groupId)
+        {
+            var users = new List<User>();
+            var response = await this.graphServiceClient
+                                    .Groups[groupId]
+                                    .TransitiveMembers
+                                    .Request()
+                                    .Select("displayName")
+                                    .Top(GraphConstants.MaxPageSize)
+                                    .WithMaxRetry(GraphConstants.MaxRetry)
+                                    .GetAsync();
+
+            users.AddRange(response.OfType<User>());
+            while (response.NextPageRequest != null)
+            {
+                response = await response.NextPageRequest.GetAsync();
+                users.AddRange(response.OfType<User>());
+            }
+
+            return users.Count;
+        }
     }
 }

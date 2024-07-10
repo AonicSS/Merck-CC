@@ -66,29 +66,24 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
             int minQueryLength = 2;
             if (string.IsNullOrEmpty(query) || query.Length < minQueryLength)
             {
-                return default;
+                return Enumerable.Empty<GroupData>();
             }
 
             var groups = await this.groupsService.SearchAsync(query);
-            var groupDataList = new List<GroupData>(); // List to store GroupData objects
-
-            foreach (var group in groups)
+            var groupDataTasks = groups.Select(async group =>
             {
-                var members = await this.groupMembersService.GetGroupMembersAsync(group.Id);
-                var memberCount = members.Count();
+                var memberCount = await this.groupMembersService.GetGroupMembersCountAsync(group.Id);
 
-                // Create GroupData object with memberCount included
-                var groupData = new GroupData
+                return new GroupData
                 {
                     Id = group.Id,
                     Name = group.DisplayName,
                     Mail = group.Mail,
-                    MemberCount = memberCount, // Add the memberCount property
+                    MemberCount = memberCount,
                 };
+            });
 
-                groupDataList.Add(groupData); // Add the GroupData object to the list
-            }
-
+            var groupDataList = await Task.WhenAll(groupDataTasks);
             return groupDataList;
         }
 
