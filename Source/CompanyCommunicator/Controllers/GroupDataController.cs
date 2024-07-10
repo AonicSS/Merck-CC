@@ -63,7 +63,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
         [Authorize(PolicyNames.MSGraphGroupDataPolicy)]
         public async Task<IEnumerable<GroupData>> SearchAsync(string query)
         {
-            int minQueryLength = 3;
+            int minQueryLength = 2;
             if (string.IsNullOrEmpty(query) || query.Length < minQueryLength)
             {
                 return default;

@@ -28,7 +28,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.MicrosoftGrap
             this.graphServiceClient = graphServiceClient ?? throw new ArgumentNullException(nameof(graphServiceClient));
         }
 
-        private int MaxResultCount { get; set; } = 25;
+        private int MaxResultCount { get; set; } = 250;
 
         private int MaxRetry { get; set; } = 2;
 
