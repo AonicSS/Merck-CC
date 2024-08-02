@@ -207,15 +207,16 @@ export const DraftMessageDetail = (draftMessages: any) => {
                   </MenuTrigger>
                   <MenuPopover>
                     <MenuList>
-                      {(isAdmin || userPrincipalName !== item.createdBy) && <MenuItem
+                      <MenuItem
                         icon={<SendRegular />}
                         key={'sendConfirmationKey'}
                         onClick={() => {
                           onOpenTaskModule(sendUrl(item.id), t('SendConfirmation'));
                         }}
+                        disabled={!isAdmin && userPrincipalName === item.createdBy}
                       >
                         {t('Send')}
-                      </MenuItem>}
+                      </MenuItem>
                       {
                         // eslint-disable-next-line @typescript-eslint/no-misused-promises, @typescript-eslint/promise-function-async
                         <MenuItem key={'previewInThisChannelKey'} icon={<OpenRegular />} onClick={() => checkPreviewMessage(item.id)}>
