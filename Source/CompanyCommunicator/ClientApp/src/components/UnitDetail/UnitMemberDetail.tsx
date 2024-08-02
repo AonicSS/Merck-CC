@@ -51,9 +51,6 @@ export const UnitMemberDetail = () => {
   const unitUsers = currentUnit.users;
   const [filteredQueryUsers, setFilteredQueryUsers] = React.useState<IUser[]>([]);
   const [inputValue, setInputValue] = React.useState('');
-
-  const [isHovered, setIsHovered] = React.useState(false);
-
   React.useEffect(() => {
     const filteredItems = queryUsers.filter(item => !unitUsers.some((user: any) => user.name === item.name));
     setFilteredQueryUsers(filteredItems);
@@ -115,8 +112,7 @@ export const UnitMemberDetail = () => {
               <Label>User</Label>
               <Tooltip
                 content={{
-                  children: "Please provide at least 5 characters to begin searching for a user.",
-                  
+                  children: 'Please provide at least 5 characters to begin searching for a user.',
                 }}
                 relationship="label"
               >

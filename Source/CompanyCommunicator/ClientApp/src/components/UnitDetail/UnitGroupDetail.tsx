@@ -115,8 +115,7 @@ export const UnitGroupDetail = () => {
               <Label>Group</Label>
               <Tooltip
                 content={{
-                  children: "For precise results search using group email.",
-
+                  children: 'For precise results search using group email.',
                 }}
                 relationship="label"
               >
