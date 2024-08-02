@@ -23,14 +23,16 @@ import {
   useId,
   ComboboxProps,
   Link,
-  InfoLabel
+  Tooltip,
+  Label
 } from '@fluentui/react-components';
 
 import {
   DeleteRegular,
   PeopleAudience24Regular,
   MoreHorizontal24Filled,
-  Add24Filled
+  Add24Filled,
+  Info16Regular
 } from '@fluentui/react-icons';
 import { GetUsersAction, UpdateUnitAction } from '../../actions';
 import { useAppDispatch, useAppSelector, RootState } from '../../store';
@@ -49,6 +51,8 @@ export const UnitMemberDetail = () => {
   const unitUsers = currentUnit.users;
   const [filteredQueryUsers, setFilteredQueryUsers] = React.useState<IUser[]>([]);
   const [inputValue, setInputValue] = React.useState('');
+
+  const [isHovered, setIsHovered] = React.useState(false);
 
   React.useEffect(() => {
     const filteredItems = queryUsers.filter(item => !unitUsers.some((user: any) => user.name === item.name));
@@ -108,15 +112,18 @@ export const UnitMemberDetail = () => {
         <TableHeader>
           <TableRow>
             <TableHeaderCell key='title'>
-              <InfoLabel
-                info={
-                  <>
-                    Please provide atleast 5 characters to being searching for user.
-                  </>
-                }
+              <Label>User</Label>
+              <Tooltip
+                content={{
+                  children: "Please provide at least 5 characters to begin searching for a user.",
+                  
+                }}
+                relationship="label"
               >
-                User
-              </InfoLabel>
+                <Info16Regular
+                  tabIndex={0}
+                />
+              </Tooltip>
             </TableHeaderCell>
             <TableHeaderCell key='actions' style={{ width: '50px' }}>
               <b>Actions</b>
@@ -177,7 +184,7 @@ export const UnitMemberDetail = () => {
             : null}
         </Combobox>
         }
-        {!isAdmin && <Link href='https://www.google.com' target='_blank'>
+        {!isAdmin && <Link href='#'>
           Add Users
         </Link>}
       </div>

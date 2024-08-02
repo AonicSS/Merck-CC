@@ -23,14 +23,16 @@ import {
   useId,
   ComboboxProps,
   Link,
-  InfoLabel,
+  Tooltip,
+  Label
 } from '@fluentui/react-components';
 
 import {
   DeleteRegular,
   PeopleAudience24Regular,
   MoreHorizontal24Filled,
-  Add24Filled
+  Add24Filled,
+  Info16Regular
 } from '@fluentui/react-icons';
 import { SearchGroupsAction, UpdateUnitAction } from '../../actions';
 import { useAppDispatch, useAppSelector, RootState } from '../../store';
@@ -110,15 +112,18 @@ export const UnitGroupDetail = () => {
         <TableHeader>
           <TableRow>
             <TableHeaderCell key='title'>
-              <InfoLabel
-                info={
-                  <>
-                    For precise results search using group email.
-                  </>
-                }
+              <Label>Group</Label>
+              <Tooltip
+                content={{
+                  children: "For precise results search using group email.",
+
+                }}
+                relationship="label"
               >
-                Group
-              </InfoLabel>
+                <Info16Regular
+                  tabIndex={0}
+                />
+              </Tooltip>
             </TableHeaderCell>
             <TableHeaderCell key='actions' style={{ width: '50px' }}>
               <b>Actions</b>
@@ -179,7 +184,7 @@ export const UnitGroupDetail = () => {
             : null}
         </Combobox>
         }
-        {!isAdmin && <Link href='https://www.google.com' target='_blank'>
+        {!isAdmin && <Link href='#'>
           Add AD Groups
         </Link>}
       </div>
