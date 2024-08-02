@@ -43,7 +43,7 @@ import {
   GetUnitAction,
   GetUnitDraftMessagesAction,
 } from '../../actions';
-import { createDraftNotification, getDraftNotification, sendDraftNotification, updateDraftNotification } from '../../apis/messageListApi';
+import { createDraftNotification, getDraftNotification, updateDraftNotification } from '../../apis/messageListApi';
 import { getBaseUrl } from '../../configVariables';
 import { RootState, useAppDispatch, useAppSelector } from '../../store';
 import {
@@ -552,27 +552,7 @@ export const NewMessage = () => {
           unitId: finalMessage.unitId,
           unitName: finalMessage.unitName,
         };
-
-        const selectedGroup = filteredQueryGroups.filter(item => item.id === group);
-
-        if (selectedGroup[0]?.memberCount > 50) {
-          await postDraftMessage(message);
-        } else {
-          try {
-            const draftNotificationId = await createDraftNotification(message);
-            console.log('Draft Notification ID:', draftNotificationId);
-
-            const draftNotification = await getDraftNotification(draftNotificationId);
-            console.log('Draft Notification:', draftNotification);
-
-            await sendDraftNotification(draftNotification);
-          } catch (error) {
-            console.error('Error:', error);
-            return error;
-          } finally {
-            setShowMsgDraftingSpinner(false);
-          }
-        }
+        await postDraftMessage(message);
       });
 
       try {
