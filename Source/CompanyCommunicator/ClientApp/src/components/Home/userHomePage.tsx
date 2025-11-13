@@ -8,11 +8,12 @@ import { useTranslation } from 'react-i18next';
 import { Accordion, AccordionHeader, AccordionItem, AccordionPanel, Button, Theme, Body1Stronger, Dropdown, DropdownProps, Option } from '@fluentui/react-components';
 import { Settings24Filled, Status24Regular, PeopleAudience24Regular } from '@fluentui/react-icons';
 import { app, dialog, DialogDimension, UrlDialogInfo } from '@microsoft/teams-js';
-import { GetUnitAction, GetUnitDraftMessagesAction, GetUnitSentMessagesAction, UpdateUserPermission } from '../../actions';
+import { GetUnitAction, GetUnitDraftMessagesAction, GetUnitScheduledMessagesAction, GetUnitSentMessagesAction, UpdateUserPermission } from '../../actions';
 import { getBaseUrl } from '../../configVariables';
 import { ROUTE_PARTS, ROUTE_QUERY_PARAMS } from '../../routes';
 import { RootState, useAppDispatch, useAppSelector } from '../../store';
 import { DraftMessages } from '../DraftMessages/draftMessages';
+import { ScheduledMessages } from '../ScheduledMessages/scheduledMessages';
 import { SentMessages } from '../SentMessages/sentMessages';
 import { Header } from '../Shared/header';
 import { IUnit } from '../../models/unit';
@@ -70,6 +71,7 @@ export const UserHomePage = (props: IHomePage) => {
 
     const submitHandler: dialog.DialogSubmitHandler = (result: dialog.ISdkResponse) => {
       GetUnitDraftMessagesAction(dispatch, { id: currentUnit.id });
+      GetUnitScheduledMessagesAction(dispatch, { id: currentUnit.id });
       GetUnitSentMessagesAction(dispatch, { id: currentUnit.id });
     };
 
@@ -82,6 +84,7 @@ export const UserHomePage = (props: IHomePage) => {
   const onDropdownSelect: DropdownProps['onOptionSelect'] = (event: any, data: any) => {
     GetUnitAction(dispatch, { id: data.optionValue });
   };
+
 
   return (
     <>
@@ -118,6 +121,12 @@ export const UserHomePage = (props: IHomePage) => {
           <AccordionHeader><Body1Stronger>{t('DraftMessagesSectionTitle')}</Body1Stronger></AccordionHeader>
           <AccordionPanel className='cc-accordion-panel'>
             {currentUnit.id && <DraftMessages />}
+          </AccordionPanel>
+        </AccordionItem>
+        <AccordionItem value='2' key='scheduledMessagesKey'>
+          <AccordionHeader><Body1Stronger>{t('ScheduledMessagesSectionTitle')}</Body1Stronger></AccordionHeader>
+          <AccordionPanel className='cc-accordion-panel'>
+            {currentUnit.id && <ScheduledMessages />}
           </AccordionPanel>
         </AccordionItem>
         <AccordionItem value='3' key='sentMessagesKey'>

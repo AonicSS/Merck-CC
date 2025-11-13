@@ -122,6 +122,11 @@ export const getUnitDraftNotification = async (id: string): Promise<any> => {
   return await apiCall.getJsonResponse(url);
 };
 
+export const getUnitScheduledDraftNotification = async (id: string): Promise<any> => {
+  const url = baseAxiosUrl + '/notifications/scheduled/' + id;
+  return await apiCall.getJsonResponse(url);
+};
+
 export const getUnitSentNotification = async (id: string): Promise<any> => {
   const url = baseAxiosUrl + '/notifications/sent/' + id;
   return await apiCall.getJsonResponse(url);

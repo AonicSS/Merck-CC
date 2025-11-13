@@ -175,7 +175,7 @@ export const ManageUnit = () => {
       <Divider />
       <div className='cc-unit'>Organize, edit and view your unit and all the AD groups you can send a message to.
         If you would like to add a member to your unit or request access to a new AD Group,
-        use the request button belwo</div>
+        use the request button below</div>
       <Accordion defaultOpenItems={['1', '2']} multiple collapsible>
         <AccordionItem value='1' key='unitMemberKey'>
           <AccordionHeader>Unit</AccordionHeader>

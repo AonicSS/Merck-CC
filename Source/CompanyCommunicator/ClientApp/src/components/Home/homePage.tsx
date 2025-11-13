@@ -12,6 +12,7 @@ import { getBaseUrl } from '../../configVariables';
 import { ROUTE_PARTS } from '../../routes';
 import { RootState, useAppDispatch, useAppSelector } from '../../store';
 import { DraftMessages } from '../DraftMessages/draftMessages';
+import { ScheduledMessages } from '../ScheduledMessages/scheduledMessages';
 import { SentMessages } from '../SentMessages/sentMessages';
 import { Header } from '../Shared/header';
 import { IUnit } from '../../models/unit';
@@ -69,7 +70,13 @@ export const HomePage = (props: IHomePage) => {
             <DraftMessages />
           </AccordionPanel>
         </AccordionItem>
-        <AccordionItem value='3' key='sentMessagesKey'>
+        <AccordionItem value='3' key='scheduledMessagesKey'>
+          <AccordionHeader><Body1Stronger>{t('ScheduledMessagesSectionTitle')}</Body1Stronger></AccordionHeader>
+          <AccordionPanel className='cc-accordion-panel'>
+            <ScheduledMessages />
+          </AccordionPanel>
+        </AccordionItem>
+        <AccordionItem value='4' key='sentMessagesKey'>
           <AccordionHeader><Body1Stronger>{t('SentMessagesSectionTitle')}</Body1Stronger></AccordionHeader>
           <AccordionPanel className='cc-accordion-panel'>
             <SentMessages />

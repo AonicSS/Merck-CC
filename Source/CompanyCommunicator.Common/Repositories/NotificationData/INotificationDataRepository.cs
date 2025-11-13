@@ -33,6 +33,13 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.Notificat
         public Task<IEnumerable<NotificationDataEntity>> GetAllDraftNotificationsOfUnitAsync(string unitId);
 
         /// <summary>
+        /// Get all scheduled notification entities from the table storage.
+        /// </summary>
+        /// <param name="unitId">Unit Id.</param>
+        /// <returns>All scheduled draft notification entities.</returns>
+        public Task<IEnumerable<NotificationDataEntity>> GetAllScheduledNotificationsOfUnitAsync(string unitId);
+
+        /// <summary>
         /// Get all sent notification entities from the table storage.
         /// </summary>
         /// <param name="unitId">Unit Id.</param>

@@ -16,6 +16,7 @@ import {
   getUser,
   getUserUnits,
   getUnitDraftNotification,
+  getUnitScheduledDraftNotification,
   getUnitSentNotification,
 } from './apis/messageListApi';
 import { formatDate } from './i18n';
@@ -208,6 +209,17 @@ export const GetUnitDraftMessagesAction = (dispatch: typeof store.dispatch, payl
     })
     .finally(() => {
       DraftMessageFetchStatusAction(dispatch, false);
+    });
+};
+
+export const GetUnitScheduledMessagesAction = (dispatch: typeof store.dispatch, payload: { id: string }) => {
+  ScheduledMessageFetchStatusAction(dispatch, true);
+  getUnitScheduledDraftNotification(payload.id)
+    .then((response) => {
+      dispatch(scheduledMessages({ type: 'FETCH_SCHEDULED_MESSAGES', payload: response || [] }));
+    })
+    .finally(() => {
+      ScheduledMessageFetchStatusAction(dispatch, false);
     });
 };
 

@@ -28,9 +28,10 @@ import {
   Textarea,
   tokens,
   useId,
+  Checkbox,
 } from '@fluentui/react-components';
 import { InfoLabel } from '@fluentui/react-components/unstable';
-import { IComboBox } from '@fluentui/react';
+import { IComboBox, DatePicker, TimePicker } from '@fluentui/react';
 import { initializeIcons } from '@fluentui/react/lib/Icons';
 import { ArrowUpload24Regular, Dismiss12Regular } from '@fluentui/react-icons';
 import { dialog } from '@microsoft/teams-js';
@@ -988,6 +989,62 @@ export const NewMessage = () => {
               <div>
                 <></>
               </div>
+              <div>
+                <Label size='large' id='MoreOptionsLabelId'>
+                  {t('MoreOptions')}
+                </Label>
+              </div>
+              <Checkbox
+                id='ScheduleCheckbox'
+                label={t('ScheduleSend')}
+                defaultChecked={scheduleSendCheckBox}
+                onChange={handleScheduleSendCheckBox}
+              />
+              {scheduleSendCheckBox && (
+                <div>
+                  <Label
+                    id='ScheduleSection'
+                    className='info-text'
+                    style={{ marginBottom: '5px', display: 'block', marginLeft: '36px' }}
+                  >
+                    {t('ScheduleSection')}
+                  </Label>
+                  <Text
+                    id='ScheduleNote'
+                    className='info-text'
+                    style={{ marginBottom: '5px', display: 'block', marginLeft: '36px' }}
+                  >
+                    {t('ScheduleNote')}
+                  </Text>
+                  <div className='flex-container schedulesend-datetime'>
+                    <DatePicker
+                      value={scheduledDatePicker}
+                      onSelectDate={handleScheduleSendDate}
+                      minDate={new Date()}
+                      placeholder='Select a date'
+                      ariaLabel={'Scheduled Date required'}
+                      className='schedule-datepicker'
+                      calloutProps={{ className: 'incidentdatepicker-callout' }}
+                    />
+                    <TimePicker
+                      dateAnchor={scheduledDatePicker}
+                      value={scheduledTimePicker}
+                      placeholder='Select a time'
+                      onChange={handleScheduleSendTime}
+                      calloutProps={{ directionalHintFixed: true, doNotLayer: true }}
+                      ariaLabel={'Scheduled Time required'}
+                      className='schedule-timepicker'
+                      useHour12={true}
+                      allowFreeform={false}
+                    />
+                  </div>
+                  {scheduledSendTimeValidation && (
+                    <div className='validationText'>
+                      <Text role='alert'>{t('ScheduleTimeValidation')}</Text>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
             <div className='card-area'>
               <div className={cardAreaBorderClass}>

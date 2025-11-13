@@ -97,6 +97,57 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
         }
 
         /// <summary>
+        /// Gets scheduled notifications for a unit.
+        /// </summary>
+        /// <param name="unitId">Unit Id.</param>
+        /// <returns>Scheduled Draft notifications.</returns>
+        [HttpGet("scheduled/{unitId}")]
+        public async Task<IEnumerable<DraftNotification>> GetScheduledNotificationsByUnitIdAsync(string unitId)
+        {
+            var entities = await this.notificationDataRepository.GetAllScheduledNotificationsOfUnitAsync(unitId);
+            var results = new List<DraftNotification>();
+
+            foreach (var entity in entities)
+            {
+                var groupNames = await this.groupsService
+                    .GetByIdsAsync(entity.Groups)
+                    .Select(x => x.DisplayName)
+                    .ToListAsync();
+
+                var result = new DraftNotification
+                {
+                    Id = entity.Id,
+                    Title = entity.Title,
+                    ImageLink = entity.ImageLink,
+                    ImageBase64BlobName = entity.ImageBase64BlobName,
+                    Summary = entity.Summary,
+                    Author = entity.Author,
+                    ButtonTitle = entity.ButtonTitle,
+                    ButtonLink = entity.ButtonLink,
+                    CreatedDateTime = entity.CreatedDate,
+                    Teams = entity.Teams,
+                    Rosters = entity.Rosters,
+                    Groups = entity.Groups,
+                    AllUsers = entity.AllUsers,
+                    UnitId = entity.UnitId,
+                    UnitName = entity.UnitName,
+                    CreatedBy = entity.CreatedBy,
+                    GroupNames = groupNames,
+                };
+
+                // In case we have blob name instead of URL to public image.
+                if (!string.IsNullOrEmpty(entity.ImageBase64BlobName))
+                {
+                    result.ImageLink = await this.notificationDataRepository.GetImageAsync(entity.ImageLink, entity.ImageBase64BlobName);
+                }
+
+                results.Add(result);
+            }
+
+            return results;
+        }
+
+        /// <summary>
         /// Gets sent notifications for a unit.
         /// </summary>
         /// <param name="unitId">Unit Id.</param>

@@ -62,7 +62,22 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.Notificat
                 nameof(NotificationDataEntity.UnitId),
                 QueryComparisons.Equal,
                 unitId);
-            var result = await this.GetWithFilterAsync(filter, NotificationDataTableNames.DraftNotificationsPartition);
+            var scheduledMessageFilter = TableQuery.GenerateFilterConditionForBool("IsScheduled", QueryComparisons.Equal, false);
+            var combinedFilter = TableQuery.CombineFilters(filter, TableOperators.And, scheduledMessageFilter);
+            var result = await this.GetWithFilterAsync(combinedFilter, NotificationDataTableNames.DraftNotificationsPartition);
+            return result;
+        }
+
+        /// <inheritdoc/>
+        public async Task<IEnumerable<NotificationDataEntity>> GetAllScheduledNotificationsOfUnitAsync(string unitId)
+        {
+            var filter = TableQuery.GenerateFilterCondition(
+                nameof(NotificationDataEntity.UnitId),
+                QueryComparisons.Equal,
+                unitId);
+            var isScheduledFilter = this.GenerateIsScheduledFilter();
+            var combinedFilter = TableQuery.CombineFilters(filter, TableOperators.And, isScheduledFilter);
+            var result = await this.GetWithFilterAsync(combinedFilter, NotificationDataTableNames.DraftNotificationsPartition);
             return result;
         }
 

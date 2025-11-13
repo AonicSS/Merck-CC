@@ -4,9 +4,11 @@
 import './main.scss';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Divider, Link, teamsLightTheme, Theme } from '@fluentui/react-components';
-import { PersonFeedback24Regular, QuestionCircle24Regular } from '@fluentui/react-icons';
+import { Button, Divider, Link, teamsLightTheme, Theme } from '@fluentui/react-components';
+import { PersonFeedback24Regular, QuestionCircle24Regular, ArrowLeft24Regular } from '@fluentui/react-icons';
 import mslogo from '../../assets/Images/mslogo.png';
+import customLogo from '../../assets/Images/InfoIcon.svg';
+import { useNavigate } from 'react-router-dom';
 
 interface IHeaderProps {
   theme: Theme;
@@ -14,14 +16,26 @@ interface IHeaderProps {
 
 export const Header = (props: IHeaderProps) => {
   const { t } = useTranslation();
-  const customHeaderImagePath = process.env.REACT_APP_HEADERIMAGE;
+  const navigate = useNavigate();
   const customHeaderText = process.env.REACT_APP_HEADERTEXT ? t(process.env.REACT_APP_HEADERTEXT) : t('CompanyCommunicator');
+
+  const handleBack = () => {
+    // Go back one step in history
+    navigate(-1);
+  };
 
   return (
     <>
       <div className={props.theme === teamsLightTheme ? 'cc-header-light' : 'cc-header'}>
         <div className='cc-main-left'>
-          <img src={customHeaderImagePath ?? mslogo} alt='Microsoft logo' className='cc-logo' title={customHeaderText} />
+          <Button
+            appearance='subtle'
+            icon={<ArrowLeft24Regular />}
+            onClick={handleBack}
+            title={t('Back') ?? 'Back'}
+            className='cc-back-button'
+          />
+          <img src={customLogo ?? mslogo} alt='Microsoft logo' className='cc-logo' title={customHeaderText} />
           <span className='cc-title' title={customHeaderText}>
             {customHeaderText}
           </span>
