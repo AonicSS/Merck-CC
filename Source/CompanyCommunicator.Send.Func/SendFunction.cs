@@ -44,6 +44,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
         private readonly double sendRetryDelayNumberOfSeconds;
         private readonly INotificationService notificationService;
         private readonly ISendingNotificationDataRepository notificationRepo;
+        private readonly INotificationDataRepository notificationDataRepository;
         private readonly IMessageService messageService;
         private readonly ISendQueue sendQueue;
         private readonly IStringLocalizer<Strings> localizer;
@@ -63,6 +64,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
             INotificationService notificationService,
             IMessageService messageService,
             ISendingNotificationDataRepository notificationRepo,
+            INotificationDataRepository notificationDataRepository,
             ISendQueue sendQueue,
             IStringLocalizer<Strings> localizer,
             IMemoryCache memoryCache)
@@ -78,6 +80,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
             this.notificationService = notificationService ?? throw new ArgumentNullException(nameof(notificationService));
             this.messageService = messageService ?? throw new ArgumentNullException(nameof(messageService));
             this.notificationRepo = notificationRepo ?? throw new ArgumentNullException(nameof(notificationRepo));
+            this.notificationDataRepository = notificationDataRepository ?? throw new ArgumentNullException(nameof(notificationDataRepository));
             this.sendQueue = sendQueue ?? throw new ArgumentNullException(nameof(sendQueue));
             this.localizer = localizer ?? throw new ArgumentNullException(nameof(localizer));
             this.memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
@@ -164,13 +167,28 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
                 }
 
                 // Send message.
+                var notificationDataEntity = await this.notificationDataRepository.GetAsync(
+                    partitionKey: NotificationDataTableNames.SentNotificationsPartition,
+                    rowKey: messageContent.NotificationId);
+
+                log.LogInformation($"Processing notification: {notificationDataEntity}");
+
+                string unitName = "Mdigital Communicator";
+
+                if (notificationDataEntity != null)
+                {
+                    unitName = notificationDataEntity.UnitName;
+                }
+
                 var messageActivity = await this.GetMessageActivity(messageContent, log);
                 var response = await this.messageService.SendMessageAsync(
                     message: messageActivity,
                     serviceUrl: messageContent.GetServiceUrl(),
                     conversationId: messageContent.GetConversationId(),
                     maxAttempts: this.maxNumberOfAttempts,
-                    logger: log);
+                    logger: log,
+                    unitName: unitName
+                    );
 
                 // Process response.
                 await this.ProcessResponseAsync(messageContent, response, log);

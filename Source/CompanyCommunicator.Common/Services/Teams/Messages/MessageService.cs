@@ -45,7 +45,8 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.Teams
             string conversationId,
             string serviceUrl,
             int maxAttempts,
-            ILogger log)
+            ILogger log,
+            string unitName)
         {
             if (message is null)
             {
@@ -91,7 +92,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.Teams
                     try
                     {
                         // Send message.
-                        message.Summary = "A new message from " + message;
+                        message.Summary = "A new message from " + unitName;
                         await policy.ExecuteAsync(async () => await turnContext.SendActivityAsync(message));
 
                         // Success.

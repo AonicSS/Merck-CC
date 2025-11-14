@@ -22,12 +22,14 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.Teams
         /// <param name="serviceUrl">The service URL to use for sending the notification.</param>
         /// <param name="maxAttempts">Max attempts to send the message.</param>
         /// <param name="logger">Logger.</param>
+        /// <param name="unitName">Unit name.</param>
         /// <returns>Send message response.</returns>
         public Task<SendMessageResponse> SendMessageAsync(
             IMessageActivity message,
             string conversationId,
             string serviceUrl,
             int maxAttempts,
-            ILogger logger);
+            ILogger logger,
+            string unitName = null);
     }
 }
