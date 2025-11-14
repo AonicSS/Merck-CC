@@ -10,6 +10,9 @@
 
 .cc-main-left {
     float: left;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 
     .cc-logo {
         vertical-align: middle;

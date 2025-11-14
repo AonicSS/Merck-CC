@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { Button, Divider, Link, teamsLightTheme, Theme } from '@fluentui/react-components';
 import { PersonFeedback24Regular, QuestionCircle24Regular, ArrowLeft24Regular } from '@fluentui/react-icons';
 import mslogo from '../../assets/Images/mslogo.png';
-import customLogo from '../../assets/Images/InfoIcon.svg';
+import customLogo from '../../assets/Images/globePurple.png';
 import { useNavigate } from 'react-router-dom';
 
 interface IHeaderProps {
@@ -21,7 +21,7 @@ export const Header = (props: IHeaderProps) => {
 
   const handleBack = () => {
     // Go back one step in history
-    navigate(-1);
+    navigate('/selectunit');
   };
 
   return (

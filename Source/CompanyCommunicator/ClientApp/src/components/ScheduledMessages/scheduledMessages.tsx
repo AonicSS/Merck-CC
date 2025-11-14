@@ -35,8 +35,6 @@ export const ScheduledMessages = () => {
     }
   }, delay);
 
-  console.log(scheduledMessages);
-
   return (
     <>
       {loader && <Spinner labelPosition='below' label='Fetching...' />}

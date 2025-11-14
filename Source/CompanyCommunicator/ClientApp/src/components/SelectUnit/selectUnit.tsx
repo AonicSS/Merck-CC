@@ -48,7 +48,9 @@ const SelectUnit = (props: ISelectUnit) => {
 
   const onSelectUnit = (props: string) => {
     GetUnitAction(dispatch, { id: props });
-    navigate('/unitmessages');
+    setTimeout(() => {
+      navigate('/unitmessages');
+    }, 500)
   };
 
   const currentUser: IUser = useAppSelector((state: RootState) => state.messages).user.payload;

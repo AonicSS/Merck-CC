@@ -57,6 +57,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
         /// <param name="notificationService">The service to precheck and determine if the queue message should be processed.</param>
         /// <param name="messageService">Message service.</param>
         /// <param name="notificationRepo">Notification repository.</param>
+        /// <param name="notificationDataRepository">Notification data repository.</param>
         /// <param name="sendQueue">The send queue.</param>
         /// <param name="localizer">Localization service.</param>
         public SendFunction(
@@ -171,8 +172,6 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
                     partitionKey: NotificationDataTableNames.SentNotificationsPartition,
                     rowKey: messageContent.NotificationId);
 
-                log.LogInformation($"Processing notification: {notificationDataEntity}");
-
                 string unitName = "Mdigital Communicator";
 
                 if (notificationDataEntity != null)
@@ -187,8 +186,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
                     conversationId: messageContent.GetConversationId(),
                     maxAttempts: this.maxNumberOfAttempts,
                     logger: log,
-                    unitName: unitName
-                    );
+                    unitName: unitName);
 
                 // Process response.
                 await this.ProcessResponseAsync(messageContent, response, log);

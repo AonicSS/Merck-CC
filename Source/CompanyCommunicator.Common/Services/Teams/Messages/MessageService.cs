@@ -92,7 +92,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.Teams
                     try
                     {
                         // Send message.
-                        message.Summary = "A new message from " + unitName;
+                        message.Summary = unitName + " sent a Message.";
                         await policy.ExecuteAsync(async () => await turnContext.SendActivityAsync(message));
 
                         // Success.
