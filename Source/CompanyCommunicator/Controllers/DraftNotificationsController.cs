@@ -397,11 +397,17 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
             var result = new List<DraftNotificationSummary>();
             foreach (var notificationEntity in notificationEntities)
             {
+                var groupNames = await this.groupsService
+                    .GetByIdsAsync(notificationEntity.Groups)
+                    .Select(x => x.DisplayName)
+                    .ToListAsync();
+
                 var summary = new DraftNotificationSummary
                 {
                     Id = notificationEntity.Id,
                     Title = notificationEntity.Title,
                     ScheduledDate = notificationEntity.ScheduledDate,
+                    GroupNames = groupNames,
                 };
 
                 result.Add(summary);

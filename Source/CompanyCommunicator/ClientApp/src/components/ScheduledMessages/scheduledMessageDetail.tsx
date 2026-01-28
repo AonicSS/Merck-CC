@@ -31,7 +31,7 @@ import {
 } from '@fluentui/react-icons';
 import { getBaseUrl } from '../../configVariables';
 import { ROUTE_PARTS, ROUTE_QUERY_PARAMS } from '../../routes';
-import { useAppDispatch } from '../../store';
+import { useAppDispatch, useAppSelector, RootState } from '../../store';
 import { app, dialog, DialogDimension, UrlDialogInfo } from '@microsoft/teams-js';
 import {
   GetDraftMessagesSilentAction,
@@ -41,11 +41,14 @@ import {
 import { deleteDraftNotification, duplicateDraftNotification, sendPreview } from '../../apis/messageListApi';
 import { formatDate } from '../../i18n';
 
+
 export const ScheduledMessageDetail = (scheduledMessages: any) => {
   const { t } = useTranslation();
   const keyboardNavAttr = useArrowNavigationGroup({ axis: 'grid' });
+  const isAdmin: boolean = useAppSelector((state: RootState) => state.messages).isAdmin.payload;
   const [teamsTeamId, setTeamsTeamId] = React.useState('');
   const [teamsChannelId, setTeamsChannelId] = React.useState('');
+  const [userPrincipalName, setUserPrincipalName] = React.useState<string | undefined>(undefined);
   const dispatch = useAppDispatch();
   const sendUrl = (id: string) =>
     getBaseUrl() + `/${ROUTE_PARTS.SEND_CONFIRMATION}/${id}?${ROUTE_QUERY_PARAMS.LOCALE}={locale}`;
@@ -59,6 +62,7 @@ export const ScheduledMessageDetail = (scheduledMessages: any) => {
       void app.getContext().then((context: app.Context) => {
         setTeamsTeamId(context.team?.internalId ?? '');
         setTeamsChannelId(context.channel?.id ?? '');
+        setUserPrincipalName(context.user?.userPrincipalName ?? '');
       });
     }
   }, []);
@@ -126,6 +130,7 @@ export const ScheduledMessageDetail = (scheduledMessages: any) => {
       });
   };
 
+
   return (
     <Table {...keyboardNavAttr} role='grid' aria-label='Scheduled messages table with grid keyboard navigation'>
       <TableHeader>
@@ -135,6 +140,9 @@ export const ScheduledMessageDetail = (scheduledMessages: any) => {
           </TableHeaderCell>
           <TableHeaderCell key='schedule'>
             <Body1Strong>{t('Schedule')}</Body1Strong>
+          </TableHeaderCell>
+          <TableHeaderCell key='groupName'>
+            <b>Send to Group</b>
           </TableHeaderCell>
           <TableHeaderCell key='actions' style={{ width: '50px' }}>
             <Body1Strong>{t('actions')}</Body1Strong>
@@ -160,6 +168,13 @@ export const ScheduledMessageDetail = (scheduledMessages: any) => {
             <TableCell tabIndex={0} role='gridcell'>
               <TableCellLayout truncate>{formatDate(item.scheduledDate)}</TableCellLayout>
             </TableCell>
+            <TableCell tabIndex={0} role='gridcell'>
+              <TableCellLayout truncate title={item.groupNames}>
+                {// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+                  <div>{item.groupNames ?? [0]}</div>
+                }
+              </TableCellLayout>
+            </TableCell>
             <TableCell role='gridcell' style={{ width: '50px' }}>
               <TableCellLayout style={{ float: 'right' }}>
                 <Menu>
@@ -174,6 +189,7 @@ export const ScheduledMessageDetail = (scheduledMessages: any) => {
                         onClick={() => {
                           onOpenTaskModule(sendUrl(item.id), t('SendConfirmation'));
                         }}
+                        disabled={!isAdmin && userPrincipalName === item.createdBy}
                       >
                         {t('SendNow')}
                       </MenuItem>

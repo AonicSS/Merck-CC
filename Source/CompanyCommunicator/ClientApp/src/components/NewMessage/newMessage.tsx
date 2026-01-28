@@ -360,8 +360,9 @@ export const NewMessage = () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleScheduleSendCheckBox = (event: any) => {
     setScheduleSendCheckBox((scheduleSendCheckBox) => !scheduleSendCheckBox);
+    // do not schedule messages, need to put it on the draft bucket unless approved.
     if (event.target.checked) {
-      setMessageState({ ...messageState, isScheduled: true });
+      setMessageState({ ...messageState, isScheduled: false });
     } else {
       setMessageState({ ...messageState, isScheduled: false });
       if (messageState.scheduledDate) {

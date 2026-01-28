@@ -125,6 +125,8 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
                     ButtonTitle = entity.ButtonTitle,
                     ButtonLink = entity.ButtonLink,
                     CreatedDateTime = entity.CreatedDate,
+                    IsScheduled = entity.IsScheduled,
+                    ScheduledDate = entity.ScheduledDate,
                     Teams = entity.Teams,
                     Rosters = entity.Rosters,
                     Groups = entity.Groups,

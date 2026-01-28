@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { Button, Field, Label, Persona, Spinner, Text } from '@fluentui/react-components';
 import { dialog } from '@microsoft/teams-js';
-import { getConsentSummaries, getDraftNotification, sendDraftNotification } from '../../apis/messageListApi';
+import { getConsentSummaries, getDraftNotification, updateDraftNotification, sendDraftNotification } from '../../apis/messageListApi';
 import { getInitAdaptiveCard, setCardAuthor, setCardBtn, setCardImageLink, setCardSummary, setCardTitle } from '../AdaptiveCard/adaptiveCard';
 import { AvatarShape } from '@fluentui/react-avatar';
 
@@ -28,6 +28,8 @@ export interface IMessageState {
   buttonTitle?: string;
   createdBy?: string;
   isDraftMsgUpdated: boolean;
+  isScheduled?: boolean;
+  scheduledDate?: string;
 }
 
 export interface IConsentState {
@@ -128,16 +130,52 @@ export const SendConfirmationTask = () => {
     }
   };
 
-  const onSendMessage = () => {
+  const onSendMessage = async () => {
     setDisableSendButton(true);
-    console.log(messageState);
-    sendDraftNotification(messageState)
-      .then(() => {
-        dialog.url.submit();
-      })
-      .finally(() => {
-        setDisableSendButton(false);
-      });
+
+    try {
+      const now = new Date();
+      const scheduledDate = messageState.scheduledDate
+        ? new Date(messageState.scheduledDate)
+        : null;
+
+      // Clone messageState to modify before sending/updating
+      const updatedMessage = { ...messageState };
+
+      if (scheduledDate && !messageState.isScheduled) {
+        // Mark as scheduled
+        updatedMessage.isScheduled = true;
+
+        if (scheduledDate > now) {
+          // Future scheduled message ? just update the draft
+          updateDraftNotification(updatedMessage)
+            .then(() => {
+              console.log("Draft updated for future scheduled message.");
+            })
+            .finally(() => {
+              setDisableSendButton(false);
+              dialog.url.submit();
+            });
+        } else {
+          // Past scheduled message ? update draft AND send immediately
+          updateDraftNotification(updatedMessage)
+            .then(() => sendDraftNotification(updatedMessage))
+            .finally(() => {
+              setDisableSendButton(false);
+              dialog.url.submit();
+            });
+        }
+      } else {
+        // Immediate send (no scheduled date or already scheduled)
+        sendDraftNotification(updatedMessage).finally(() => {
+          setDisableSendButton(false);
+          dialog.url.submit();
+        });
+      }
+    } catch (error) {
+      console.error("Error sending message:", error);
+      setDisableSendButton(false);
+    }
   };
 
   const getItemList = (items: string[], secondaryText: string, shape: AvatarShape) => {
