@@ -50,7 +50,7 @@ const SelectUnit = (props: ISelectUnit) => {
     GetUnitAction(dispatch, { id: props });
     setTimeout(() => {
       navigate('/unitmessages');
-    }, 500)
+    }, 500);
   };
 
   const currentUser: IUser = useAppSelector((state: RootState) => state.messages).user.payload;

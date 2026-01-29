@@ -41,7 +41,6 @@ import {
 import { deleteDraftNotification, duplicateDraftNotification, sendPreview } from '../../apis/messageListApi';
 import { formatDate } from '../../i18n';
 
-
 export const ScheduledMessageDetail = (scheduledMessages: any) => {
   const { t } = useTranslation();
   const keyboardNavAttr = useArrowNavigationGroup({ axis: 'grid' });
@@ -129,7 +128,6 @@ export const ScheduledMessageDetail = (scheduledMessages: any) => {
         return error;
       });
   };
-
 
   return (
     <Table {...keyboardNavAttr} role='grid' aria-label='Scheduled messages table with grid keyboard navigation'>

@@ -85,7 +85,6 @@ export const UserHomePage = (props: IHomePage) => {
     GetUnitAction(dispatch, { id: data.optionValue });
   };
 
-
   return (
     <>
       <Header theme={props.theme} />

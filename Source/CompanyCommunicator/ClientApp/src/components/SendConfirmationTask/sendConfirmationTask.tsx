@@ -150,7 +150,7 @@ export const SendConfirmationTask = () => {
           // Future scheduled message ? just update the draft
           updateDraftNotification(updatedMessage)
             .then(() => {
-              console.log("Draft updated for future scheduled message.");
+              console.log('Draft updated for future scheduled message.');
             })
             .finally(() => {
               setDisableSendButton(false);
@@ -159,6 +159,7 @@ export const SendConfirmationTask = () => {
         } else {
           // Past scheduled message ? update draft AND send immediately
           updateDraftNotification(updatedMessage)
+          // eslint-disable-next-line @typescript-eslint/promise-function-async
             .then(() => sendDraftNotification(updatedMessage))
             .finally(() => {
               setDisableSendButton(false);
@@ -173,7 +174,7 @@ export const SendConfirmationTask = () => {
         });
       }
     } catch (error) {
-      console.error("Error sending message:", error);
+      console.error('Error sending message:', error);
       setDisableSendButton(false);
     }
   };
@@ -256,7 +257,11 @@ export const SendConfirmationTask = () => {
           <div className='footer-action-right'>
             <div className='footer-actions-flex'>
               {disableSendButton && <Spinner role='alert' id='sendLoader' label={t('PreparingMessageLabel')} size='small' labelPosition='after' />}
-              <Button disabled={loader || disableSendButton} style={{ marginLeft: '16px' }} onClick={onSendMessage} appearance='primary'>
+              <Button disabled={loader || disableSendButton}
+                style={{ marginLeft: '16px' }}
+                // eslint-disable-next-line @typescript-eslint/no-misused-promises
+                onClick={onSendMessage}
+                appearance='primary'>
                 {t('Send')}
               </Button>
             </div>
