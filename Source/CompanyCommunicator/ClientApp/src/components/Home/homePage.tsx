@@ -49,14 +49,17 @@ export const HomePage = (props: IHomePage) => {
   return (
     <>
       <Header theme={props.theme} />
-      <Button
-        className='cc-button'
-        icon={<AddCircle24Regular />}
-        appearance='primary'
-        onClick={onManageUnit}
-      >
-        Create new unit
-      </Button>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0px 15px' }}>
+        <h2>{currentUnit.name}</h2>
+        <Button
+          className='cc-button'
+          icon={<AddCircle24Regular />}
+          appearance='primary'
+          onClick={onManageUnit}
+        >
+          Create new unit
+        </Button>
+      </div>
       <Accordion defaultOpenItems={['1', '2', '3']} multiple collapsible>
         <AccordionItem value='1' key='unitsKey'>
           <AccordionHeader>List of Units</AccordionHeader>

@@ -29,12 +29,13 @@ export const Header = (props: IHeaderProps) => {
       <div className={props.theme === teamsLightTheme ? 'cc-header-light' : 'cc-header'}>
         <div className='cc-main-left'>
           <Button
-            appearance='subtle'
+            appearance='primary'
             icon={<ArrowLeft24Regular />}
             onClick={handleBack}
             title={t('Back') ?? 'Back'}
             className='cc-back-button'
-          />
+          >Back
+          </Button>
           <img src={customLogo ?? mslogo} alt='Microsoft logo' className='cc-logo' title={customHeaderText} />
           <span className='cc-title' title={customHeaderText}>
             {customHeaderText}
