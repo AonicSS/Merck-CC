@@ -8,7 +8,7 @@ import { Button, Divider, Link, teamsLightTheme, Theme } from '@fluentui/react-c
 import { PersonFeedback24Regular, QuestionCircle24Regular, ArrowLeft24Regular } from '@fluentui/react-icons';
 import mslogo from '../../assets/Images/mslogo.png';
 import customLogo from '../../assets/Images/globePurple.png';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 interface IHeaderProps {
   theme: Theme;
@@ -17,25 +17,29 @@ interface IHeaderProps {
 export const Header = (props: IHeaderProps) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
   const customHeaderText = process.env.REACT_APP_HEADERTEXT ? t(process.env.REACT_APP_HEADERTEXT) : t('CompanyCommunicator');
 
   const handleBack = () => {
-    // Go back one step in history
     navigate('/selectunit');
   };
+
+  const showBackButton = location.pathname !== '/selectunit';
 
   return (
     <>
       <div className={props.theme === teamsLightTheme ? 'cc-header-light' : 'cc-header'}>
         <div className='cc-main-left'>
-          <Button
-            appearance='primary'
-            icon={<ArrowLeft24Regular />}
-            onClick={handleBack}
-            title={t('Back') ?? 'Back'}
-            className='cc-back-button'
-          >Back
-          </Button>
+          {showBackButton && (
+            <Button
+              appearance='primary'
+              icon={<ArrowLeft24Regular />}
+              onClick={handleBack}
+              title={t('Back') ?? 'Back'}
+              className='cc-back-button'
+            >Back
+            </Button>
+          )}
           <img src={customLogo ?? mslogo} alt='Microsoft logo' className='cc-logo' title={customHeaderText} />
           <span className='cc-title' title={customHeaderText}>
             {customHeaderText}
