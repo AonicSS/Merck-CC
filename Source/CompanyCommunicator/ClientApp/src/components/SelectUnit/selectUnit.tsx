@@ -18,33 +18,22 @@ import {
   PeopleAudience24Regular,
 } from '@fluentui/react-icons';
 import { useNavigate } from 'react-router-dom';
-import { GetUnitAction, GetUnitsAction, GetUserAction, GetUserUnitsAction, UpdateUserPermission } from '../../actions';
+import { GetUnitAction, GetUnitsAction, GetUserUnitsAction, UpdateUserPermission } from '../../actions';
 import { app } from '@microsoft/teams-js';
 import { Header } from '../Shared/header';
-import { IUser } from '../../models/user';
 import { IUnit } from '../../models/unit';
+import { getUser, getUserUnits } from '../../apis/messageListApi';
 
 interface ISelectUnit {
   theme: Theme;
 }
 
 const SelectUnit = (props: ISelectUnit) => {
-  const isAdmin: boolean = useAppSelector((state: RootState) => state.messages).isAdmin.payload;
   const keyboardNavAttr = useArrowNavigationGroup({ axis: 'grid' });
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
-  const [userPrincipalName, setUserPrincipalName] = React.useState<string | undefined>(undefined);
-
-  const getUpn = async () => {
-    const ctx = await app.getContext();
-    const upn = ctx.user?.userPrincipalName;
-    setUserPrincipalName(upn);
-  };
-
-  React.useEffect(() => {
-    void getUpn();
-  }, []);
+  const displayUnits: IUnit[] = useAppSelector((state: RootState) => state.messages).units.payload;
 
   const onSelectUnit = (props: string) => {
     GetUnitAction(dispatch, { id: props });
@@ -53,40 +42,39 @@ const SelectUnit = (props: ISelectUnit) => {
     }, 500);
   };
 
-  const currentUser: IUser = useAppSelector((state: RootState) => state.messages).user.payload;
-  const currentUserUnits: IUnit[] = useAppSelector((state: RootState) => state.messages).units.payload;
-  const [unitFetched, setUnitFetched] = React.useState(false);
-
-  // get the current user
   React.useEffect(() => {
-    if (userPrincipalName) {
-      GetUserAction(dispatch, { mail: userPrincipalName });
-    }
-  }, [dispatch, userPrincipalName]);
+    let active = true;
 
-  // get the current users unit
-  React.useEffect(() => {
-    if (currentUser.id.length !== 0) {
-      GetUserUnitsAction(dispatch, { id: currentUser.id });
-      setUnitFetched(true);
-    }
-  }, [dispatch, currentUser]);
+    const loadUnits = async () => {
+      const ctx = await app.getContext();
+      const upn = ctx.user?.userPrincipalName;
+      if (!upn || !active) return;
 
-  // check if current user unit is empty after fetching
-  React.useEffect(() => {
-    if (currentUserUnits && currentUserUnits.length === 0 && unitFetched) {
-      window.location.href = '/requestaccess';
-    } else if (currentUserUnits && currentUserUnits.length !== 0) {
-      const isInAdmin = currentUserUnits.some(unit => unit.name === 'Admin Unit');
-      UpdateUserPermission(dispatch, isInAdmin);
-    }
-  }, [dispatch, currentUserUnits]);
+      const currentUser = await getUser(upn);
+      if (!currentUser?.id || !active) return;
 
-  React.useEffect(() => {
-    if (isAdmin) {
-      GetUnitsAction(dispatch);
-    }
-  }, [isAdmin]);
+      const userUnits: IUnit[] = (await getUserUnits(currentUser.id)) || [];
+      if (!active) return;
+
+      if (userUnits.length === 0) {
+        window.location.href = '/requestaccess';
+        return;
+      }
+
+      const isUserAdmin = userUnits.some(unit => unit.name === 'Admin Unit');
+      UpdateUserPermission(dispatch, isUserAdmin);
+
+      if (isUserAdmin) {
+        GetUnitsAction(dispatch);
+      } else {
+        GetUserUnitsAction(dispatch, { id: currentUser.id });
+      }
+    };
+
+    void loadUnits();
+
+    return () => { active = false; };
+  }, [dispatch]);
 
   return (
     <>
@@ -102,7 +90,7 @@ const SelectUnit = (props: ISelectUnit) => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {currentUserUnits?.map((item: any) => (
+          {displayUnits?.map((item: any) => (
             <TableRow key={item.id}>
               <TableCell tabIndex={0} role='gridcell'>
                 <TableCellLayout
