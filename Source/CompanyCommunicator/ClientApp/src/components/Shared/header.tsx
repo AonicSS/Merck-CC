@@ -18,7 +18,7 @@ export const Header = (props: IHeaderProps) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const customHeaderText = process.env.REACT_APP_HEADERTEXT ? t(process.env.REACT_APP_HEADERTEXT) : t('CompanyCommunicator');
+  const customHeaderText = "MDigital Communicator";
 
   const handleBack = () => {
     navigate('/selectunit');
