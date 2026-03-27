@@ -18,7 +18,7 @@ export const Header = (props: IHeaderProps) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const customHeaderText = "MDigital Communicator";
+  const customHeaderText = 'MDigital Communicator';
 
   const handleBack = () => {
     navigate('/selectunit');
