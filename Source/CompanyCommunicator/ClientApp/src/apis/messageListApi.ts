@@ -5,8 +5,9 @@ import { getBaseUrl } from '../configVariables';
 import { IDeleteMessageRequest } from '../models/deleteMessages';
 import apiCall from './apiDecorator';
 
-let baseAxiosUrl = getBaseUrl() + '/api';
-baseAxiosUrl = baseAxiosUrl.replace(/azurefd/g, 'azurewebsites');
+// API calls go through the same origin the SPA was loaded from (typically Azure Front Door),
+// so the route in Front Door forwards /api/* to the App Service origin.
+const baseAxiosUrl = getBaseUrl() + '/api';
 
 export const getSentNotifications = async (): Promise<any> => {
   const url = baseAxiosUrl + '/sentnotifications';
