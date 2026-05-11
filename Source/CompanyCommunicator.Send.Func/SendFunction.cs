@@ -172,7 +172,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
                     partitionKey: NotificationDataTableNames.SentNotificationsPartition,
                     rowKey: messageContent.NotificationId);
 
-                string unitName = "Mdigital Communicator";
+                string unitName = "DW Communicator";
 
                 if (notificationDataEntity != null)
                 {
