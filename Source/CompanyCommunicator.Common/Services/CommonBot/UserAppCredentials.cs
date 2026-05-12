@@ -23,13 +23,17 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.CommonBot
         public UserAppCredentials(IOptions<BotOptions> botOptions)
             : base(
                   appId: botOptions.Value.UserAppId,
-                  password: botOptions.Value.UserAppPassword,
-                  channelAuthTenant: string.IsNullOrEmpty(botOptions.Value.MicrosoftAppTenantId)
-                      ? null
-                      : botOptions.Value.MicrosoftAppTenantId)
+                  password: botOptions.Value.UserAppPassword)
         {
             botOptions = botOptions ?? throw new ArgumentNullException(nameof(botOptions));
             this.useCertificate = botOptions.Value.UseCertificate;
+
+            // When configured, authenticate against the tenant-specific authority
+            // instead of the multi-tenant botframework.com authority.
+            if (!string.IsNullOrEmpty(botOptions.Value.MicrosoftAppTenantId))
+            {
+                this.ChannelAuthTenant = botOptions.Value.MicrosoftAppTenantId;
+            }
         }
 
         /// <summary>
