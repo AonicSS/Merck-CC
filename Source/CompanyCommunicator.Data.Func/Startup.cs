@@ -65,6 +65,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Data.Func
                    botOptions.GraphAppId = configuration.GetValue<string>("GraphAppId");
                    botOptions.GraphAppCertName = configuration.GetValue<string>("GraphAppCertName", string.Empty);
                    botOptions.UseCertificate = configuration.GetValue<bool>("UseCertificate", false);
+                   botOptions.MicrosoftAppTenantId = configuration.GetValue<string>("MicrosoftAppTenantId", string.Empty);
                });
             builder.Services.AddOptions<CleanUpFileOptions>()
                .Configure<IConfiguration>((cleanUpFileOptions, configuration) =>

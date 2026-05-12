@@ -35,11 +35,17 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.CommonBot
         {
             botOptions = botOptions ?? throw new ArgumentNullException(nameof(botOptions));
             this.credentials = new Dictionary<string, ServiceClientCredentialsFactory>();
+
+            // When MicrosoftAppTenantId is configured, the bots authenticate against the
+            // tenant-specific authority (single-tenant flow). When empty, the multi-tenant
+            // botframework.com authority is used.
+            var tenantId = botOptions.Value.MicrosoftAppTenantId ?? string.Empty;
+
             if (!string.IsNullOrEmpty(botOptions.Value.UserAppId))
             {
                 var appId = botOptions.Value.UserAppId;
                 var password = botOptions.Value.UserAppPassword;
-                var credFactory = new PasswordServiceClientCredentialFactory(appId, password, string.Empty, null, null);
+                var credFactory = new PasswordServiceClientCredentialFactory(appId, password, tenantId, null, null);
                 this.credentials.Add(appId, credFactory);
             }
 
@@ -47,7 +53,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.CommonBot
             {
                 var appId = botOptions.Value.AuthorAppId;
                 var password = botOptions.Value.AuthorAppPassword;
-                var credFactory = new PasswordServiceClientCredentialFactory(appId, password, string.Empty, null, null);
+                var credFactory = new PasswordServiceClientCredentialFactory(appId, password, tenantId, null, null);
                 this.credentials.Add(appId, credFactory);
             }
 

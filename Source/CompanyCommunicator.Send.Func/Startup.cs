@@ -60,6 +60,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
                     botOptions.GraphAppId = configuration.GetValue<string>("GraphAppId");
                     botOptions.GraphAppCertName = configuration.GetValue<string>("GraphAppCertName", string.Empty);
                     botOptions.UseCertificate = configuration.GetValue<bool>("UseCertificate", false);
+                    botOptions.MicrosoftAppTenantId = configuration.GetValue<string>("MicrosoftAppTenantId", string.Empty);
                 });
             builder.Services.AddOptions<RepositoryOptions>()
                 .Configure<IConfiguration>((repositoryOptions, configuration) =>

@@ -36,6 +36,13 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.CommonBot
         public string GraphAppId { get; set; }
 
         /// <summary>
+        /// Gets or sets the AAD tenant ID used for outbound bot authentication.
+        /// When set, bots authenticate against the tenant-specific authority
+        /// (single-tenant bot model). When null or empty, the multi-tenant flow is used.
+        /// </summary>
+        public string MicrosoftAppTenantId { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether to use certificates.
         /// </summary>
         public bool UseCertificate { get; set; }
