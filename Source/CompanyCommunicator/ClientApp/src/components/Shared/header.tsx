@@ -18,7 +18,7 @@ export const Header = (props: IHeaderProps) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const customHeaderText = 'DW Communicator';
+  const customHeaderText = 'Electronics Communication';
 
   const handleBack = () => {
     navigate('/selectunit');
